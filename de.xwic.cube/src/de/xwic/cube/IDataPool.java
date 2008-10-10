@@ -98,4 +98,16 @@ public interface IDataPool extends IIdentifyable {
 	 */
 	public abstract boolean containsMeasure(String key);
 
+	/**
+	 * Persist the DataPool. 
+	 * @throws StorageException
+	 */
+	public abstract void save() throws StorageException;
+
+	/**
+	 * Delete the DataPool (both from memory and the underlying storage).
+	 * @throws StorageException
+	 */
+	public abstract void delete() throws StorageException;
+	
 }

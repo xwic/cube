@@ -14,8 +14,8 @@ public abstract class DataPoolManagerFactory {
 	 * R
 	 * @return
 	 */
-	public static IDataPoolManager createDataPoolManager() {
-		return new DataPoolManager();
+	public static IDataPoolManager createDataPoolManager(IDataPoolStorageProvider storageProvider) {
+		return new DataPoolManager(storageProvider);
 	}
 	
 }
