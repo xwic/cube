@@ -3,6 +3,9 @@
  */
 package de.xwic.cube;
 
+import java.io.File;
+
+import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.cube.util.DataDump;
 
 
@@ -13,11 +16,17 @@ public class Demo {
 
 	/**
 	 * @param args
+	 * @throws StorageException 
 	 */
 	@SuppressWarnings("unused")
-	public static void main(String[] args) {
+	public static void main(String[] args) throws StorageException {
 		
-		IDataPoolManager dataPoolManager = DataPoolManagerFactory.createDataPoolManager();
+		File dataDir = new File("data");
+		if (!dataDir.exists()) {
+			dataDir.mkdirs();
+		}
+		IDataPoolStorageProvider storageProvider = new FileDataPoolStorageProvider(dataDir);
+		IDataPoolManager dataPoolManager = DataPoolManagerFactory.createDataPoolManager(storageProvider);
 		
 		IDataPool dataPool = dataPoolManager.createDataPool("demo");
 		
@@ -77,6 +86,9 @@ public class Demo {
 		System.out.println(value);
 		
 		DataDump.printValues(System.out, cube, dimGEO, dimLOB, mePLAN);
+		
+		dataPool.save();
+		
 	}
 
 }

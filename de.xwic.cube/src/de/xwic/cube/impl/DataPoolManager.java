@@ -5,6 +5,8 @@ import java.util.Map;
 
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDataPoolManager;
+import de.xwic.cube.IDataPoolStorageProvider;
+import de.xwic.cube.StorageException;
 
 /**
  * Manages all pool instances.
@@ -14,10 +16,20 @@ import de.xwic.cube.IDataPoolManager;
 public class DataPoolManager implements IDataPoolManager {
 
 	private String id = null;
-	private Map<String, DataPool> poolMap = new HashMap<String, DataPool>();
+	private Map<String, IDataPool> poolMap = new HashMap<String, IDataPool>();
+	private final IDataPoolStorageProvider storageProvider;
 	
 	
 	
+	/**
+	 * @param storageProvider
+	 */
+	public DataPoolManager(IDataPoolStorageProvider storageProvider) {
+		this.storageProvider = storageProvider;
+	}
+
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -60,7 +72,7 @@ public class DataPoolManager implements IDataPoolManager {
 		if (poolMap.containsKey(key)) {
 			throw new IllegalArgumentException("A DataPool with that key already exists. (" + key + ")");
 		}
-		DataPool pool = new DataPool(this, key);
+		IDataPool pool = new DataPool(this, key);
 		poolMap.put(key, pool);
 		return pool;
 	}
@@ -69,9 +81,48 @@ public class DataPoolManager implements IDataPoolManager {
 
 	/**
 	 * @param dataPool
+	 * @throws StorageException 
 	 */
-	public void saveDataPool(DataPool dataPool) {
-		// TODO Auto-generated method stub
+	public void saveDataPool(IDataPool dataPool) throws StorageException {
+		storageProvider.saveDataPool(dataPool);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDataPoolManager#getDataPool(java.lang.String)
+	 */
+	public synchronized IDataPool getDataPool(String key) throws StorageException {
+		if (poolMap.containsKey(key)) {
+			return poolMap.get(key);
+		} else {
+			if (storageProvider.containsDataPool(key)) {
+				IDataPool pool = storageProvider.loadDataPool(key);
+				poolMap.put(key, pool);
+				return pool;
+			}
+		}
+		throw new IllegalArgumentException("A DataPool with that key does not exist.");
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDataPoolManager#releaseDataPool(de.xwic.cube.IDataPool)
+	 */
+	public void releaseDataPool(IDataPool pool) {
+		poolMap.remove(pool.getKey());
+	}
+
+
+
+	/**
+	 * @param dataPool
+	 */
+	public void deleteDataPool(IDataPool dataPool) {
+		
+		releaseDataPool(dataPool);
+		storageProvider.deleteDataPool(dataPool.getKey());
 		
 	}
 	

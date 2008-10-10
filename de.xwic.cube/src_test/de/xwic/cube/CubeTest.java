@@ -3,7 +3,10 @@
  */
 package de.xwic.cube;
 
+import java.io.File;
+
 import junit.framework.TestCase;
+import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.cube.util.DataDump;
 
 /**
@@ -16,6 +19,8 @@ public class CubeTest extends TestCase {
 	private IDimension dimOT;
 	private IDimension dimLOB;
 	private IDimension dimTime;
+	private IDataPool pool;
+	private IDataPoolManager manager;
 	
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -23,9 +28,13 @@ public class CubeTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		
-		IDataPoolManager manager = DataPoolManagerFactory.createDataPoolManager();
-		IDataPool pool = manager.createDataPool("test");
-		
+		File dataDir = new File("data");
+		if (!dataDir.exists()) {
+			dataDir.mkdirs();
+		}
+		IDataPoolStorageProvider storageProvider = new FileDataPoolStorageProvider(dataDir);
+		manager = DataPoolManagerFactory.createDataPoolManager(storageProvider);
+		pool = manager.createDataPool("test");
 		dimOT = pool.createDimension("OrderType");
 		dimOT.createDimensionElement("AOO");	
 		dimOT.createDimensionElement("COO");
@@ -145,4 +154,5 @@ public class CubeTest extends TestCase {
 
 	}
 
+	
 }

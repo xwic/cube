@@ -14,6 +14,7 @@ import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDataPoolManager;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.StorageException;
 
 /**
  * @author Florian Lippisch
@@ -228,9 +229,18 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	
 	/**
 	 * Store the DataPool. 
+	 * @throws StorageException 
 	 */
-	public void save() {
+	public void save() throws StorageException {
 		dataPoolManager.saveDataPool(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDataPool#delete()
+	 */
+	public void delete() throws StorageException {
+		dataPoolManager.deleteDataPool(this);
+		
 	}
 	
 }
