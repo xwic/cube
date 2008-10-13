@@ -126,4 +126,11 @@ public class DataPoolManager implements IDataPoolManager {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDataPoolManager#containsDataPool(java.lang.String)
+	 */
+	public boolean containsDataPool(String key) throws StorageException {
+		return poolMap.containsKey(key) || storageProvider.containsDataPool(key);
+	}
+	
 }
