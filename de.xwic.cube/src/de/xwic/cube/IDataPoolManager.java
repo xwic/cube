@@ -31,6 +31,14 @@ public interface IDataPoolManager {
 	 * @throws StorageException 
 	 */
 	public abstract IDataPool getDataPool(String key) throws StorageException;
+
+	/**
+	 * Returns true if a DataPool with that key exists.
+	 * @param poolkeyAmis
+	 * @return
+	 * @throws StorageException 
+	 */
+	public abstract boolean containsDataPool(String poolkeyAmis) throws StorageException;
 	
 
 }
