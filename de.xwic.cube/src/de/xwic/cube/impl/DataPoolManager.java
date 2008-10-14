@@ -97,8 +97,9 @@ public class DataPoolManager implements IDataPoolManager {
 			return poolMap.get(key);
 		} else {
 			if (storageProvider.containsDataPool(key)) {
-				IDataPool pool = storageProvider.loadDataPool(key);
+				DataPool pool = (DataPool)storageProvider.loadDataPool(key);
 				poolMap.put(key, pool);
+				pool.setDataPoolManager(this);
 				return pool;
 			}
 		}
