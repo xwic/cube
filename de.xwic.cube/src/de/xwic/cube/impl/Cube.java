@@ -287,4 +287,18 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	public Double getCellValue(String keyString, IMeasure measure) {
 		return getCellValue(createKey(keyString), measure);
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#getDimensionIndex(de.xwic.cube.IDimension)
+	 */
+	public int getDimensionIndex(IDimension dimVert) {
+		int idx = 0;
+		for (IDimension dim : dimensionMap.values()) {
+			if (dim.equals(dimVert)) {
+				return idx;
+			}
+			idx++;
+		}
+		throw new IllegalArgumentException("The specified dimension is not used in this cube.");
+	}
 }

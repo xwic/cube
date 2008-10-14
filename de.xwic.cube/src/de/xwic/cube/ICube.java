@@ -81,4 +81,11 @@ public interface ICube extends IIdentifyable {
 	 */
 	public abstract void reset();
 
+	/**
+	 * Returns the key index position for this dimension.
+	 * @param dimVert
+	 * @return
+	 */
+	public abstract int getDimensionIndex(IDimension dimVert);
+
 }

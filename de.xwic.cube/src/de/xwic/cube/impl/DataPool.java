@@ -186,10 +186,10 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
+//		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result
-				+ ((dataPoolManager == null) ? 0 : dataPoolManager.hashCode());
+//		result = prime * result
+//				+ ((dataPoolManager == null) ? 0 : dataPoolManager.hashCode());
 		return result;
 	}
 
@@ -204,12 +204,12 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		final DataPool other = (DataPool) obj;
-		if (dataPoolManager == null) {
-			if (other.dataPoolManager != null)
-				return false;
-		} else if (!dataPoolManager.equals(other.dataPoolManager))
-			return false;
+//		final DataPool other = (DataPool) obj;
+//		if (dataPoolManager == null) {
+//			if (other.dataPoolManager != null)
+//				return false;
+//		} else if (!dataPoolManager.equals(other.dataPoolManager))
+//			return false;
 		return true;
 	}
 
