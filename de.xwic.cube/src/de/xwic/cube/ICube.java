@@ -35,6 +35,11 @@ public interface ICube extends IIdentifyable {
 	 * Create a Key from a string notation. The key string must contain a [] pair for
 	 * each dimension in the cube. If the dimension key is not present in the key pair, 
 	 * the dimension at the index position is assumed.
+	 * </p>
+	 * Some examples:
+	 * <ul>
+	 * <li>[GEO:EMEA/Germany][Time:2009/Q1/Apr]
+	 * </ul>
 	 * 
 	 * @param key
 	 * @return
