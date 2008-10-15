@@ -9,6 +9,7 @@ package de.xwic.cube.webui.util;
 public class TableCell {
 
 	private String content = null;
+	private String cssClass = null;
 	
 	/**
 	 * @param content
@@ -36,6 +37,20 @@ public class TableCell {
 	 */
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	/**
+	 * @return the cssClass
+	 */
+	public String getCssClass() {
+		return cssClass;
+	}
+
+	/**
+	 * @param cssClass the cssClass to set
+	 */
+	public void setCssClass(String cssClass) {
+		this.cssClass = cssClass;
 	}
 	
 }

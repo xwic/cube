@@ -13,19 +13,25 @@ import java.util.List;
  */
 public class TableRenderer {
 
+	private List<Object> columnData = new ArrayList<Object>();
+	private List<Object> rowData = new ArrayList<Object>();
+	
 	private List<List<TableCell>> rows = new ArrayList<List<TableCell>>();
 	
-	private int row = 0;
-	private int col = 0;
+	private String cssClass = "";
 	
 	public void render(PrintWriter out) {
 		
-		out.println("<TABLE border=1>");
+		out.println("<TABLE cellspacing=0 cellpadding=0 class=\"" + cssClass + "\">");
 		for (List<TableCell> row : rows) {
 			out.println("<TR>");
 			for (TableCell cell : row) {
-				out.print("<TD>");
-				out.print(cell.getContent() != null ? cell.getContent() : "");
+				out.print("<TD");
+				if (cell.getCssClass() != null) {
+					out.print(" class=\"" + cell.getCssClass() + "\"");
+				}
+				out.print(">");
+				out.print(cell.getContent() != null ? cell.getContent() : "&nbsp;");
 				out.print("</TD>");
 			}
 			out.println("</TR>");
@@ -34,24 +40,100 @@ public class TableRenderer {
 	}
 
 	/**
-	 * @param string
+	 * @param i
+	 * @param j
 	 */
-	public void append(String content) {
-	
-		while (rows.size() <= row) {
-			rows.add(new ArrayList<TableCell>());
+	public void initSize(int rowCount, int colCount) {
+		
+		rows.clear();
+		rowData.clear();
+		columnData.clear();
+		for (int i = 0; i < rowCount; i++) {
+			List<TableCell> cells = new ArrayList<TableCell>();
+			rows.add(cells);
+			for (int c = 0; c < colCount; c++) {
+				cells.add(new TableCell());
+			}
+			rowData.add("");
 		}
-		List<TableCell> cells = rows.get(row);
-		cells.add(new TableCell(content));
+		
+		for (int c = 0; c < colCount; c++) {
+			columnData.add("");
+		}
+		
+	}
+	
+	/**
+	 * Returns the cell at the specified position.
+	 * @param row
+	 * @param col
+	 * @return
+	 */
+	public TableCell getCell(int row, int col) {
+		if (rows.size() > row) {
+			List<TableCell> cells = rows.get(row);
+			if (cells.size() > col) {
+				return cells.get(col);
+			}
+			throw new IndexOutOfBoundsException("Column index out of range.");
+		}
+		throw new IndexOutOfBoundsException("Row index out of range.");
+	}
+	
+	/**
+	 * Set a column ID.
+	 * @param col
+	 * @param data
+	 */
+	public void setColumnData(int col, Object data) {
+		if (columnData.size() < col) {
+			throw new IndexOutOfBoundsException("Column index out of range");
+		}
+		columnData.set(col, data);
+	}
+	
+	/**
+	 * Set the row id.
+	 * @param row
+	 * @param data
+	 */
+	public void setRowData(int row, Object data) {
+		if (rowData.size() < row) {
+			throw new IndexOutOfBoundsException("Row index out of range");
+		}
+		rowData.set(row, data);
+	}
+	
+	/**
+	 * Returns the custom Id for that column.
+	 * @param col
+	 * @return
+	 */
+	public Object getColumnData(int col) {
+		return columnData.get(col);
+	}
+	
+	/**
+	 * Returns the custom Id for that row.
+	 * @param row
+	 * @return
+	 */
+	public Object getRowData(int row) {
+		return rowData.get(row);
 	}
 
 	/**
-	 * 
+	 * @return the cssClass
 	 */
-	public void newRow() {
-		row++;
-		col = 0;
-		
+	public String getCssClass() {
+		return cssClass;
+	}
+
+	/**
+	 * @param cssClass the cssClass to set
+	 */
+	public void setCssClass(String cssClass) {
+		this.cssClass = cssClass;
 	}
 	
 }
