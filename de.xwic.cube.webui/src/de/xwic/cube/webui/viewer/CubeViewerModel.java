@@ -5,8 +5,10 @@ package de.xwic.cube.webui.viewer;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
@@ -25,6 +27,8 @@ public class CubeViewerModel {
 	private IMeasure measure = null;
 	private List<INavigationProvider> rowProvider = new ArrayList<INavigationProvider>();
 	private List<INavigationProvider> columnProvider = new ArrayList<INavigationProvider>();
+	
+	private Set<String> expandedElements = new HashSet<String>(); 
 	
 	private NumberFormat numberFormat;
 	
@@ -134,6 +138,32 @@ public class CubeViewerModel {
 	 */
 	public int getDimensionIndex(IDimension dimVert) {
 		return cube.getDimensionIndex(dimVert);
+	}
+
+
+	/**
+	 * Returns true if the specified element is expanded.
+	 * @param elementId
+	 * @return
+	 */
+	public boolean isExpanded(String elementId) {
+		return expandedElements.contains(elementId);
+	}
+	
+	/**
+	 * Expand an element.
+	 * @param elementId
+	 */
+	public void expand(String elementId) {
+		expandedElements.add(elementId);
+	}
+
+	/**
+	 * Collapse an element.
+	 * @param elementId
+	 */
+	public void collapse(String elementId) {
+		expandedElements.remove(elementId);
 	}
 	
 }
