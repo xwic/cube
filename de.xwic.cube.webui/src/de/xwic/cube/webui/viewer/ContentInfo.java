@@ -16,7 +16,7 @@ public class ContentInfo {
 	private List<IDimensionElement> elements = new ArrayList<IDimensionElement>();
 	private Object userData = null;
 	private ICubeDataProvider cubeDataProvider = null;
-	
+	private int level = 0;
 	
 	
 	/**
@@ -70,6 +70,20 @@ public class ContentInfo {
 	 */
 	public void setCubeDataProvider(ICubeDataProvider cubeDataProvider) {
 		this.cubeDataProvider = cubeDataProvider;
+	}
+
+	/**
+	 * @return the level
+	 */
+	public int getLevel() {
+		return level;
+	}
+
+	/**
+	 * @param level the level to set
+	 */
+	public void setLevel(int level) {
+		this.level = level;
 	}
 	
 }
