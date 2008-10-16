@@ -10,6 +10,7 @@ public class TableCell {
 
 	private String content = null;
 	private String cssClass = null;
+	private int colSpan = 1;
 	
 	/**
 	 * @param content
@@ -35,8 +36,9 @@ public class TableCell {
 	/**
 	 * @param content the content to set
 	 */
-	public void setContent(String content) {
+	public TableCell setContent(String content) {
 		this.content = content;
+		return this;
 	}
 
 	/**
@@ -49,8 +51,24 @@ public class TableCell {
 	/**
 	 * @param cssClass the cssClass to set
 	 */
-	public void setCssClass(String cssClass) {
+	public TableCell setCssClass(String cssClass) {
 		this.cssClass = cssClass;
+		return this;
+	}
+
+	/**
+	 * @return the colSpan
+	 */
+	public int getColSpan() {
+		return colSpan;
+	}
+
+	/**
+	 * @param colSpan the colSpan to set
+	 */
+	public TableCell setColSpan(int colSpan) {
+		this.colSpan = colSpan;
+		return this;
 	}
 	
 }

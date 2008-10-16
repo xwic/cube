@@ -25,14 +25,23 @@ public class TableRenderer {
 		out.println("<TABLE cellspacing=0 cellpadding=0 class=\"" + cssClass + "\">");
 		for (List<TableCell> row : rows) {
 			out.println("<TR>");
+			int skip = 0;
 			for (TableCell cell : row) {
-				out.print("<TD");
-				if (cell.getCssClass() != null) {
-					out.print(" class=\"" + cell.getCssClass() + "\"");
+				if (skip > 0) {
+					skip--;
+				} else {
+					out.print("<TD");
+					if (cell.getCssClass() != null) {
+						out.print(" class=\"" + cell.getCssClass() + "\"");
+					}
+					if (cell.getColSpan() > 1) {
+						out.print(" colspan=\"" + cell.getColSpan() + "\"");
+					}
+					out.print(">");
+					out.print(cell.getContent() != null ? cell.getContent() : "&nbsp;");
+					out.print("</TD>");
+					skip = cell.getColSpan() - 1;
 				}
-				out.print(">");
-				out.print(cell.getContent() != null ? cell.getContent() : "&nbsp;");
-				out.print("</TD>");
 			}
 			out.println("</TR>");
 		}
@@ -75,7 +84,7 @@ public class TableRenderer {
 			if (cells.size() > col) {
 				return cells.get(col);
 			}
-			throw new IndexOutOfBoundsException("Column index out of range.");
+			throw new IndexOutOfBoundsException("Column index out of range. (" + col + " of " + cells.size() + ")");
 		}
 		throw new IndexOutOfBoundsException("Row index out of range.");
 	}
