@@ -143,7 +143,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 				
 				TableCell cell = tbl.getCell(rowIdx, colIdx);
 				cell.setContent(dataProvider.getCellData(model, ciRow, ciCol));
-				cell.setCssClass("xcube-data");
+				cell.setCssClass("xcube-data xcube-data-vlvl-" + ciRow.getLevel() + " xcube-data-hlvl-" + ciCol.getLevel());
 			}
 		}
 		
@@ -177,6 +177,8 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 			int titleRow = row;
 			int titleCol = col;
 			int items = 1;
+			ContentInfo contentInfo = elm.getContentInfo();
+			contentInfo.setLevel(level);
 			if (expanded) {
 				Align align = horizontal ? columnTotalAlign : rowTotalAlign;
 				int startIndent = !elm.hideTotal() && (align == Align.BEGIN) ? 1 : 0;
@@ -196,14 +198,14 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 					int stRow = row + (horizontal ? subSize.depth : (align == Align.BEGIN ? 0 : subSize.cells));
 					int stCol = col + (horizontal ? (align == Align.BEGIN ? 0 : subSize.cells) : subSize.depth);
 					if (horizontal) {
-						tbl.setColumnData(stCol, elm.getContentInfo());
+						tbl.setColumnData(stCol, contentInfo);
 						for (int r = row + 1; r <= stRow; r++) {
-							tbl.getCell(r, stCol).setCssClass("xcube-hl-" + level);
+							tbl.getCell(r, stCol).setCssClass("xcube-hl-" + level + " xcube-hor-end");
 							
 						}
 						titleCol = stCol;
 					} else {
-						tbl.setRowData(stRow, elm.getContentInfo());
+						tbl.setRowData(stRow, contentInfo);
 						for (int c = col + 1; c <= stCol; c++) {
 							tbl.getCell(stRow, c).setCssClass("xcube-hl-" + level);
 						}
@@ -213,9 +215,13 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 				}
 			} else {
 				if (horizontal) {
-					tbl.setColumnData(col, elm.getContentInfo());
+					tbl.setColumnData(col, contentInfo);
+					for (int r = row + 1; r <= totalSize.depth; r++) {
+						tbl.getCell(r, col).setCssClass("xcube-hl-" + level + " xcube-hor-end");
+						
+					}
 				} else {
-					tbl.setRowData(row, elm.getContentInfo());
+					tbl.setRowData(row, contentInfo);
 				}
 			}
 			
@@ -223,7 +229,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 			totalItems += items;
 			if (horizontal) {
 				for (int c = 0; c < items; c++) {
-					tbl.getCell(row, col + c).setCssClass("xcube-hl-" + level);
+					tbl.getCell(row, col + c).setCssClass("xcube-hl-" + level + " xcube-hor-span");
 				}
 				col += items;
 			} else {
@@ -247,7 +253,10 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 				sb.append("<span class=\"xcube-title\">").append(elm.getTitle()).append("</span>");
 			}
 			cell.setContent(sb.toString());
-			cell.setCssClass("xcube-hl-" + level);
+			cell.setCssClass("xcube-hl-" + level + " xcube-" +
+					(horizontal ? "hor" : (rowTotalAlign == Align.BEGIN ? "ver" : "verBt")) + 
+					"-end");
+			
 			if (horizontal) {
 				if (columnTotalAlign == Align.BEGIN) {
 					cell.setColSpan(items);
