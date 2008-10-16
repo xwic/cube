@@ -63,11 +63,11 @@ public class TableRenderer {
 			for (int c = 0; c < colCount; c++) {
 				cells.add(new TableCell());
 			}
-			rowData.add("");
+			rowData.add(null);
 		}
 		
 		for (int c = 0; c < colCount; c++) {
-			columnData.add("");
+			columnData.add(null);
 		}
 		
 	}

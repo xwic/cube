@@ -19,6 +19,11 @@ public class ContentInfo {
 	private int level = 0;
 	
 	
+	public ContentInfo(ICubeDataProvider cubeDataProvider) {
+		super();
+		this.cubeDataProvider = cubeDataProvider;
+	}
+	
 	/**
 	 * @param element 
 	 * @param contentProvider
