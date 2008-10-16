@@ -122,6 +122,29 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	}
 
 	/**
+	 * Add a value to the existing value in the specified cell.
+	 * @param key
+	 * @param measure
+	 * @param value
+	 * @return
+	 */
+	public int addCellValue(Key key, IMeasure measure, double value) {
+		
+		if (!allowSplash && !key.containsLeafsOnly()) {
+			// splash not implemented yet.
+			throw new IllegalArgumentException("The key must contain only leafs.");
+		}
+		
+		ICell cell = getCell(key, true);
+		
+		Double oldValue = cell.getValue(measure);
+		double newValue = (oldValue != null ? value + oldValue.doubleValue() : value);
+
+		return splashAndWriteValue(0, key, measure, newValue);
+		
+	}
+
+	/**
 	 * @param key
 	 * @param measure
 	 * @param value
