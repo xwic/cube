@@ -55,6 +55,15 @@ public interface ICube extends IIdentifyable {
 	public abstract ICell getCell(Key key);
 
 	/**
+	 * Add a value to the existing value in the specified cell.
+	 * @param key
+	 * @param measure
+	 * @param value
+	 * @return
+	 */
+	public int addCellValue(Key key, IMeasure measure, double value);
+	
+	/**
 	 * Write the value into the cube.
 	 * NOTE: This method is not thread safe and must be synchronized externally
 	 * if the cube is modified in different threads.
