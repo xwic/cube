@@ -137,13 +137,17 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 				ContentInfo ciRow = (ContentInfo) tbl.getRowData(rowIdx);
 				ContentInfo ciCol = (ContentInfo) tbl.getColumnData(colIdx);
 				
-				ICubeDataProvider dataProvider = ciRow.getCubeDataProvider().getPriority() > ciCol.getCubeDataProvider().getPriority() ?
-						ciRow.getCubeDataProvider() :
-						ciCol.getCubeDataProvider();
-				
 				TableCell cell = tbl.getCell(rowIdx, colIdx);
-				cell.setContent(dataProvider.getCellData(model, ciRow, ciCol));
-				cell.setCssClass("xcube-data xcube-data-vlvl-" + ciRow.getLevel() + " xcube-data-hlvl-" + ciCol.getLevel());
+				if (ciCol != null && ciRow != null) {
+					ICubeDataProvider dataProvider = ciRow.getCubeDataProvider().getPriority() > ciCol.getCubeDataProvider().getPriority() ?
+							ciRow.getCubeDataProvider() :
+							ciCol.getCubeDataProvider();
+					
+					cell.setContent(dataProvider.getCellData(model, ciRow, ciCol));
+					cell.setCssClass("xcube-data xcube-data-vlvl-" + ciRow.getLevel() + " xcube-data-hlvl-" + ciCol.getLevel());
+				} else {
+					cell.setContent("NoCI");
+				}
 			}
 		}
 		
