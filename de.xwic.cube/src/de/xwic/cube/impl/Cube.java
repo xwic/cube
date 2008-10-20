@@ -117,6 +117,10 @@ public class Cube extends Identifyable implements ICube, Serializable {
 			throw new IllegalArgumentException("The key must contain only leafs.");
 		}
 		
+		if (measure.isFunction()) {
+			throw new IllegalArgumentException("The specified measure is a function. Functional measures can not hold data.");
+		}
+		
 		return splashAndWriteValue(0, key, measure, value);
 		
 	}
@@ -219,6 +223,9 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	 */
 	public Double getCellValue(Key key, IMeasure measure) {
 		ICell cell = getCell(key);
+		if (measure.isFunction()) {
+			return measure.getFunction().computeValue(key, cell, measure);
+		} 
 		if (cell != null) {
 			return cell.getValue(measure);
 		}
