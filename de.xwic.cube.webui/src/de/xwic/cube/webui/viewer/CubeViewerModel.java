@@ -111,6 +111,7 @@ public class CubeViewerModel {
 	 */
 	public void setMeasure(IMeasure measure) {
 		this.measure = measure;
+		fireEvent(EventType.FILTER_UPDATE, new CubeViewerModelEvent(this));
 	}
 
 	/**
