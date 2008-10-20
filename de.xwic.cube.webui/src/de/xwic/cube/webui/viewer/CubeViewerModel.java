@@ -3,7 +3,6 @@
  */
 package de.xwic.cube.webui.viewer;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +15,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.IValueFormat;
 import de.xwic.cube.Key;
 
 /**
@@ -36,19 +36,20 @@ public class CubeViewerModel {
 	
 	private Set<String> expandedElements = new HashSet<String>(); 
 	
-	private NumberFormat numberFormat;
+	private IValueFormat valueFormat;
 	private Key baseKey = null;
 	
 	private List<ICubeViewerModelListener> listeners = new ArrayList<ICubeViewerModelListener>();
+
+	private final Locale locale;
 	
 	/**
 	 * Constructor.
 	 * @param locale
 	 */
 	public CubeViewerModel(Locale locale) {
-		numberFormat = NumberFormat.getNumberInstance(locale);
-		numberFormat.setMinimumFractionDigits(2);
-		numberFormat.setMaximumFractionDigits(2);
+		this.locale = locale;
+		
 	}
 	
 	/**
@@ -112,6 +113,7 @@ public class CubeViewerModel {
 	public void setMeasure(IMeasure measure) {
 		this.measure = measure;
 		fireEvent(EventType.FILTER_UPDATE, new CubeViewerModelEvent(this));
+		valueFormat = measure.getValueFormatProvider().createValueFormat(locale);
 	}
 
 	/**
@@ -139,18 +141,9 @@ public class CubeViewerModel {
 	/**
 	 * @return the numberFormat
 	 */
-	public NumberFormat getNumberFormat() {
-		return numberFormat;
+	public IValueFormat getValueFormat() {
+		return valueFormat;
 	}
-
-
-	/**
-	 * @param numberFormat the numberFormat to set
-	 */
-	public void setNumberFormat(NumberFormat numberFormat) {
-		this.numberFormat = numberFormat;
-	}
-
 
 	/**
 	 * @param navigationProvider

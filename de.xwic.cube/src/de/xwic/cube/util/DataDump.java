@@ -5,11 +5,13 @@ package de.xwic.cube.util;
 
 import java.io.PrintStream;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.IValueFormat;
 
 /**
  * @author Florian Lippisch
@@ -51,9 +53,6 @@ public class DataDump {
 
 	public static void printValues(PrintStream out, ICube cube, IDimension vertical, IDimension horizontal, IMeasure measure) {
 		
-		NumberFormat nf = NumberFormat.getInstance();
-		nf.setMaximumFractionDigits(2);
-		
 		// print header
 		out.print(space(20));
 		for (IDimensionElement elm : horizontal.getDimensionElements()) {
@@ -63,7 +62,7 @@ public class DataDump {
 		out.print(fixedString("Total", 10));
 		out.println("");
 		
-		printValueLine(out, nf, cube, vertical, horizontal, 0, measure);
+		printValueLine(out, cube, vertical, horizontal, 0, measure);
 		
 		//out.print(fixedString("Total", 20));
 
@@ -80,10 +79,12 @@ public class DataDump {
 	 * @param i
 	 * @param key
 	 */
-	private static void printValueLine(PrintStream out, NumberFormat nf, ICube cube, IDimensionElement verticalElm, IDimension horizontal, int idx, IMeasure measure) {
+	private static void printValueLine(PrintStream out, ICube cube, IDimensionElement verticalElm, IDimension horizontal, int idx, IMeasure measure) {
 		
 		out.print(space(idx * 2));
 		out.print(fixedString(verticalElm.getKey(), 20 - (idx * 2)));
+		
+		IValueFormat nf = measure.getValueFormatProvider().createValueFormat(Locale.getDefault());
 		
 		for (IDimensionElement elm : horizontal.getDimensionElements()) {
 			
@@ -99,7 +100,7 @@ public class DataDump {
 		if (!verticalElm.isLeaf()) {
 			idx++;
 			for (IDimensionElement elm : verticalElm.getDimensionElements()) {
-				printValueLine(out, nf, cube, elm, horizontal, idx, measure);
+				printValueLine(out, cube, elm, horizontal, idx, measure);
 			}
 		}
 		

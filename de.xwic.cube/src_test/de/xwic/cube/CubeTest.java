@@ -6,6 +6,8 @@ package de.xwic.cube;
 import java.io.File;
 
 import junit.framework.TestCase;
+import de.xwic.cube.formatter.PercentageValueFormatProvider;
+import de.xwic.cube.functions.DifferenceFunction;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.cube.util.DataDump;
 
@@ -16,6 +18,8 @@ public class CubeTest extends TestCase {
 
 	ICube cube = null;
 	private IMeasure meBookings;
+	private IMeasure mePlan;
+	private IMeasure meDiff;
 	private IDimension dimOT;
 	private IDimension dimLOB;
 	private IDimension dimTime;
@@ -62,6 +66,13 @@ public class CubeTest extends TestCase {
 		deQ2.createDimensionElement("Jun");
 		
 		meBookings = pool.createMeasure("Bookings");
+		mePlan = pool.createMeasure("Plan");
+		meDiff = pool.createMeasure("Diff");
+
+		DifferenceFunction function = new DifferenceFunction(meBookings, mePlan, true); 
+		meDiff.setFunction(function);
+		meDiff.setValueFormatProvider(new PercentageValueFormatProvider());
+		
 		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings });
 		
 	}
@@ -123,6 +134,57 @@ public class CubeTest extends TestCase {
 		assertEquals(470.0, cube.getCellValue("", meBookings));
 
 		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
+		
+	}
+	
+	public void testMeasureFunction() {
+		Key key = cube.createKey("[AOO][Hardware][2008/Q1/Jan]");
+		cube.setCellValue(key, meBookings, 100.0);
+
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Feb]");
+		cube.setCellValue(key, meBookings, 40.0);
+
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Mar]");
+		cube.setCellValue(key, meBookings, 80.0);
+		
+		key = cube.createKey("[AOO][PS/Consulting][2008/Q1/Feb]");
+		cube.setCellValue(key, meBookings, 50.0);
+
+		key = cube.createKey("[COO][PS/Consulting][2008/Q1/Mar]");
+		cube.setCellValue(key, meBookings, 500.0);
+		
+		key = cube.createKey("[COO][PS/Service][2008/Q1/Mar]");
+		cube.setCellValue(key, meBookings, 20.0);
+
+		// now with other measure
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Jan]");
+		cube.setCellValue(key, mePlan, 250.0);
+
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Feb]");
+		cube.setCellValue(key, mePlan, 30.0);
+
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Mar]");
+		cube.setCellValue(key, mePlan, 50.0);
+		
+		key = cube.createKey("[AOO][PS/Consulting][2008/Q1/Feb]");
+		cube.setCellValue(key, mePlan, 120.0);
+
+		key = cube.createKey("[COO][PS/Consulting][2008/Q1/Mar]");
+		cube.setCellValue(key, mePlan, 250.0);
+
+		key = cube.createKey("[COO][PS/Installation][2008/Q1/Mar]");
+		cube.setCellValue(key, mePlan, 150.0);
+
+		
+		// show
+		System.out.println("Bookings");
+		DataDump.printValues(System.out, cube, dimLOB, dimOT, meBookings);
+
+		System.out.println("Plan");
+		DataDump.printValues(System.out, cube, dimLOB, dimOT, mePlan);
+		
+		System.out.println("Difference");
+		DataDump.printValues(System.out, cube, dimLOB, dimOT, meDiff);
 		
 	}
 

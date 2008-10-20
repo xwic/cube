@@ -31,7 +31,7 @@ public class DefaultDimensionDataProvider implements ICubeDataProvider {
 			cursor.setDimensionElement(idx, elm);
 		}
 		Double value = cube.getCellValue(cursor, model.getMeasure());
-		return value != null ? model.getNumberFormat().format(value) : "";
+		return value != null ? model.getValueFormat().format(value) : "";
 		
 	}
 

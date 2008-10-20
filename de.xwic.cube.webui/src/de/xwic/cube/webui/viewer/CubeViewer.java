@@ -310,7 +310,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	 */
 	private String formatValue(Double value) {
 		if (value != null) {
-			return model.getNumberFormat().format(value);
+			return model.getValueFormat().format(value);
 		}
 		return "<i>na</i>";
 	}
