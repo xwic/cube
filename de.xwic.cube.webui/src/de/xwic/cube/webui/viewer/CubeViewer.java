@@ -40,7 +40,18 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		setRendererId(SelfRenderer.RENDERER_ID);
 		
 		model = new CubeViewerModel(getSessionContext().getLocale());
-		
+		model.addCubeViewerModelListener(new ICubeViewerModelListener() {
+			public void filterUpdated(CubeViewerModelEvent event) {
+				onFilterUpdated(event);				
+			}
+		});
+	}
+
+	/**
+	 * @param event
+	 */
+	protected void onFilterUpdated(CubeViewerModelEvent event) {
+		requireRedraw();
 	}
 
 	/**

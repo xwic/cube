@@ -5,13 +5,16 @@ package de.xwic.cube.webui.viewer;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
+import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
 
@@ -22,20 +25,62 @@ import de.xwic.cube.Key;
  */
 public class CubeViewerModel {
 
-	private ICube cube = null;
+	private enum EventType { FILTER_UPDATE }; 
+		private ICube cube = null;
 
 	private IMeasure measure = null;
 	private List<INavigationProvider> rowProvider = new ArrayList<INavigationProvider>();
 	private List<INavigationProvider> columnProvider = new ArrayList<INavigationProvider>();
 	
+	private Map<IDimension, IDimensionElement> filter = new HashMap<IDimension, IDimensionElement>(); 
+	
 	private Set<String> expandedElements = new HashSet<String>(); 
 	
 	private NumberFormat numberFormat;
+	private Key baseKey = null;
 	
+	private List<ICubeViewerModelListener> listeners = new ArrayList<ICubeViewerModelListener>();
+	
+	/**
+	 * Constructor.
+	 * @param locale
+	 */
 	public CubeViewerModel(Locale locale) {
 		numberFormat = NumberFormat.getNumberInstance(locale);
 		numberFormat.setMinimumFractionDigits(2);
 		numberFormat.setMaximumFractionDigits(2);
+	}
+	
+	/**
+	 * Add a listener.
+	 * @param listener
+	 */
+	public synchronized void addCubeViewerModelListener(ICubeViewerModelListener listener) {
+		listeners.add(listener);
+	}
+	
+	/**
+	 * Remove a listener.
+	 * @param listener
+	 */
+	public synchronized void removeCubeViewerModelListener(ICubeViewerModelListener listener) {
+		listeners.remove(listener);
+	}
+
+	/**
+	 * @param filter_update
+	 * @param event
+	 */
+	private void fireEvent(EventType eventType, CubeViewerModelEvent event) {
+		ICubeViewerModelListener[] l = new ICubeViewerModelListener[listeners.size()];
+		l = listeners.toArray(l);
+		for (ICubeViewerModelListener listener : l) {
+			switch (eventType) {
+			case FILTER_UPDATE: 
+				listener.filterUpdated(event);
+				break;
+			}
+		}
 	}
 	
 	
@@ -51,6 +96,7 @@ public class CubeViewerModel {
 	 */
 	public void setCube(ICube cube) {
 		this.cube = cube;
+		baseKey = cube.createKey("");
 	}
 
 	/**
@@ -85,7 +131,7 @@ public class CubeViewerModel {
 	 * @return
 	 */
 	public Key getTotalKey() {
-		return cube.createKey("");
+		return baseKey.clone();
 	}
 
 
@@ -126,7 +172,7 @@ public class CubeViewerModel {
 	 */
 	public Key createCursor() {
 		// later: inject filter 
-		Key key = cube.createKey("");
+		Key key = baseKey.clone();
 		key.setModifyable(true);
 		return key;
 	}
@@ -164,6 +210,32 @@ public class CubeViewerModel {
 	 */
 	public void collapse(String elementId) {
 		expandedElements.remove(elementId);
+	}
+
+
+	/**
+	 * @param dimension
+	 */
+	public void applyFilter(IDimensionElement dimensionElement) {
+		filter.put(dimensionElement.getDimension(), dimensionElement);
+		
+		updateBaseKey();
+		fireEvent(EventType.FILTER_UPDATE, new CubeViewerModelEvent(this));
+	}
+
+
+	/**
+	 * 
+	 */
+	private void updateBaseKey() {
+		
+		baseKey = cube.createKey("");
+		baseKey.setModifyable(true);
+		for (IDimension dim : filter.keySet()) {
+			int idx = cube.getDimensionIndex(dim);
+			baseKey.setDimensionElement(idx, filter.get(dim));
+		}
+		
 	}
 	
 }

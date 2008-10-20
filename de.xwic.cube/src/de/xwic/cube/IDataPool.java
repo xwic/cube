@@ -109,5 +109,15 @@ public interface IDataPool extends IIdentifyable {
 	 * @throws StorageException
 	 */
 	public abstract void delete() throws StorageException;
+
+	/**
+	 * Returns the DimensionElement specified in the id. The id is created
+	 * from IDimensionElement.getId(). Sample:
+	 * <p>[GEO:EMEA/Germany]
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public abstract IDimensionElement parseDimensionElementId(String id);
 	
 }
