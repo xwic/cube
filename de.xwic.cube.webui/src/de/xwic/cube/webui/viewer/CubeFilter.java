@@ -15,6 +15,7 @@ import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
+import de.xwic.cube.IMeasure;
 
 /**
  * @author Florian Lippisch
@@ -24,9 +25,10 @@ public class CubeFilter extends ControlContainer {
 	private static final long serialVersionUID = 1L;
 	private final CubeViewerModel model;
 
+	private ListBoxControl lbcMeasures = null;
 	private List<IDimension> dimensions = new ArrayList<IDimension>(); 
-	
 	private Map<String, String> dimCtrlMap = new HashMap<String, String>();
+	private boolean selectMeasure = true;
 	
 	/**
 	 * @param container
@@ -35,6 +37,28 @@ public class CubeFilter extends ControlContainer {
 	public CubeFilter(IControlContainer container, String name, CubeViewerModel model) {
 		super(container, name);
 		this.model = model;
+	
+		lbcMeasures = new ListBoxControl(this, "lbcMeasure");
+		lbcMeasures.setChangeNotification(true);
+		for (IMeasure measure : model.getCube().getMeasures()) {
+			lbcMeasures.addElement(measure.getTitle() != null && measure.getTitle().length() > 0 ? measure.getTitle() : measure.getKey(), measure.getKey());
+		}
+		if (model.getMeasure() != null) {
+			lbcMeasures.setSelectedKey(model.getMeasure().getKey());
+		}
+		lbcMeasures.addElementSelectedListener(new ElementSelectedListener() {
+			public void elementSelected(ElementSelectedEvent event) {
+				onMeasureSelect((String)event.getElement());
+			}
+		});
+		
+	}
+
+	/**
+	 * @param element
+	 */
+	protected void onMeasureSelect(String key) {
+		model.setMeasure(model.getCube().getDataPool().getMeasure(key));
 	}
 
 	/**
@@ -113,6 +137,20 @@ public class CubeFilter extends ControlContainer {
 	 */
 	public List<IDimension> getDimensions() {
 		return dimensions;
+	}
+
+	/**
+	 * @return the selectMeasure
+	 */
+	public boolean isSelectMeasure() {
+		return selectMeasure;
+	}
+
+	/**
+	 * @param selectMeasure the selectMeasure to set
+	 */
+	public void setSelectMeasure(boolean selectMeasure) {
+		this.selectMeasure = selectMeasure;
 	}
 	
 	
