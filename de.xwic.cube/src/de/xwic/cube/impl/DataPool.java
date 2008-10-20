@@ -13,6 +13,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDataPoolManager;
 import de.xwic.cube.IDimension;
+import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.StorageException;
 
@@ -241,6 +242,51 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	public void delete() throws StorageException {
 		dataPoolManager.deleteDataPool(this);
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDataPool#parseDimensionElementId(java.lang.String)
+	 */
+	public IDimensionElement parseDimensionElementId(String id) {
+		
+		
+		int start = id.indexOf('[');
+		if (start == -1) {
+			throw new IllegalArgumentException("Missing starting [");
+		}
+		int end = id.indexOf(']', start);
+		if (end == -1) {
+			throw new IllegalArgumentException("Missing ending ]");
+		}
+		String part = id.substring(start + 1, end);
+		int idxDimSep = part.indexOf(':');
+		String elmKeys;
+		IDimension dimension;
+		// does the key contain a dimension key?
+		if (idxDimSep == -1) { // no key given
+			throw new IllegalArgumentException("No dimension key found");
+		}
+		
+		String dimKey = part.substring(0, idxDimSep);
+		elmKeys = part.substring(idxDimSep + 1);
+		dimension = getDimension(dimKey);
+		IDimensionElement element = dimension;
+		if (!"*".equals(elmKeys)) { // specific key given.
+			int idxPathSep;
+			int idxPathStart = 0;
+			do {
+				idxPathSep = elmKeys.indexOf('/', idxPathStart);
+				String elmKey;
+				if (idxPathSep == -1) {
+					elmKey = elmKeys.substring(idxPathStart);
+				} else {
+					elmKey = elmKeys.substring(idxPathStart, idxPathSep);
+				}
+				element = element.getDimensionElement(elmKey);
+				idxPathStart = idxPathSep + 1;
+			} while (idxPathSep != -1);
+		}
+		return element;
 	}
 	
 }

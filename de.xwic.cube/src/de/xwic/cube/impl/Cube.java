@@ -324,4 +324,11 @@ public class Cube extends Identifyable implements ICube, Serializable {
 		}
 		throw new IllegalArgumentException("The specified dimension is not used in this cube.");
 	}
+
+	/**
+	 * @return the dataPool
+	 */
+	public DataPool getDataPool() {
+		return dataPool;
+	}
 }

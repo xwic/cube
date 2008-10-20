@@ -55,6 +55,12 @@ public interface ICube extends IIdentifyable {
 	public abstract ICell getCell(Key key);
 
 	/**
+	 * Returns the DataPool this cube belongs too.
+	 * @return
+	 */
+	public abstract IDataPool getDataPool();
+	
+	/**
 	 * Add a value to the existing value in the specified cell.
 	 * @param key
 	 * @param measure
