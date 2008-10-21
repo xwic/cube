@@ -38,6 +38,12 @@ public class CubeFilter extends ControlContainer {
 		super(container, name);
 		this.model = model;
 	
+		model.addCubeViewerModelListener(new ICubeViewerModelListener() {
+			public void filterUpdated(CubeViewerModelEvent event) {
+				onFilterUpdate(event);
+			}
+		});
+		
 		lbcMeasures = new ListBoxControl(this, "lbcMeasure");
 		lbcMeasures.setChangeNotification(true);
 		for (IMeasure measure : model.getCube().getMeasures()) {
@@ -55,10 +61,23 @@ public class CubeFilter extends ControlContainer {
 	}
 
 	/**
+	 * @param event
+	 */
+	protected void onFilterUpdate(CubeViewerModelEvent event) {
+		
+		if (isSelectMeasure() && !model.getMeasure().getKey().equals(lbcMeasures.getSelectedKey())) {
+			lbcMeasures.setSelectedKey(model.getMeasure().getKey());
+		}
+		
+	}
+
+	/**
 	 * @param element
 	 */
 	protected void onMeasureSelect(String key) {
-		model.setMeasure(model.getCube().getDataPool().getMeasure(key));
+		if (!key.equals(model.getMeasure().getKey())) {
+			model.setMeasure(model.getCube().getDataPool().getMeasure(key));
+		}
 	}
 
 	/**

@@ -194,6 +194,7 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 * @param weight the weight to set
 	 */
 	public void setWeight(double weight) {
+		//System.out.println(NumberFormat.getNumberInstance().format(weight));
 		this.weight = weight;
 	}
 

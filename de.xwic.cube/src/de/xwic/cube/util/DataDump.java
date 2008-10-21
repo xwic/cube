@@ -4,7 +4,6 @@
 package de.xwic.cube.util;
 
 import java.io.PrintStream;
-import java.text.NumberFormat;
 import java.util.Locale;
 
 import de.xwic.cube.ICube;
