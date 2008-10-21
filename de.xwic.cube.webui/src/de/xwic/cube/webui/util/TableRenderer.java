@@ -38,7 +38,8 @@ public class TableRenderer {
 						out.print(" colspan=\"" + cell.getColSpan() + "\"");
 					}
 					out.print(">");
-					out.print(cell.getContent() != null ? cell.getContent() : "&nbsp;");
+					String content = cell.getContent(); 
+					out.print(content != null && content.length() > 0? content : "&nbsp;");
 					out.print("</TD>");
 					skip = cell.getColSpan() - 1;
 				}
