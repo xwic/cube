@@ -11,6 +11,7 @@ import java.util.Map;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ListBoxControl;
+import de.jwic.controls.ListEntry;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.xwic.cube.IDimension;
@@ -90,9 +91,10 @@ public class CubeFilter extends ControlContainer {
 		
 		// create the control
 		ListBoxControl lbc = new ListBoxControl(this);
+		lbc.setCssClass("xcube-cb");
 		lbc.setChangeNotification(true);
 		
-		lbc.addElement("- All -", dimension.getID());
+		lbc.addElement("- All -", dimension.getID()).setCssClass("xcube-cb-base");
 		addEntries(lbc, 0, dimension);
 		
 		lbc.setSelectedKey(dimension.getID());
@@ -142,7 +144,8 @@ public class CubeFilter extends ControlContainer {
 		for (IDimensionElement elm : parent.getDimensionElements()) {
 			
 			String title = elm.getTitle() != null && elm.getTitle().length() > 0 ? elm.getTitle() : elm.getKey();
-			lbc.addElement(indent + title, elm.getID());
+			ListEntry entry =  lbc.addElement(indent + title, elm.getID());
+			entry.setCssClass("xcube-cb-lvl" + depth);
 			if (!elm.isLeaf()) {
 				addEntries(lbc, depth + 1, elm);
 			}
