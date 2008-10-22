@@ -52,7 +52,8 @@ public class DifferenceFunction implements IMeasureFunction, Serializable {
 			Double valB = cell.getValue(measureB);
 			if (valA == null) {
 				valA = 0.0;
-			} else if (valB == null) {
+			} 
+			if (valB == null) {
 				valB = 0.0;
 			}
 			double diff = valA - valB;

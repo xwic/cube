@@ -89,22 +89,13 @@ public class CubeFilter extends ControlContainer {
 	public void addDimension(IDimension dimension) {
 		dimensions.add(dimension);
 		
-		// create the control
-		ListBoxControl lbc = new ListBoxControl(this);
-		lbc.setCssClass("xcube-cb");
-		lbc.setChangeNotification(true);
-		
-		lbc.addElement("- All -", dimension.getID()).setCssClass("xcube-cb-base");
-		addEntries(lbc, 0, dimension);
-		
-		lbc.setSelectedKey(dimension.getID());
-		lbc.addElementSelectedListener(new ElementSelectedListener() {
+		DimensionSelectorControl dsc = new DimensionSelectorControl(this, null, dimension);
+		dsc.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
 				filterSelection((String)event.getElement());
 			}
 		});
-		
-		dimCtrlMap.put(dimension.getKey(), lbc.getName());
+		dimCtrlMap.put(dimension.getKey(), dsc.getName());
 		
 	}
 	
@@ -125,33 +116,6 @@ public class CubeFilter extends ControlContainer {
 	 */
 	public String getControlName(String dimensionKey) {
 		return dimCtrlMap.get(dimensionKey);
-	}
-
-	/**
-	 * @param lbc
-	 * @param i
-	 * @param dimension
-	 */
-	private void addEntries(ListBoxControl lbc, int depth, IDimensionElement parent) {
-	
-		StringBuilder indent = new StringBuilder();
-		for (int i = 0; i < depth; i++) {
-			indent.append("   ");
-		}
-		if (depth > 0) {
-			indent.append("- ");
-		}
-		for (IDimensionElement elm : parent.getDimensionElements()) {
-			
-			String title = elm.getTitle() != null && elm.getTitle().length() > 0 ? elm.getTitle() : elm.getKey();
-			ListEntry entry =  lbc.addElement(indent + title, elm.getID());
-			entry.setCssClass("xcube-cb-lvl" + depth);
-			if (!elm.isLeaf()) {
-				addEntries(lbc, depth + 1, elm);
-			}
-			
-		}
-		
 	}
 
 	/**
