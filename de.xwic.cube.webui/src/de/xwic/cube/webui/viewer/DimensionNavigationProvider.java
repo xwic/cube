@@ -118,6 +118,18 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		createNavigationElements();
 	}
 
+	/**
+	 * Create a DimensionProvider with one dimension.
+	 * @param dimension
+	 */
+	public DimensionNavigationProvider(CubeViewerModel model, IDimension[] dimensions) {
+		this.model = model;
+		for (IDimension dim : dimensions) {
+			this.dimensions.add(dim);
+		}
+		createNavigationElements();
+	}
+
 	private void createNavigationElements() {
 		rootNavElements = new ArrayList<INavigationElement>();
 		if (dimensions.size() > 0) {
