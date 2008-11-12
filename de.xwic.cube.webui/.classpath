@@ -3,6 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/libs.common.jwic"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/de.pol.netapp.amis.extlibs"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
