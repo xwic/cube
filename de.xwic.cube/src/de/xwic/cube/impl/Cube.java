@@ -308,7 +308,7 @@ public class Cube extends Identifyable implements ICube, Serializable {
 			pos = end;
 			idx++;
 		}
-		return new Key(elements);
+		return new Key(this, elements);
 	}
 	
 	/* (non-Javadoc)

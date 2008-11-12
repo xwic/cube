@@ -17,6 +17,8 @@ public class ContentInfo {
 	private Object userData = null;
 	private ICubeDataProvider cubeDataProvider = null;
 	private int level = 0;
+	private boolean clickable = false;
+	private String extraClickInfo = null;
 	
 	
 	public ContentInfo(ICubeDataProvider cubeDataProvider) {
@@ -64,6 +66,25 @@ public class ContentInfo {
 	}
 
 	/**
+	 * @param clickable the clickable to set
+	 */
+	public void setClickable(boolean clickable) {
+		this.clickable = clickable;
+	}
+	
+	public String getExtraClickInfo() {
+		return extraClickInfo ;
+	}
+
+	/**
+	 * Returns true if the data is clickable.
+	 * @return
+	 */
+	public boolean isClickable() {
+		return clickable ;
+	}
+	
+	/**
 	 * @return the cubeDataProvider
 	 */
 	public ICubeDataProvider getCubeDataProvider() {
@@ -89,6 +110,13 @@ public class ContentInfo {
 	 */
 	public void setLevel(int level) {
 		this.level = level;
+	}
+
+	/**
+	 * @param extraClickInfo the extraClickInfo to set
+	 */
+	public void setExtraClickInfo(String extraClickInfo) {
+		this.extraClickInfo = extraClickInfo;
 	}
 	
 }

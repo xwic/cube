@@ -3,12 +3,29 @@
  */
 package de.xwic.cube.webui.viewer;
 
+import de.xwic.cube.Key;
+
 /**
  * @author Florian Lippisch
  */
 public class CubeViewerModelEvent {
 
 	private Object source;
+	private Key selectionKey = null;
+	private String[] selectionArguments = null;
+
+	/**
+	 * @param source
+	 * @param selectionKey
+	 * @param selectionArguments
+	 */
+	public CubeViewerModelEvent(Object source, Key selectionKey,
+			String[] selectionArguments) {
+		super();
+		this.source = source;
+		this.selectionKey = selectionKey;
+		this.selectionArguments = selectionArguments;
+	}
 
 	/**
 	 * @param source
@@ -24,5 +41,19 @@ public class CubeViewerModelEvent {
 	public Object getSource() {
 		return source;
 	}
-	
+
+	/**
+	 * @return the selectionKey
+	 */
+	public Key getSelectionKey() {
+		return selectionKey;
+	}
+
+	/**
+	 * @return the selectionArguments
+	 */
+	public String[] getSelectionArguments() {
+		return selectionArguments;
+	}
+
 }

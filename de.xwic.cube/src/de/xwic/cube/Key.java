@@ -15,12 +15,14 @@ public class Key implements Serializable {
 	private static final long serialVersionUID = -3558184977558178383L;
 	private IDimensionElement[] elementKeys;
 	private boolean modifyable = false;
+	private ICube cube = null;
 	
 	/**
 	 * @param elementKeys
 	 */
-	public Key(IDimensionElement[] elementKeys) {
+	public Key(ICube cube, IDimensionElement[] elementKeys) {
 		super();
+		this.cube = cube;
 		this.elementKeys = elementKeys;
 	}
 	
@@ -70,7 +72,7 @@ public class Key implements Serializable {
 	public Key clone() {
 		IDimensionElement[] cloneKeys = new IDimensionElement[elementKeys.length];
 		System.arraycopy(elementKeys, 0, cloneKeys, 0, elementKeys.length);
-		Key clone = new Key(cloneKeys);
+		Key clone = new Key(cube, cloneKeys);
 		clone.modifyable = this.modifyable;
 		return clone;
 	}
@@ -93,6 +95,16 @@ public class Key implements Serializable {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Change the key. The index of the dimension element is determined
+	 * automatically.
+	 * @param element
+	 */
+	public void setDimensionElement(IDimensionElement element) {
+		int idx = cube.getDimensionIndex(element.getDimension());
+		setDimensionElement(idx, element);
 	}
 	
 	/**

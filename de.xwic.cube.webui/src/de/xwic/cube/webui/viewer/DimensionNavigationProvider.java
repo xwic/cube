@@ -6,8 +6,10 @@ package de.xwic.cube.webui.viewer;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
+import de.xwic.cube.Key;
 
 /**
  * @author Florian Lippisch
@@ -19,6 +21,68 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private List<INavigationElement> rootNavElements = new ArrayList<INavigationElement>();
 	private ICubeDataProvider dataProvider = new DefaultDimensionDataProvider();
 
+	private boolean hideEmptyElements = false;
+	private boolean showDimension = false;
+	private boolean hideTotals = false;
+	private boolean clickable = false;
+	
+	/**
+	 * Used to chain multiple dimensions in one navigation.
+	 * @author Lippisch
+	 */
+	private class DimensionChain {
+		private int position;
+		private final DimensionChain parent;
+		/**
+		 * @return the parent
+		 */
+		public DimensionChain getParent() {
+			return parent;
+		}
+		/**
+		 * @return the element
+		 */
+		public IDimensionElement getElement() {
+			return element;
+		}
+		private final IDimensionElement element;
+		/**
+		 * @param position
+		 * @param element 
+		 * @param parent 
+		 */
+		public DimensionChain(int position, DimensionChain parent, IDimensionElement element) {
+			super();
+			this.position = position;
+			this.parent = parent;
+			this.element = element;
+		}
+		/**
+		 * Default constructor starts at the first dimension.
+		 */
+		public DimensionChain() {
+			position = 0;
+			parent = null;
+			element = null;
+		}
+		public boolean hasNextDimension() {
+			return position + 1 < dimensions.size();
+		}
+		/**
+		 * @return
+		 */
+		public DimensionChain nextDimensionChain(IDimensionElement element) {
+			return new DimensionChain(position +1, this, element);
+		}
+		/**
+		 * Returns the current dimension in the chain.
+		 * @return
+		 */
+		public IDimension getDimension() {
+			return dimensions.get(position);
+		}
+	}
+	
 	/**
 	 * Wrapper for a DimensionElement.
 	 * @author Florian Lippisch
@@ -27,16 +91,59 @@ public class DimensionNavigationProvider implements INavigationProvider {
 
 		private IDimensionElement element;
 		private List<INavigationElement> childs;
+		private final DimensionChain chain;
 		/**
 		 * @param element
 		 */
-		public DimensionNavigationElement(IDimensionElement element) {
+		public DimensionNavigationElement(IDimensionElement element, DimensionChain chain) {
 			super();
 			this.element = element;
+			this.chain = chain;
 			childs = new ArrayList<INavigationElement>();
-			for (IDimensionElement elm : element.getDimensionElements()) {
-				childs.add(new DimensionNavigationElement(elm));
+			if (element.getDimensionElements().size() != 0) {
+				for (IDimensionElement elm : element.getDimensionElements()) {
+					if (!hideEmptyElements || !isEmpty(elm, chain)) {
+						childs.add(new DimensionNavigationElement(elm, chain));
+					}
+				}
+			} else if (chain.hasNextDimension()) {
+				// if a leaf is reached, and another dimension is available, add the
+				// childs of this dimension. The dimension itself is not added, as it
+				// is the same as the leaf element.
+				DimensionChain next = chain.nextDimensionChain(element);
+				for (IDimensionElement elm : next.getDimension().getDimensionElements()) {
+					if (!hideEmptyElements || !isEmpty(elm, next)) {
+						childs.add(new DimensionNavigationElement(elm, next));
+					}
+				}
+				
 			}
+		}
+
+		/**
+		 * @param elm
+		 * @param chain2
+		 * @return
+		 */
+		private boolean isEmpty(IDimensionElement elm, DimensionChain dimChain) {
+			if (model.getMeasure() == null) {
+				return true;
+			}
+			ICube cube = model.getCube();
+			Key cursor = model.createCursor();
+	
+			int idx = cube.getDimensionIndex(elm.getDimension());
+			cursor.setDimensionElement(idx, elm);
+			DimensionChain dc = dimChain;
+			while (dc != null) {
+				if (dc.getElement() != null) {
+					idx = cube.getDimensionIndex(dc.getElement().getDimension());
+					cursor.setDimensionElement(idx, dc.getElement());
+				}
+				dc = dc.getParent();
+			}
+
+			return cube.getCellValue(cursor, model.getMeasure()) == null;
 		}
 
 		/* (non-Javadoc)
@@ -71,21 +178,37 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		 * @see de.xwic.cube.webui.viewer.INavigationElement#isExpandable()
 		 */
 		public boolean isExpandable() {
-			return element.getDimensionElements().size() != 0;
+			return childs.size() != 0;
 		}
 		
 		/* (non-Javadoc)
 		 * @see de.xwic.cube.webui.viewer.INavigationElement#hideTotal()
 		 */
 		public boolean hideTotal() {
-			return false;
+			return hideTotals;
 		}
 
 		/* (non-Javadoc)
 		 * @see de.xwic.cube.webui.viewer.INavigationElement#getElementData()
 		 */
 		public ContentInfo getContentInfo() {
-			return new ContentInfo(dataProvider, element);
+			// build list of elements from the chain
+			return createContentInfo(element, chain);
+			
+		}
+		private ContentInfo createContentInfo(IDimensionElement dimElement, DimensionChain dimChain) {
+			List<IDimensionElement> elements = new ArrayList<IDimensionElement>();
+			elements.add(dimElement);
+			DimensionChain dc = dimChain;
+			while (dc != null) {
+				if (dc.getElement() != null) {
+					elements.add(dc.getElement());
+				}
+				dc = dc.getParent();
+			}
+			ContentInfo contentInfo = new ContentInfo(dataProvider, elements);
+			contentInfo.setClickable(clickable);
+			return contentInfo;
 		}
 		
 	}
@@ -95,9 +218,8 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public DimensionNavigationProvider(CubeViewerModel model) {
 		this.model = model;
-		
+		initialize();
 	}
-
 	/**
 	 * Create a DimensionProvider with one dimension.
 	 * @param dimension
@@ -105,7 +227,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	public DimensionNavigationProvider(CubeViewerModel model, IDimension dimension) {
 		this.model = model;
 		dimensions.add(dimension);
-		createNavigationElements();
+		initialize();
 	}
 
 	/**
@@ -115,30 +237,86 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	public DimensionNavigationProvider(CubeViewerModel model, List<IDimension> dimensions) {
 		this.model = model;
 		this.dimensions.addAll(dimensions);
-		createNavigationElements();
+		initialize();
 	}
 
 	/**
 	 * Create a DimensionProvider with one dimension.
 	 * @param dimension
 	 */
-	public DimensionNavigationProvider(CubeViewerModel model, IDimension[] dimensions) {
+	public DimensionNavigationProvider(CubeViewerModel model, IDimension... dimensions) {
 		this.model = model;
 		for (IDimension dim : dimensions) {
 			this.dimensions.add(dim);
 		}
+		initialize();
+	}
+
+
+	/**
+	 * 
+	 */
+	private void initialize() {
 		createNavigationElements();
+		model.addCubeViewerModelListener(new CubeViewerModelAdapter() { 
+			@Override
+			public void cubeUpdated(CubeViewerModelEvent event) {
+				createNavigationElements();
+			}
+			/* (non-Javadoc)
+			 * @see de.xwic.cube.webui.viewer.ICubeViewerModelListener#filterUpdated(de.xwic.cube.webui.viewer.CubeViewerModelEvent)
+			 */
+			@Override
+			public void filterUpdated(CubeViewerModelEvent event) {
+				createNavigationElements();
+			}
+		});
 	}
 
 	private void createNavigationElements() {
 		rootNavElements = new ArrayList<INavigationElement>();
+		DimensionChain chain = new DimensionChain();
 		if (dimensions.size() > 0) {
 			IDimension dim = dimensions.get(0); // first one.
-			for (IDimensionElement elm : dim.getDimensionElements()) {
-				rootNavElements.add(new DimensionNavigationElement(elm));
+			if (showDimension) {
+				rootNavElements.add(new DimensionNavigationElement(dim, chain));
+			} else {
+				for (IDimensionElement elm : dim.getDimensionElements()) {
+					rootNavElements.add(new DimensionNavigationElement(elm, chain));
+				}
 			}
 		}
 	}
+
+	/**
+	 * @return the hideEmptyElements
+	 */
+	public boolean isHideEmptyElements() {
+		return hideEmptyElements;
+	}
+	/**
+	 * @param hideEmptyElements the hideEmptyElements to set
+	 */
+	public void setHideEmptyElements(boolean hideEmptyElements) {
+		this.hideEmptyElements = hideEmptyElements;
+		// force reinitialization
+		createNavigationElements();
+	}
+	
+	/**
+	 * @return the showDimension
+	 */
+	public boolean isShowDimension() {
+		return showDimension;
+	}
+	/**
+	 * @param showDimension the showDimension to set
+	 */
+	public void setShowDimension(boolean showDimension) {
+		this.showDimension = showDimension;
+		createNavigationElements();
+	}
+
 
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.webui.viewer.INavigationProvider#getNavigationSize()
@@ -181,6 +359,33 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public List<INavigationElement> getNavigationElements() {
 		return rootNavElements;
+	}
+
+	/**
+	 * @return the hideTotals
+	 */
+	public boolean isHideTotals() {
+		return hideTotals;
+	}
+	/**
+	 * @param hideTotals the hideTotals to set
+	 */
+	public void setHideTotals(boolean hideTotals) {
+		this.hideTotals = hideTotals;
+	}
+	/**
+	 * @return the clickable
+	 */
+	public boolean isClickable() {
+		return clickable;
+	}
+	/**
+	 * Set the dimensions to be clickable. Note that a cell is only
+	 * clickable, if both row and column providers are clickable!
+	 * @param clickable the clickable to set
+	 */
+	public void setClickable(boolean clickable) {
+		this.clickable = clickable;
 	}
 
 }

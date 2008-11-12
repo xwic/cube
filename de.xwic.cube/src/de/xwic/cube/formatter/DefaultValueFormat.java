@@ -19,11 +19,11 @@ public class DefaultValueFormat implements IValueFormat {
 	 * Uses a default NumberFormat with 2 fraction digits and
 	 * grouping. 
 	 */
-	public DefaultValueFormat(Locale locale) {
+	public DefaultValueFormat(Locale locale, int minFractionDigits, int maxFractionDigits) {
 		nf = NumberFormat.getInstance(locale);
 		nf.setGroupingUsed(true);
-		nf.setMinimumFractionDigits(2);
-		nf.setMaximumFractionDigits(2);
+		nf.setMinimumFractionDigits(minFractionDigits);
+		nf.setMaximumFractionDigits(maxFractionDigits);
 	}
 	
 	/**

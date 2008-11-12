@@ -19,6 +19,18 @@ public class DefaultDimensionDataProvider implements ICubeDataProvider {
 	public String getCellData(CubeViewerModel model, ContentInfo row, ContentInfo col) {
 		
 		ICube cube = model.getCube();
+		Key cursor = createKey(model, row, col);
+		Double value = cube.getCellValue(cursor, model.getMeasure());
+		return value != null ? model.getValueFormat().format(value) : "";
+	}
+	
+	/**
+	 * @param model
+	 * @param object
+	 * @return
+	 */
+	protected Key createKey(CubeViewerModel model, ContentInfo row, ContentInfo col) {
+		ICube cube = model.getCube();
 		Key cursor = model.createCursor();
 		
 		for (IDimensionElement elm : row.getElements()) {
@@ -30,10 +42,9 @@ public class DefaultDimensionDataProvider implements ICubeDataProvider {
 			int idx = cube.getDimensionIndex(elm.getDimension());
 			cursor.setDimensionElement(idx, elm);
 		}
-		Double value = cube.getCellValue(cursor, model.getMeasure());
-		return value != null ? model.getValueFormat().format(value) : "";
-		
+		return cursor;
 	}
+
 
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.webui.viewer.ICubeDataProvider#getPriority()

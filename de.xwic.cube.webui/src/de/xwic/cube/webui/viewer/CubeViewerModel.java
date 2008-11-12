@@ -3,6 +3,7 @@
  */
 package de.xwic.cube.webui.viewer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,9 +24,9 @@ import de.xwic.cube.Key;
  * 
  * @author Florian Lippisch
  */
-public class CubeViewerModel {
+public class CubeViewerModel implements Serializable {
 
-	private enum EventType { FILTER_UPDATE }; 
+	private enum EventType { FILTER_UPDATE, CUBE_UPDATED, CELL_SELECTION }; 
 		private ICube cube = null;
 
 	private IMeasure measure = null;
@@ -80,10 +81,32 @@ public class CubeViewerModel {
 			case FILTER_UPDATE: 
 				listener.filterUpdated(event);
 				break;
+			case CUBE_UPDATED: 
+				listener.cubeUpdated(event);
+				break;
+			case CELL_SELECTION:
+				listener.cellSelected(event);
+				break;
 			}
 		}
 	}
 	
+	public void notifyCellSelection(String dimKey, String[] args) {
+	
+		Key key = cube.createKey(dimKey);
+		for (IDimensionElement de : filter.values()) {
+			int idx = cube.getDimensionIndex(de.getDimension());
+			if (!(key.getDimensionElement(idx) instanceof IDimension)) {
+				key.setDimensionElement(idx, de);
+			}
+		}
+		
+		fireEvent(EventType.CELL_SELECTION, new CubeViewerModelEvent(this, key, args));
+	}
+	
+	public void notifyCubeUpdated() {
+		fireEvent(EventType.CUBE_UPDATED, new CubeViewerModelEvent(this));
+	}
 	
 	/**
 	 * @return the cube

@@ -10,6 +10,8 @@ public class TableCell {
 
 	private String content = null;
 	private String cssClass = null;
+	private String action = null;
+	private String actionParam = null;
 	private int colSpan = 1;
 	
 	/**
@@ -69,6 +71,34 @@ public class TableCell {
 	public TableCell setColSpan(int colSpan) {
 		this.colSpan = colSpan;
 		return this;
+	}
+
+	/**
+	 * @return the action
+	 */
+	public String getAction() {
+		return action;
+	}
+
+	/**
+	 * @param action the action to set
+	 */
+	public void setAction(String action) {
+		this.action = action;
+	}
+
+	/**
+	 * @return the actionParam
+	 */
+	public String getActionParam() {
+		return actionParam;
+	}
+
+	/**
+	 * @param actionParam the actionParam to set
+	 */
+	public void setActionParam(String actionParam) {
+		this.actionParam = actionParam;
 	}
 	
 }
