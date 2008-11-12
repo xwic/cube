@@ -11,7 +11,6 @@ import java.util.Map;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ListBoxControl;
-import de.jwic.controls.ListEntry;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.xwic.cube.IDimension;
@@ -39,7 +38,7 @@ public class CubeFilter extends ControlContainer {
 		super(container, name);
 		this.model = model;
 	
-		model.addCubeViewerModelListener(new ICubeViewerModelListener() {
+		model.addCubeViewerModelListener(new CubeViewerModelAdapter() {
 			public void filterUpdated(CubeViewerModelEvent event) {
 				onFilterUpdate(event);
 			}

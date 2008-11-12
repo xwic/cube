@@ -4,6 +4,7 @@
 package de.xwic.cube.webui.viewer;
 
 import java.io.PrintWriter;
+import java.util.StringTokenizer;
 
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
@@ -11,6 +12,7 @@ import de.jwic.base.ImageRef;
 import de.jwic.base.RenderContext;
 import de.jwic.renderer.self.ISelfRenderingControl;
 import de.jwic.renderer.self.SelfRenderer;
+import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.webui.util.TableCell;
 import de.xwic.cube.webui.util.TableRenderer;
 
@@ -29,6 +31,8 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	private Align columnTotalAlign = Align.BEGIN;
 	private Align rowTotalAlign = Align.END;
 	private int leftNavMinWidth = 250;
+	private int columnWidth = 0; // default
+	private boolean emptyCellsClickable = false;
 	
 	/**
 	 * @param container
@@ -40,13 +44,23 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		setRendererId(SelfRenderer.RENDERER_ID);
 		
 		model = new CubeViewerModel(getSessionContext().getLocale());
-		model.addCubeViewerModelListener(new ICubeViewerModelListener() {
+		model.addCubeViewerModelListener(new CubeViewerModelAdapter() {
 			public void filterUpdated(CubeViewerModelEvent event) {
 				onFilterUpdated(event);				
+			}
+			public void cubeUpdated(CubeViewerModelEvent event) {
+				onCubeUpdated(event);
 			}
 		});
 	}
 
+	/**
+	 * @param event
+	 */
+	protected void onCubeUpdated(CubeViewerModelEvent event) {
+		requireRedraw();
+	}
+	
 	/**
 	 * @param event
 	 */
@@ -61,6 +75,28 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		return model;
 	}
 
+	/**
+	 * Handle click action.
+	 * @param parameter
+	 */
+	public void actionClick(String parameter) {
+		
+		StringTokenizer stk = new StringTokenizer(parameter, ";");
+		int len = stk.countTokens();
+		String dimKey;
+		if (len > 0) {
+			dimKey = stk.nextToken();
+			String[] args = new String[len - 1];
+			int i = 0;
+			while (stk.hasMoreTokens()) {
+				args[i++] = stk.nextToken();
+			}
+			model.notifyCellSelection(dimKey, args);
+		} else {
+			log.warn("Invalid parameter for cell selection - parameter must not be empty.");
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.jwic.renderer.self.ISelfRenderingControl#render(de.jwic.base.RenderContext)
 	 */
@@ -79,7 +115,19 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 
 		PrintWriter out = renderContext.getWriter();
 
-		TableRenderer tbl = new TableRenderer();
+		TableRenderer tbl = renderTable();
+		tbl.render(out);
+		
+		out.println("<span class=\"x-cube-info\">cube: " + model.getCube().getKey() + ", measure: " + model.getMeasure().getKey() + "</span>");
+		
+		
+	}
+
+	/**
+	 * @return
+	 */
+	private TableRenderer renderTable() {
+		TableRenderer tbl = new TableRenderer(this);
 		tbl.setCssClass("xcube-tbl");
 
 		// render header...
@@ -89,7 +137,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 			tbl.getCell(0, 0).setContent("Total");
 			tbl.getCell(1, 0).setContent(formatValue(model.getCube().getCellValue(model.getTotalKey(), model.getMeasure())));
 			// early EXIT
-			return;
+			return tbl;
 		} 
 
 		// evaluate horizontal header size (columns)
@@ -115,6 +163,12 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		}
 		
 		tbl.initSize(colHeight + rowCount, rowDepth + colCount);
+		
+		if (columnWidth > 0) {
+			for (int col = rowDepth; col < (rowDepth + colCount); col ++) {
+				tbl.setColumnWidth(col, columnWidth);
+			}
+		}
 		
 		// render Header
 		int startCol = rowDepth;
@@ -149,24 +203,55 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 				ContentInfo ciCol = (ContentInfo) tbl.getColumnData(colIdx);
 				
 				TableCell cell = tbl.getCell(rowIdx, colIdx);
+				boolean empty = true;
 				if (ciCol != null && ciRow != null) {
 					ICubeDataProvider dataProvider = ciRow.getCubeDataProvider().getPriority() > ciCol.getCubeDataProvider().getPriority() ?
 							ciRow.getCubeDataProvider() :
 							ciCol.getCubeDataProvider();
 					
-					cell.setContent(dataProvider.getCellData(model, ciRow, ciCol));
+					String content = dataProvider.getCellData(model, ciRow, ciCol);
+					empty = content == null || content.length() == 0;
+					cell.setContent(content);
 					cell.setCssClass("xcube-data xcube-data-vlvl-" + ciRow.getLevel() + " xcube-data-hlvl-" + ciCol.getLevel());
 				} else {
 					cell.setContent("NoCI");
 				}
+				if (ciRow.isClickable() && ciCol.isClickable() && (!empty || emptyCellsClickable)) {
+					cell.setAction("click");
+					cell.setActionParam(buildActionParameter(ciRow, ciCol));
+				}
+				
 			}
 		}
+		return tbl;
+	}
+
+	/**
+	 * @param ciRow
+	 * @param ciCol
+	 * @return
+	 */
+	private String buildActionParameter(ContentInfo ciRow, ContentInfo ciCol) {
+
+		// build dimension data
+		StringBuilder sb = new StringBuilder();
+		for (IDimensionElement de : ciRow.getElements()) {
+			sb.append(de.getID());
+		}
+		for (IDimensionElement de : ciCol.getElements()) {
+			sb.append(de.getID());
+		}
+
+		if (ciRow.getExtraClickInfo() != null) {
+			sb.append(";")
+			  .append(ciRow.getExtraClickInfo());
+		}
+		if (ciCol.getExtraClickInfo() != null) {
+			sb.append(";")
+			  .append(ciCol.getExtraClickInfo());
+		}
 		
-		tbl.render(out);
-		
-		out.println("<span class=\"x-cube-info\">cube: " + model.getCube().getKey() + ", measure: " + model.getMeasure().getKey() + "</span>");
-		
-		
+		return sb.toString();
 	}
 
 	/**
@@ -363,6 +448,34 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	 */
 	public void setLeftNavMinWidth(int leftNavMinWidth) {
 		this.leftNavMinWidth = leftNavMinWidth;
+	}
+
+	/**
+	 * @return the columnWidth
+	 */
+	public int getColumnWidth() {
+		return columnWidth;
+	}
+
+	/**
+	 * @param columnWidth the columnWidth to set
+	 */
+	public void setColumnWidth(int columnWidth) {
+		this.columnWidth = columnWidth;
+	}
+
+	/**
+	 * @return the emptyCellsClickable
+	 */
+	public boolean isEmptyCellsClickable() {
+		return emptyCellsClickable;
+	}
+
+	/**
+	 * @param emptyCellsClickable the emptyCellsClickable to set
+	 */
+	public void setEmptyCellsClickable(boolean emptyCellsClickable) {
+		this.emptyCellsClickable = emptyCellsClickable;
 	}
 
 }

@@ -7,35 +7,69 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.jwic.base.Control;
+
 /**
  * Utility class to render a HTML table.
  * @author Florian Lippisch
  */
 public class TableRenderer {
 
+	private Control baseControl = null;
+	
 	private List<Object> columnData = new ArrayList<Object>();
 	private List<Object> rowData = new ArrayList<Object>();
+	
+	private List<Integer> colWidth = new ArrayList<Integer>(); 
 	
 	private List<List<TableCell>> rows = new ArrayList<List<TableCell>>();
 	
 	private String cssClass = "";
 	
+	public TableRenderer() {
+		super();
+	}
+	
+	/**
+	 * @param baseControl
+	 */
+	public TableRenderer(Control baseControl) {
+		super();
+		this.baseControl = baseControl;
+	}
+
 	public void render(PrintWriter out) {
 		
 		out.println("<TABLE cellspacing=0 cellpadding=0 class=\"" + cssClass + "\">");
 		for (List<TableCell> row : rows) {
 			out.println("<TR>");
 			int skip = 0;
+			int col = 0;
 			for (TableCell cell : row) {
 				if (skip > 0) {
 					skip--;
 				} else {
 					out.print("<TD");
-					if (cell.getCssClass() != null) {
-						out.print(" class=\"" + cell.getCssClass() + "\"");
+					String extraClasses = null;
+					if (cell.getAction() != null && baseControl != null) {
+						extraClasses = "x-clickable";
+						out.print(" onClick=\"");
+						out.print(baseControl.createActionURL(cell.getAction(), cell.getActionParam()));
+						out.print("\"");
+					}
+					if (cell.getCssClass() != null || extraClasses != null) {
+						out.print(" class=\"" 
+								+ (cell.getCssClass() != null ? cell.getCssClass() : "")
+								+ (extraClasses != null ? " " + extraClasses : "")
+								+ "\"");
 					}
 					if (cell.getColSpan() > 1) {
 						out.print(" colspan=\"" + cell.getColSpan() + "\"");
+					} else {
+						Integer cWidth = colWidth.get(col);
+						if (cWidth != null) {
+							out.print(" width=\"" + cWidth + "\"");
+						}
 					}
 					out.print(">");
 					String content = cell.getContent(); 
@@ -43,6 +77,7 @@ public class TableRenderer {
 					out.print("</TD>");
 					skip = cell.getColSpan() - 1;
 				}
+				col++;
 			}
 			out.println("</TR>");
 		}
@@ -69,6 +104,7 @@ public class TableRenderer {
 		
 		for (int c = 0; c < colCount; c++) {
 			columnData.add(null);
+			colWidth.add(null);
 		}
 		
 	}
@@ -100,6 +136,15 @@ public class TableRenderer {
 			throw new IndexOutOfBoundsException("Column index out of range");
 		}
 		columnData.set(col, data);
+	}
+	
+	/**
+	 * Set the column width.
+	 * @param col
+	 * @param width
+	 */
+	public void setColumnWidth(int col, Integer width) {
+		colWidth.set(col, width);
 	}
 	
 	/**

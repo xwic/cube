@@ -3,7 +3,6 @@
  */
 package de.xwic.cube.webui.viewer;
 
-import java.util.List;
 
 /**
  * @author Florian Lippisch
