@@ -93,7 +93,8 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 			}
 			model.notifyCellSelection(dimKey, args);
 		} else {
-			log.warn("Invalid parameter for cell selection - parameter must not be empty.");
+//			log.warn("Invalid parameter for cell selection - parameter must not be empty.");
+			System.err.println("Invalid parameter for cell selection - parameter must not be empty.");
 		}
 	}
 	
