@@ -14,5 +14,12 @@ public interface INavigationProvider extends INavigationElementProvider {
 	 * @return
 	 */
 	public NavigationSize getNavigationSize();
+	
+	/**
+	 * Returns how many cells the elements should be indented. The default
+	 * value should be 0.
+	 * @return
+	 */
+	public int getIndention();
 
 }

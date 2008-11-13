@@ -25,6 +25,8 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private boolean hideTotals = false;
 	private boolean clickable = false;
 	
+	private int indention = 0;
+	
 	/**
 	 * Used to chain multiple dimensions in one navigation.
 	 * @author Lippisch
@@ -387,6 +389,18 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public void setClickable(boolean clickable) {
 		this.clickable = clickable;
+	}
+	/**
+	 * @return the indention
+	 */
+	public int getIndention() {
+		return indention;
+	}
+	/**
+	 * @param indention the indention to set
+	 */
+	public void setIndention(int indention) {
+		this.indention = indention;
 	}
 
 }
