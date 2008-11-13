@@ -5,7 +5,6 @@ package de.xwic.cube.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -71,8 +70,8 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDimensionElement#getDimensionElements()
 	 */
-	public Collection<IDimensionElement> getDimensionElements() {
-		return Collections.unmodifiableCollection(elements);
+	public List<IDimensionElement> getDimensionElements() {
+		return Collections.unmodifiableList(elements);
 	}
 	
 	/* (non-Javadoc)
@@ -111,18 +110,27 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 */
 	public String getID() {
 		StringBuilder sb = new StringBuilder();
-		IDimensionElement pr = parent;
 		sb.append("[")
 		  .append(getDimension().getKey())
 		  .append(":");
-		int idx = sb.length();
+		sb.append(getPath());
+		sb.append("]");
+		return sb.toString();
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDimensionElement#getPath()
+	 */
+	@Override
+	public String getPath() {
+		StringBuilder sb = new StringBuilder();
+		IDimensionElement pr = parent;
 		while (pr != null && !(pr instanceof Dimension)) {
-			sb.insert(idx, "/");
-			sb.insert(idx, pr.getKey());
+			sb.insert(0, "/");
+			sb.insert(0, pr.getKey());
 			pr = pr.getParent();
 		}
 		sb.append(getKey());
-		sb.append("]");
 		return sb.toString();
 	}
 

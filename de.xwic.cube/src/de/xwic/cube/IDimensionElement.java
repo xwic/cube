@@ -3,7 +3,7 @@
  */
 package de.xwic.cube;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Florian Lippisch
@@ -36,7 +36,7 @@ public interface IDimensionElement extends IIdentifyable {
 	 * Returns the list of DimensionElements.
 	 * @return
 	 */
-	public abstract Collection<IDimensionElement> getDimensionElements();
+	public abstract List<IDimensionElement> getDimensionElements();
 
 	/**
 	 * Remove the element from the parent element/dimension. A DimensionElement can only be 
@@ -57,10 +57,23 @@ public interface IDimensionElement extends IIdentifyable {
 	public abstract IDimensionElement getParent();
 
 	/**
-	 * Builds the ID of an element.
+	 * Builds the ID of an element. The ID contains the dimension key and 
+	 * the path of all elements.
+	 * Sample: 
+	 * <li>[GEO:EMEA/Germany]
+	 * <li>[Time:2009/Q1/Jan]
 	 * @return
 	 */
 	public abstract String getID();
+	
+	/**
+	 * Returns the path to this dimension element.
+	 * Samples:
+	 * <li>EMEA/Germany
+	 * <li>2009/Q1/Jan
+	 * @return
+	 */
+	public abstract String getPath();
 
 	/**
 	 * Returns the total number of child elements in this dimension/element.
