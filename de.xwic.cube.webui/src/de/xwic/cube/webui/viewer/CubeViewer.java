@@ -93,8 +93,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 			}
 			model.notifyCellSelection(dimKey, args);
 		} else {
-//			log.warn("Invalid parameter for cell selection - parameter must not be empty.");
-			System.err.println("Invalid parameter for cell selection - parameter must not be empty.");
+			log.warn("Invalid parameter for cell selection - parameter must not be empty.");
 		}
 	}
 	
@@ -119,7 +118,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		TableRenderer tbl = renderTable();
 		tbl.render(out);
 		
-		out.println("<span class=\"x-cube-info\">cube: " + model.getCube().getKey() + ", measure: " + model.getMeasure().getKey() + "</span>");
+		//out.println("<span class=\"x-cube-info\">cube: " + model.getCube().getKey() + ", measure: " + model.getMeasure().getKey() + "</span>");
 		
 		
 	}
@@ -134,7 +133,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		// render header...
 		
 		if (model.getColumnProvider().size() == 0 && model.getRowProvider().size() == 0) {
-			tbl.initSize(1, 1);
+			tbl.initSize(2, 1);
 			tbl.getCell(0, 0).setContent("Total");
 			tbl.getCell(1, 0).setContent(formatValue(model.getCube().getCellValue(model.getTotalKey(), model.getMeasure())));
 			// early EXIT
@@ -191,7 +190,9 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		for (INavigationProvider navProvider : model.getRowProvider()) {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.depth = rowDepth;
-			renderNavigation(tbl, startRow, 0, navProvider, size, false);
+			if (size.cells > 0) {
+				renderNavigation(tbl, startRow, 0, navProvider, size, false);
+			}
 			startRow += size.cells;
 		}		
 		

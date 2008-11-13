@@ -19,6 +19,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
+import de.xwic.cube.webui.controls.DimensionSelectorControl;
 
 /**
  * @author lippisch

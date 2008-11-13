@@ -94,9 +94,10 @@ public class CubeViewerModel implements Serializable {
 	public void notifyCellSelection(String dimKey, String[] args) {
 	
 		Key key = cube.createKey(dimKey);
+		key.setModifyable(true);
 		for (IDimensionElement de : filter.values()) {
 			int idx = cube.getDimensionIndex(de.getDimension());
-			if (!(key.getDimensionElement(idx) instanceof IDimension)) {
+			if (key.getDimensionElement(idx) instanceof IDimension) {
 				key.setDimensionElement(idx, de);
 			}
 		}

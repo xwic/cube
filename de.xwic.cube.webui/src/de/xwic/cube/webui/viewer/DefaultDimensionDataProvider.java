@@ -5,6 +5,7 @@ package de.xwic.cube.webui.viewer;
 
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimensionElement;
+import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
 
 /**
@@ -13,6 +14,8 @@ import de.xwic.cube.Key;
  */
 public class DefaultDimensionDataProvider implements ICubeDataProvider {
 
+	private IMeasure fixedMeasure = null;
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.webui.viewer.ICubeDataProvider#getCellData(de.xwic.cube.webui.viewer.CubeViewerModel, de.xwic.cube.webui.viewer.ContentInfo, de.xwic.cube.webui.viewer.ContentInfo)
 	 */
@@ -20,7 +23,8 @@ public class DefaultDimensionDataProvider implements ICubeDataProvider {
 		
 		ICube cube = model.getCube();
 		Key cursor = createKey(model, row, col);
-		Double value = cube.getCellValue(cursor, model.getMeasure());
+		IMeasure measure = fixedMeasure != null ? fixedMeasure : model.getMeasure();
+		Double value = cube.getCellValue(cursor, measure);
 		return value != null ? model.getValueFormat().format(value) : "";
 	}
 	
@@ -51,6 +55,20 @@ public class DefaultDimensionDataProvider implements ICubeDataProvider {
 	 */
 	public int getPriority() {
 		return 1;
+	}
+
+	/**
+	 * @return the fixedMeasure
+	 */
+	public IMeasure getFixedMeasure() {
+		return fixedMeasure;
+	}
+
+	/**
+	 * @param fixedMeasure the fixedMeasure to set
+	 */
+	public void setFixedMeasure(IMeasure fixedMeasure) {
+		this.fixedMeasure = fixedMeasure;
 	}
 
 }

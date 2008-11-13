@@ -16,6 +16,7 @@ import de.jwic.events.ElementSelectedListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.webui.controls.DimensionSelectorControl;
 
 /**
  * @author Florian Lippisch

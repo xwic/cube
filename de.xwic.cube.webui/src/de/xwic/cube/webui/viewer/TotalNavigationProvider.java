@@ -6,12 +6,17 @@ package de.xwic.cube.webui.viewer;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.xwic.cube.IMeasure;
+
 /**
  * @author Florian Lippisch
  */
 public class TotalNavigationProvider implements INavigationProvider {
 
 	private List<INavigationElement> elements;
+	private String title = "Total";
+	private IMeasure fixedMeasure = null;
+	public boolean clickable = false;
 
 	private class TotalNavigationElement implements INavigationElement {
 
@@ -19,7 +24,10 @@ public class TotalNavigationProvider implements INavigationProvider {
 		 * @see de.xwic.cube.webui.viewer.INavigationElement#getContentInfo()
 		 */
 		public ContentInfo getContentInfo() {
-			ContentInfo ci = new ContentInfo (new DefaultDimensionDataProvider());
+			DefaultDimensionDataProvider dataProvider = new DefaultDimensionDataProvider();
+			dataProvider.setFixedMeasure(fixedMeasure);
+			ContentInfo ci = new ContentInfo (dataProvider);
+			ci.setClickable(clickable );
 			return ci;
 		}
 
@@ -41,7 +49,7 @@ public class TotalNavigationProvider implements INavigationProvider {
 		 * @see de.xwic.cube.webui.viewer.INavigationElement#getTitle()
 		 */
 		public String getTitle() {
-			return "Total";
+			return title;
 		}
 
 		/* (non-Javadoc)
@@ -87,6 +95,48 @@ public class TotalNavigationProvider implements INavigationProvider {
 	 */
 	public List<INavigationElement> getNavigationElements() {
 		return elements;
+	}
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	 * @param title the title to set
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	/**
+	 * @return the fixedMeasure
+	 */
+	public IMeasure getFixedMeasure() {
+		return fixedMeasure;
+	}
+
+	/**
+	 * @param fixedMeasure the fixedMeasure to set
+	 */
+	public void setFixedMeasure(IMeasure fixedMeasure) {
+		this.fixedMeasure = fixedMeasure;
+	}
+
+	/**
+	 * @return the clickable
+	 */
+	public boolean isClickable() {
+		return clickable;
+	}
+
+	/**
+	 * @param clickable the clickable to set
+	 */
+	public void setClickable(boolean clickable) {
+		this.clickable = clickable;
 	}
 
 }
