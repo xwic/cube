@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.xwic.cube.ICube;
-import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.Key;
 
@@ -16,13 +15,13 @@ import de.xwic.cube.Key;
  */
 public class DimensionNavigationProvider implements INavigationProvider {
 
-	private List<IDimension> dimensions = new ArrayList<IDimension>();
+	private List<IDimensionElement> dimensions = new ArrayList<IDimensionElement>();
 	private final CubeViewerModel model;
 	private List<INavigationElement> rootNavElements = new ArrayList<INavigationElement>();
 	private ICubeDataProvider dataProvider = new DefaultDimensionDataProvider();
 
 	private boolean hideEmptyElements = false;
-	private boolean showDimension = false;
+	private boolean showRoot = false;
 	private boolean hideTotals = false;
 	private boolean clickable = false;
 	
@@ -78,7 +77,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		 * Returns the current dimension in the chain.
 		 * @return
 		 */
-		public IDimension getDimension() {
+		public IDimensionElement getNext() {
 			return dimensions.get(position);
 		}
 	}
@@ -111,39 +110,13 @@ public class DimensionNavigationProvider implements INavigationProvider {
 				// childs of this dimension. The dimension itself is not added, as it
 				// is the same as the leaf element.
 				DimensionChain next = chain.nextDimensionChain(element);
-				for (IDimensionElement elm : next.getDimension().getDimensionElements()) {
+				for (IDimensionElement elm : next.getNext().getDimensionElements()) {
 					if (!hideEmptyElements || !isEmpty(elm, next)) {
 						childs.add(new DimensionNavigationElement(elm, next));
 					}
 				}
 				
 			}
-		}
-
-		/**
-		 * @param elm
-		 * @param chain2
-		 * @return
-		 */
-		private boolean isEmpty(IDimensionElement elm, DimensionChain dimChain) {
-			if (model.getMeasure() == null) {
-				return true;
-			}
-			ICube cube = model.getCube();
-			Key cursor = model.createCursor();
-	
-			int idx = cube.getDimensionIndex(elm.getDimension());
-			cursor.setDimensionElement(idx, elm);
-			DimensionChain dc = dimChain;
-			while (dc != null) {
-				if (dc.getElement() != null) {
-					idx = cube.getDimensionIndex(dc.getElement().getDimension());
-					cursor.setDimensionElement(idx, dc.getElement());
-				}
-				dc = dc.getParent();
-			}
-
-			return cube.getCellValue(cursor, model.getMeasure()) == null;
 		}
 
 		/* (non-Javadoc)
@@ -224,7 +197,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 * Create a DimensionProvider with one dimension.
 	 * @param dimension
 	 */
-	public DimensionNavigationProvider(CubeViewerModel model, IDimension dimension) {
+	public DimensionNavigationProvider(CubeViewerModel model, IDimensionElement dimension) {
 		this.model = model;
 		dimensions.add(dimension);
 		initialize();
@@ -234,7 +207,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 * Create a DimensionProvider with one dimension.
 	 * @param dimension
 	 */
-	public DimensionNavigationProvider(CubeViewerModel model, List<IDimension> dimensions) {
+	public DimensionNavigationProvider(CubeViewerModel model, List<IDimensionElement> dimensions) {
 		this.model = model;
 		this.dimensions.addAll(dimensions);
 		initialize();
@@ -244,14 +217,40 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 * Create a DimensionProvider with one dimension.
 	 * @param dimension
 	 */
-	public DimensionNavigationProvider(CubeViewerModel model, IDimension... dimensions) {
+	public DimensionNavigationProvider(CubeViewerModel model, IDimensionElement... dimensions) {
 		this.model = model;
-		for (IDimension dim : dimensions) {
+		for (IDimensionElement dim : dimensions) {
 			this.dimensions.add(dim);
 		}
 		initialize();
 	}
 
+
+	/**
+	 * @param elm
+	 * @param chain2
+	 * @return
+	 */
+	private boolean isEmpty(IDimensionElement elm, DimensionChain dimChain) {
+		if (model.getMeasure() == null) {
+			return true;
+		}
+		ICube cube = model.getCube();
+		Key cursor = model.createCursor();
+
+		int idx = cube.getDimensionIndex(elm.getDimension());
+		cursor.setDimensionElement(idx, elm);
+		DimensionChain dc = dimChain;
+		while (dc != null) {
+			if (dc.getElement() != null) {
+				idx = cube.getDimensionIndex(dc.getElement().getDimension());
+				cursor.setDimensionElement(idx, dc.getElement());
+			}
+			dc = dc.getParent();
+		}
+
+		return cube.getCellValue(cursor, model.getMeasure()) == null;
+	}
 
 	/**
 	 * 
@@ -277,12 +276,14 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		rootNavElements = new ArrayList<INavigationElement>();
 		DimensionChain chain = new DimensionChain();
 		if (dimensions.size() > 0) {
-			IDimension dim = dimensions.get(0); // first one.
-			if (showDimension) {
+			IDimensionElement dim = dimensions.get(0); // first one.
+			if (showRoot) {
 				rootNavElements.add(new DimensionNavigationElement(dim, chain));
 			} else {
 				for (IDimensionElement elm : dim.getDimensionElements()) {
-					rootNavElements.add(new DimensionNavigationElement(elm, chain));
+					if (!hideEmptyElements || !isEmpty(elm, chain)) {
+						rootNavElements.add(new DimensionNavigationElement(elm, chain));
+					}
 				}
 			}
 		}
@@ -306,14 +307,14 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	/**
 	 * @return the showDimension
 	 */
-	public boolean isShowDimension() {
-		return showDimension;
+	public boolean isShowRoot() {
+		return showRoot;
 	}
 	/**
 	 * @param showDimension the showDimension to set
 	 */
-	public void setShowDimension(boolean showDimension) {
-		this.showDimension = showDimension;
+	public void setShowRoot(boolean showDimension) {
+		this.showRoot = showDimension;
 		createNavigationElements();
 	}
 
