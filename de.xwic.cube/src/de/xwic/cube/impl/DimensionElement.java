@@ -121,7 +121,6 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDimensionElement#getPath()
 	 */
-	@Override
 	public String getPath() {
 		StringBuilder sb = new StringBuilder();
 		IDimensionElement pr = parent;
