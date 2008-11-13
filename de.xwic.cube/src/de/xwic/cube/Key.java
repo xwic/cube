@@ -4,7 +4,10 @@
 package de.xwic.cube;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Represents a pointer to a cell in a cube.
@@ -132,6 +135,18 @@ public class Key implements Serializable {
 	 */
 	public IDimensionElement getDimensionElement(int idx) {
 		return elementKeys[idx];
+	}
+
+	/**
+	 * Returns a collection of all DimensionElements in this key.
+	 * @return
+	 */
+	public Collection<IDimensionElement> getDimensionElements() {
+		List<IDimensionElement> elements = new ArrayList<IDimensionElement>();
+		for (IDimensionElement e : elementKeys) {
+			elements.add(e);
+		}
+		return elements;
 	}
 	
 }
