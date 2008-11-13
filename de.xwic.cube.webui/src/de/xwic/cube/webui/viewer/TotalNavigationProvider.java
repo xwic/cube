@@ -17,6 +17,7 @@ public class TotalNavigationProvider implements INavigationProvider {
 	private String title = "Total";
 	private IMeasure fixedMeasure = null;
 	public boolean clickable = false;
+	private int indention = 0;
 
 	private class TotalNavigationElement implements INavigationElement {
 
@@ -137,6 +138,20 @@ public class TotalNavigationProvider implements INavigationProvider {
 	 */
 	public void setClickable(boolean clickable) {
 		this.clickable = clickable;
+	}
+
+	/**
+	 * @return the indention
+	 */
+	public int getIndention() {
+		return indention;
+	}
+
+	/**
+	 * @param indention the indention to set
+	 */
+	public void setIndention(int indention) {
+		this.indention = indention;
 	}
 
 }

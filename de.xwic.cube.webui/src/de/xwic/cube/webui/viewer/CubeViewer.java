@@ -93,8 +93,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 			}
 			model.notifyCellSelection(dimKey, args);
 		} else {
-//			log.warn("Invalid parameter for cell selection - parameter must not be empty.");
-			System.err.println("Invalid parameter for cell selection - parameter must not be empty.");
+			log.warn("Invalid parameter for cell selection - parameter must not be empty.");
 		}
 	}
 	
@@ -145,9 +144,10 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		int colHeight = 0;
 		int colCount = 0;
 		for (INavigationProvider navProvider : model.getColumnProvider()) {
-			NavigationSize size = navProvider.getNavigationSize(); 
-			if (size.depth > colHeight) {
-				colHeight = size.depth;
+			NavigationSize size = navProvider.getNavigationSize();
+			int depth = size.depth + navProvider.getIndention();
+			if (depth > colHeight) {
+				colHeight = depth;
 			}
 			colCount += size.cells;
 		}
@@ -156,9 +156,10 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		int rowDepth = 0;
 		int rowCount = 0;
 		for (INavigationProvider navProvider : model.getRowProvider()) {
-			NavigationSize size = navProvider.getNavigationSize(); 
-			if (size.depth > rowDepth) {
-				rowDepth = size.depth;
+			NavigationSize size = navProvider.getNavigationSize();
+			int depth = size.depth + navProvider.getIndention();
+			if (depth > rowDepth) {
+				rowDepth = depth;
 			}
 			rowCount += size.cells;
 		}
@@ -176,7 +177,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		for (INavigationProvider navProvider : model.getColumnProvider()) {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.cells += startCol;
-			renderNavigation(tbl, 0, startCol, navProvider, size, true);
+			renderNavigation(tbl, navProvider.getIndention(), startCol, navProvider, size, true);
 			startCol += (size.cells - startCol);
 		}		
 		
@@ -192,7 +193,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.depth = rowDepth;
 			if (size.cells > 0) {
-				renderNavigation(tbl, startRow, 0, navProvider, size, false);
+				renderNavigation(tbl, startRow, navProvider.getIndention(), navProvider, size, false);
 			}
 			startRow += size.cells;
 		}		

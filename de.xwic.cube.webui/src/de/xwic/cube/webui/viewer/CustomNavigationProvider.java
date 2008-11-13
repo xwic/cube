@@ -17,6 +17,7 @@ import de.xwic.cube.webui.viewer.NavigationSize;
 public class CustomNavigationProvider implements INavigationProvider {
 
 	private List<INavigationElement> elements = new ArrayList<INavigationElement>();
+	private int indention = 0;
 	
 	/**
 	 * @param elements
@@ -46,6 +47,20 @@ public class CustomNavigationProvider implements INavigationProvider {
 	 */
 	public List<INavigationElement> getNavigationElements() {
 		return elements;
+	}
+
+	/**
+	 * @return the indention
+	 */
+	public int getIndention() {
+		return indention;
+	}
+
+	/**
+	 * @param indention the indention to set
+	 */
+	public void setIndention(int indention) {
+		this.indention = indention;
 	}
 
 }
