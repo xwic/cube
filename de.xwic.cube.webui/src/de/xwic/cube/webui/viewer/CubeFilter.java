@@ -4,6 +4,7 @@
 package de.xwic.cube.webui.viewer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,17 @@ public class CubeFilter extends ControlContainer {
 	 * @param name
 	 */
 	public CubeFilter(IControlContainer container, String name, CubeViewerModel model) {
+		this(container, name, model, model.getCube().getMeasures());
+	}
+
+	/**
+	 * 
+	 * @param container
+	 * @param name
+	 * @param model
+	 * @param measures that should be selectable in the combobox.
+	 */
+	public CubeFilter(IControlContainer container, String name, CubeViewerModel model, Collection<IMeasure> measures) {
 		super(container, name);
 		this.model = model;
 	
@@ -47,7 +59,7 @@ public class CubeFilter extends ControlContainer {
 		
 		lbcMeasures = new ListBoxControl(this, "lbcMeasure");
 		lbcMeasures.setChangeNotification(true);
-		for (IMeasure measure : model.getCube().getMeasures()) {
+		for (IMeasure measure : measures) {
 			lbcMeasures.addElement(measure.getTitle() != null && measure.getTitle().length() > 0 ? measure.getTitle() : measure.getKey(), measure.getKey());
 		}
 		if (model.getMeasure() != null) {
@@ -58,9 +70,8 @@ public class CubeFilter extends ControlContainer {
 				onMeasureSelect((String)event.getElement());
 			}
 		});
-		
 	}
-
+	
 	/**
 	 * @param event
 	 */
