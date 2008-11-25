@@ -6,6 +6,7 @@ package de.xwic.cube.functions;
 import java.io.Serializable;
 
 import de.xwic.cube.ICell;
+import de.xwic.cube.ICube;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.IMeasureFunction;
 import de.xwic.cube.Key;
@@ -19,6 +20,8 @@ public class DifferenceFunction implements IMeasureFunction, Serializable {
 	
 	private IMeasure measureA;
 	private IMeasure measureB;
+	private int measureIndexA = -1;
+	private int measureIndexB = -1;
 	private boolean asPercent = false;
 
 	/**
@@ -37,7 +40,7 @@ public class DifferenceFunction implements IMeasureFunction, Serializable {
 	 * @param measureA
 	 * @param measureB
 	 */
-	public DifferenceFunction(IMeasure measureA, IMeasure measureB) {
+	public DifferenceFunction(ICube cube, IMeasure measureA, IMeasure measureB) {
 		super();
 		this.measureA = measureA;
 		this.measureB = measureB;
@@ -46,10 +49,21 @@ public class DifferenceFunction implements IMeasureFunction, Serializable {
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IMeasureFunction#computeValue(de.xwic.cube.Key, de.xwic.cube.ICell, de.xwic.cube.IMeasure)
 	 */
-	public Double computeValue(Key key, ICell cell, IMeasure measure) {
+	public Double computeValue(ICube cube, Key key, ICell cell, IMeasure measure) {
+		
+		// cache the measure index on first use. This does not
+		// need to be synchronized because if it would realy
+		// happen that an initial call is done in two ore more threads,
+		// the result would still be the same.
+		
+		if (measureIndexA == -1) {
+			measureIndexA = cube.getMeasureIndex(measureA);
+			measureIndexB = cube.getMeasureIndex(measureB);
+		}
+		
 		if (cell != null) {
-			Double valA = cell.getValue(measureA);
-			Double valB = cell.getValue(measureB);
+			Double valA = cell.getValue(measureIndexA);
+			Double valB = cell.getValue(measureIndexB);
 			if (valA == null) {
 				valA = 0.0;
 			} 

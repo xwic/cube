@@ -17,15 +17,12 @@ public class Key implements Serializable {
 
 	private static final long serialVersionUID = -3558184977558178383L;
 	private IDimensionElement[] elementKeys;
-	private boolean modifyable = false;
-	private ICube cube = null;
 	
 	/**
 	 * @param elementKeys
 	 */
-	public Key(ICube cube, IDimensionElement[] elementKeys) {
+	public Key(IDimensionElement[] elementKeys) {
 		super();
-		this.cube = cube;
 		this.elementKeys = elementKeys;
 	}
 	
@@ -75,18 +72,9 @@ public class Key implements Serializable {
 	public Key clone() {
 		IDimensionElement[] cloneKeys = new IDimensionElement[elementKeys.length];
 		System.arraycopy(elementKeys, 0, cloneKeys, 0, elementKeys.length);
-		Key clone = new Key(cube, cloneKeys);
-		clone.modifyable = this.modifyable;
+		Key clone = new Key(cloneKeys);
 		return clone;
 	}
-
-	/**
-	 * @return the modifyable
-	 */
-	public boolean isModifyable() {
-		return modifyable;
-	}
-
 	/**
 	 * Returns true if this key is based upon leafs only.
 	 * @return
@@ -101,32 +89,12 @@ public class Key implements Serializable {
 	}
 	
 	/**
-	 * Change the key. The index of the dimension element is determined
-	 * automatically.
-	 * @param element
-	 */
-	public void setDimensionElement(IDimensionElement element) {
-		int idx = cube.getDimensionIndex(element.getDimension());
-		setDimensionElement(idx, element);
-	}
-	
-	/**
 	 * Change the key.
 	 * @param idx
 	 * @param element
 	 */
 	public void setDimensionElement(int idx, IDimensionElement element) {
-		if (!modifyable) {
-			throw new IllegalStateException("The key is unmodifyable!");
-		}
 		elementKeys[idx] = element;
-	}
-
-	/**
-	 * @param modifyable the modifyable to set
-	 */
-	public void setModifyable(boolean modifyable) {
-		this.modifyable = modifyable;
 	}
 
 	/**

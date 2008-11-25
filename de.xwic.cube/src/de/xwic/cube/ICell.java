@@ -14,6 +14,6 @@ public interface ICell {
 	 * @param measure
 	 * @return
 	 */
-	public abstract Double getValue(IMeasure measure);
+	public abstract Double getValue(int measureIndex);
 
 }

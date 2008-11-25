@@ -15,6 +15,6 @@ public interface IMeasureFunction {
 	 * @param key 
 	 * @return
 	 */
-	Double computeValue(Key key, ICell cell, IMeasure measure);
+	Double computeValue(ICube cube, Key key, ICell cell, IMeasure measure);
 
 }
