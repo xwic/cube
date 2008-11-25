@@ -107,5 +107,18 @@ public interface ICube extends IIdentifyable {
 	 * @return
 	 */
 	public abstract int getDimensionIndex(IDimension dimVert);
+	
+	/**
+	 * Returns the number of filled cells in this cube.
+	 * @return
+	 */
+	public int getSize();
+
+	/**
+	 * Returns the measure index.
+	 * @param measure
+	 * @return
+	 */
+	public int getMeasureIndex(IMeasure measure);
 
 }

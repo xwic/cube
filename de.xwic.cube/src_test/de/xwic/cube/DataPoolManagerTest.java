@@ -64,21 +64,21 @@ public class DataPoolManagerTest extends TestCase {
 		ICube cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB }, new IMeasure[] { meBookings });
 		assertNotNull(cube);
 		
-		Key key = new Key(cube, new IDimensionElement[] { elmAOO, elmInst });
+		Key key = new Key(new IDimensionElement[] { elmAOO, elmInst });
 		cube.setCellValue(key, meBookings, 100);
 		
-		key = new Key(cube, new IDimensionElement[] { elmAOO, elmED });
+		key = new Key(new IDimensionElement[] { elmAOO, elmED });
 		cube.setCellValue(key, meBookings, 200);
 
 		Double value = cube.getCellValue(key, meBookings);
 		assertNotNull(value);
 		assertEquals(200.0, value.doubleValue());
 		
-		key = new Key(cube, new IDimensionElement[] { elmAOO, elmConsulting });
+		key = new Key(new IDimensionElement[] { elmAOO, elmConsulting });
 		cube.setCellValue(key, meBookings, 50);
 
 		
-		key = new Key(cube, new IDimensionElement[] { elmAOO, dimLOB });
+		key = new Key(new IDimensionElement[] { elmAOO, dimLOB });
 		value = cube.getCellValue(key, meBookings);
 		assertNotNull(value);
 		assertEquals(350.0, value.doubleValue());

@@ -164,7 +164,7 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	/**
 	 * @param cube
 	 */
-	void removeCube(Cube cube) {
+	void removeCube(ICube cube) {
 		if (cubeMap.containsKey(cube.getKey())) {
 			cubeMap.remove(cube.getKey());
 		}

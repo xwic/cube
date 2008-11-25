@@ -99,9 +99,8 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	private Cell getCell(Key key, boolean createNew) {
 		Cell cell = data.get(key);
 		if (cell == null && createNew) {
-			cell = new Cell();
+			cell = new Cell(measureMap.size());
 			Key newKey = key.clone();
-			newKey.setModifyable(false);
 			data.put(newKey, cell);
 		}
 		return cell;
@@ -121,7 +120,7 @@ public class Cube extends Identifyable implements ICube, Serializable {
 			throw new IllegalArgumentException("The specified measure is a function. Functional measures can not hold data.");
 		}
 		
-		return splashAndWriteValue(0, key, measure, value);
+		return splashAndWriteValue(0, key, getMeasureIndex(measure), value);
 		
 	}
 
@@ -139,12 +138,13 @@ public class Cube extends Identifyable implements ICube, Serializable {
 			throw new IllegalArgumentException("The key must contain only leafs.");
 		}
 		
+		int measureIndex = getMeasureIndex(measure);
 		ICell cell = getCell(key, true);
 		
-		Double oldValue = cell.getValue(measure);
+		Double oldValue = cell.getValue(measureIndex);
 		double newValue = (oldValue != null ? value + oldValue.doubleValue() : value);
 
-		return splashAndWriteValue(0, key, measure, newValue);
+		return splashAndWriteValue(0, key, measureIndex, newValue);
 		
 	}
 
@@ -153,23 +153,22 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	 * @param measure
 	 * @param value
 	 */
-	private int splashAndWriteValue(int idx, Key key, IMeasure measure, double value) {
+	private int splashAndWriteValue(int idx, Key key, int measureIndex, double value) {
 		
 		int cellsModified = 0;
 		if (key.containsLeafsOnly()) {
 			ICell cell = getCell(key, true);
 			
-			Double oldValue = cell.getValue(measure);
+			Double oldValue = cell.getValue(measureIndex);
 			double diff = (oldValue != null ? value - oldValue.doubleValue() : value);
 			
 //			System.out.println("Start ApplyChange to: " + key);
-			cellsModified += applyValueChange(0, key, measure, diff);
+			cellsModified += applyValueChange(0, key, measureIndex, diff);
 			
 		} else {
 			IDimensionElement elmCurr = key.getDimensionElement(idx);
 			if (!elmCurr.isLeaf()) {
 				Key subKey = key.clone();
-				subKey.setModifyable(true);
 				// splash and iterate over children
 				double total = elmCurr.getElementsTotalWeight();
 				double atom = total != 0 ? value / total : 0;
@@ -179,10 +178,10 @@ public class Cube extends Identifyable implements ICube, Serializable {
 					double elmValue =  it.hasNext() ? de.getWeight() * atom : rest;
 					rest -= elmValue;
 					subKey.setDimensionElement(idx, de);
-					cellsModified += splashAndWriteValue(idx, subKey, measure, elmValue);
+					cellsModified += splashAndWriteValue(idx, subKey, measureIndex, elmValue);
 				}
 			} else {
-				cellsModified += splashAndWriteValue(idx + 1, key, measure, value);
+				cellsModified += splashAndWriteValue(idx + 1, key, measureIndex, value);
 			}
 		}
 		return cellsModified;
@@ -194,21 +193,20 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	 * @param measure
 	 * @param diff
 	 */
-	private int applyValueChange(int idx, Key key, IMeasure measure, double diff) {
+	private int applyValueChange(int idx, Key key, int measureIndex, double diff) {
 		
 		int cellsModified = 0;
 		if (idx == dimensionMap.size()) {
 			Cell cell = getCell(key, true);
-			Double oldValue = cell.getValue(measure);
-			cell.setValue(measure, oldValue != null ? oldValue.doubleValue() + diff : diff);
+			Double oldValue = cell.getValue(measureIndex);
+			cell.setValue(measureIndex, oldValue != null ? oldValue.doubleValue() + diff : diff);
 			cellsModified = 1;
 			//System.out.println("Changed Cell " + key + " from " + oldValue + " to " + cell.getValue(measure));
 		} else {
 			Key myCursor = key.clone();
-			myCursor.setModifyable(true);
 			IDimensionElement element = key.getDimensionElement(idx);
 			do {
-				cellsModified += applyValueChange(idx + 1, myCursor, measure, diff);
+				cellsModified += applyValueChange(idx + 1, myCursor, measureIndex, diff);
 				if (element != null) {
 					element = element.getParent();
 					myCursor.setDimensionElement(idx, element);
@@ -224,10 +222,10 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	public Double getCellValue(Key key, IMeasure measure) {
 		ICell cell = getCell(key);
 		if (measure.isFunction()) {
-			return measure.getFunction().computeValue(key, cell, measure);
+			return measure.getFunction().computeValue(this, key, cell, measure);
 		} 
 		if (cell != null) {
-			return cell.getValue(measure);
+			return cell.getValue(getMeasureIndex(measure));
 		}
 		return null;
 	}
@@ -308,7 +306,7 @@ public class Cube extends Identifyable implements ICube, Serializable {
 			pos = end;
 			idx++;
 		}
-		return new Key(this, elements);
+		return new Key(elements);
 	}
 	
 	/* (non-Javadoc)
@@ -333,9 +331,34 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	}
 
 	/**
+	 * Returns the measure index.
+	 * @param measure
+	 * @return
+	 */
+	public int getMeasureIndex(IMeasure measure) {
+		int idx = 0;
+		for (IMeasure m : measureMap.values()) {
+			if (m.equals(measure)) {
+				return idx;
+			}
+			idx++;
+		}
+		throw new IllegalArgumentException("The specified measure is not used int his cube.");
+	}
+	
+	/**
 	 * @return the dataPool
 	 */
 	public DataPool getDataPool() {
 		return dataPool;
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#size()
+	 */
+	@Override
+	public int getSize() {
+		return data.size();
+	}
+	
 }

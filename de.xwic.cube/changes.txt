@@ -1,0 +1,8 @@
+Change Notes
+============
+
+
+2008-11-25	FLI
+	- Optimized memory usage by refactoring the internal data model. This has
+	  lead to a few API changes, but also improved performance. The memory
+	  usage decreased by 24%, performance gain is at about 33%. 
