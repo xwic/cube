@@ -10,6 +10,7 @@ import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.ImageRef;
 import de.jwic.base.RenderContext;
+import de.jwic.base.UserAgentInfo;
 import de.jwic.renderer.self.ISelfRenderingControl;
 import de.jwic.renderer.self.SelfRenderer;
 import de.xwic.cube.IDimensionElement;
@@ -129,6 +130,11 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	private TableRenderer renderTable() {
 		TableRenderer tbl = new TableRenderer(this);
 		tbl.setCssClass("xcube-tbl");
+		
+		UserAgentInfo userAgent = getSessionContext().getUserAgent();
+		if (userAgent.isIE() && userAgent.getVersion().equals("6.0")) {
+			tbl.setEnableJSHoverMode(true);
+		}
 
 		// render header...
 		

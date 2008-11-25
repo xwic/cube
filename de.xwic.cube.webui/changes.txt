@@ -1,7 +1,11 @@
 Change Notes
 =============
 
-
+2008-11-25  FLI
+	- Added LeafDimensionSelection support into the CubeFilter
+	- Added row highlighting support for IE6 browser
+	- Fixed changes due to performance optimizations in the cube API
+	
 2008-11-13	FLI
 	Added an indention level for navigation providers. This allows to better customize the viewer
 	when using multiple NavigationProviders, for example a Total and some Dimensions.

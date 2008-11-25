@@ -94,7 +94,6 @@ public class CubeViewerModel implements Serializable {
 	public void notifyCellSelection(String dimKey, String[] args) {
 	
 		Key key = cube.createKey(dimKey);
-		key.setModifyable(true);
 		for (IDimensionElement de : filter.values()) {
 			int idx = cube.getDimensionIndex(de.getDimension());
 			if (key.getDimensionElement(idx) instanceof IDimension) {
@@ -191,7 +190,6 @@ public class CubeViewerModel implements Serializable {
 	public Key createCursor() {
 		// later: inject filter 
 		Key key = baseKey.clone();
-		key.setModifyable(true);
 		return key;
 	}
 
@@ -241,6 +239,14 @@ public class CubeViewerModel implements Serializable {
 		fireEvent(EventType.FILTER_UPDATE, new CubeViewerModelEvent(this));
 	}
 
+	/**
+	 * Returns the dimension element that is set for the specified dimension.
+	 * @param dimension
+	 * @return
+	 */
+	public IDimensionElement getFilterDimension(IDimension dimension) {
+		return filter.get(dimension);
+	}
 
 	/**
 	 * 
@@ -248,7 +254,6 @@ public class CubeViewerModel implements Serializable {
 	private void updateBaseKey() {
 		
 		baseKey = cube.createKey("");
-		baseKey.setModifyable(true);
 		for (IDimension dim : filter.keySet()) {
 			int idx = cube.getDimensionIndex(dim);
 			baseKey.setDimensionElement(idx, filter.get(dim));
