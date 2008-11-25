@@ -26,6 +26,8 @@ public class TableRenderer {
 	
 	private String cssClass = "";
 	
+	private boolean enableJSHoverMode = false;
+	
 	public TableRenderer() {
 		super();
 	}
@@ -42,7 +44,11 @@ public class TableRenderer {
 		
 		out.println("<TABLE cellspacing=0 cellpadding=0 class=\"" + cssClass + "\">");
 		for (List<TableCell> row : rows) {
-			out.println("<TR>");
+			if (enableJSHoverMode) {
+				out.println("<TR onMouseOver=\"this.className='hover';\" onMouseOut=\"this.className=''\">");
+			} else {
+				out.println("<TR>");
+			}
 			int skip = 0;
 			int col = 0;
 			for (TableCell cell : row) {
@@ -189,6 +195,20 @@ public class TableRenderer {
 	 */
 	public void setCssClass(String cssClass) {
 		this.cssClass = cssClass;
+	}
+
+	/**
+	 * @return the enableJSHoverMode
+	 */
+	public boolean isEnableJSHoverMode() {
+		return enableJSHoverMode;
+	}
+
+	/**
+	 * @param enableJSHoverMode the enableJSHoverMode to set
+	 */
+	public void setEnableJSHoverMode(boolean enableJSHoverMode) {
+		this.enableJSHoverMode = enableJSHoverMode;
 	}
 	
 }

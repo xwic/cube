@@ -94,7 +94,6 @@ public class DimensionSelectorControl extends ControlContainer {
 	public String getSelectedId() {
 		return lbDim.getSelectedKey();
 	}
-	
 	/**
 	 * @param key
 	 */

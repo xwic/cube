@@ -18,6 +18,7 @@ import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.webui.controls.DimensionSelectorControl;
+import de.xwic.cube.webui.controls.LeafDimensionSelectorControl;
 
 /**
  * @author Florian Lippisch
@@ -110,6 +111,36 @@ public class CubeFilter extends ControlContainer {
 		
 	}
 	
+	/**
+	 * Add a LeafDimensionSelector for the specified dimension.
+	 * @param dimension
+	 * @param filter
+	 */
+	public void addDimensionLeafSelector(IDimension dimension, IDimensionFilter filter) {
+		dimensions.add(dimension);
+		
+		LeafDimensionSelectorControl dsc = new LeafDimensionSelectorControl(this, null, dimension, filter);
+		dsc.addElementSelectedListener(new ElementSelectedListener() {
+			public void elementSelected(ElementSelectedEvent event) {
+				filterSelection((IDimensionElement)event.getElement());
+			}
+		});
+		dimCtrlMap.put(dimension.getKey(), dsc.getName());
+		
+		IDimensionElement elmSet = model.getFilterDimension(dimension);
+		if (elmSet != null && elmSet.isLeaf()) {
+			dsc.setDimensionElement(elmSet);
+		}
+		
+	}
+	
+	/**
+	 * @param element
+	 */
+	protected void filterSelection(IDimensionElement element) {
+		model.applyFilter(element);		
+	}
+
 	/**
 	 * @param element
 	 */
