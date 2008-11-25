@@ -75,6 +75,12 @@ public class DemoApplication1 extends Application {
 		navigationProvider.setClickable(true);
 		model.addRowNavigationProvider(navigationProvider);
 		
+		navigationProvider = new DimensionNavigationProvider(model, dimGEO);
+		navigationProvider.setHideEmptyElements(false);
+		navigationProvider.setShowRoot(true);
+		navigationProvider.setClickable(true);
+		navigationProvider.setIndention(1);
+		model.addRowNavigationProvider(navigationProvider);
 		
 		// create filter
 		CubeFilter filter = new CubeFilter(page, "filter", model);
