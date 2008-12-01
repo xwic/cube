@@ -71,11 +71,18 @@ public class CubeWriter extends ControlContainer {
 			}
 			
 			Key key = cube.createKey(sbKey.toString());
-			double value = Double.parseDouble(inpValue.getText());
-			IMeasure measure = cube.getDataPool().getMeasure(lbcMeasures.getSelectedKey());
-			cube.setCellValue(key, measure, value);
-			model.notifyCubeUpdated();
 			
+			String sValue = inpValue.getText();
+			if (sValue.trim().length() == 0) {
+				IMeasure measure = cube.getDataPool().getMeasure(lbcMeasures.getSelectedKey());
+				cube.clear(measure, key);
+				model.notifyCubeUpdated();
+			} else {
+				double value = Double.parseDouble(sValue);
+				IMeasure measure = cube.getDataPool().getMeasure(lbcMeasures.getSelectedKey());
+				cube.setCellValue(key, measure, value);
+				model.notifyCubeUpdated();
+			}
 		}
 		
 	}

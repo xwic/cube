@@ -65,22 +65,22 @@ public class DemoApplication1 extends Application {
 		IDimension dimTime = cube.getDataPool().getDimension("Time");
 		IDimension dimOT = cube.getDataPool().getDimension("OrderType");
 		
-		DimensionNavigationProvider navigationProvider = new DimensionNavigationProvider(model, dimOT);
+		DimensionNavigationProvider navigationProvider = new DimensionNavigationProvider(model, dimTime);
 		navigationProvider.setClickable(true);
 		model.addColumnNavigationProvider(navigationProvider);
 		
-		navigationProvider = new DimensionNavigationProvider(model, dimGEO);
+		navigationProvider = new DimensionNavigationProvider(model, dimGEO, dimOT);
 		navigationProvider.setHideEmptyElements(true);
 		navigationProvider.setShowRoot(true);
 		navigationProvider.setClickable(true);
 		model.addRowNavigationProvider(navigationProvider);
 		
-		navigationProvider = new DimensionNavigationProvider(model, dimGEO);
+		/*navigationProvider = new DimensionNavigationProvider(model, dimGEO);
 		navigationProvider.setHideEmptyElements(false);
 		navigationProvider.setShowRoot(true);
 		navigationProvider.setClickable(true);
 		navigationProvider.setIndention(1);
-		model.addRowNavigationProvider(navigationProvider);
+		model.addRowNavigationProvider(navigationProvider);*/
 		
 		// create filter
 		CubeFilter filter = new CubeFilter(page, "filter", model);
@@ -90,13 +90,13 @@ public class DemoApplication1 extends Application {
 		// create writer
 		new CubeWriter(page, "writer", model);
 		
-		LeafDimensionSelectorControl lfd = new LeafDimensionSelectorControl(page, "timeSelection", dimTime);
+		/*LeafDimensionSelectorControl lfd = new LeafDimensionSelectorControl(page, "timeSelection", dimTime);
 		lfd.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
 				model.applyFilter((IDimensionElement) event.getElement());
 			}
 		});
-		lfd.setWidth(150);
+		lfd.setWidth(150);*/
 		
 		return page;
 	}
