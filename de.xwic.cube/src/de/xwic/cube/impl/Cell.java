@@ -16,7 +16,7 @@ public class Cell implements ICell, Serializable {
 
 	private static final long serialVersionUID = -4297789024853482650L;
 	
-	private Double[] values;
+	public Double[] values;
 	
 	Cell(int measureSize) {
 		values = new Double[measureSize];
@@ -35,4 +35,18 @@ public class Cell implements ICell, Serializable {
 	void setValue(int measureIndex, Double value) {
 		values[measureIndex] = value;
 	}
+	
+	/**
+	 * Returns true if the cell is empty.
+	 * @return
+	 */
+	public boolean isEmpty() {
+		for (Double d : values) {
+			if (d != null) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 }

@@ -16,4 +16,10 @@ public interface ICell {
 	 */
 	public abstract Double getValue(int measureIndex);
 
+	/**
+	 * Returns true if the cell is empty.
+	 * @return
+	 */
+	public boolean isEmpty();
+
 }

@@ -161,7 +161,7 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 		if (dimension == null) {
 			if (other.dimension != null)
 				return false;
-		} else if (!dimension.equals(other.dimension))
+		} else if (dimension != this && !dimension.equals(other.dimension))
 			return false;
 		if (parent == null) {
 			if (other.parent != null)

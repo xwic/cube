@@ -98,9 +98,28 @@ public interface ICube extends IIdentifyable {
 
 	/**
 	 * Empties all values in the cube.
+	 * @deprecated - use clear()
 	 */
 	public abstract void reset();
 
+	/**
+	 * Empty all values in the cube.
+	 */
+	public abstract void clear();
+	
+	/**
+	 * Empty all values for the specified measure.
+	 * @param measure
+	 */
+	public abstract void clear(IMeasure measure);
+	
+	/**
+	 * Empty all values for the specified measure and key.
+	 * @param measure
+	 * @param key
+	 */
+	public abstract void clear(IMeasure measure, Key key);
+	
 	/**
 	 * Returns the key index position for this dimension.
 	 * @param dimVert

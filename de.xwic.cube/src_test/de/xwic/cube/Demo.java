@@ -80,7 +80,7 @@ public class Demo {
 		DataDump.printValues(System.out, cube, dimGEO, dimLOB, meIST);
 		
 		key = cube.createKey("[LOB:Software][GEO:EMEA/Benelux]");
-		cube.setCellValue(key, mePLAN, 120);
+		cube.setCellValue(key, mePLAN, 120.0d);
 
 		Double value = cube.getCellValue("[*][Software]", mePLAN);
 		System.out.println(value);
