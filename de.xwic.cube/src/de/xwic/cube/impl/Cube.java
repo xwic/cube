@@ -356,7 +356,6 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.ICube#size()
 	 */
-	@Override
 	public int getSize() {
 		return data.size();
 	}
