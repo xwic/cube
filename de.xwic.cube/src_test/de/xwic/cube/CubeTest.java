@@ -73,7 +73,7 @@ public class CubeTest extends TestCase {
 		meDiff.setFunction(function);
 		meDiff.setValueFormatProvider(new PercentageValueFormatProvider());
 		
-		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings });
+		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings, mePlan, meDiff });
 		
 	}
 	
@@ -203,18 +203,94 @@ public class CubeTest extends TestCase {
 		System.out.println(cube.getCellValue("[AOO][Hardware]", meBookings));
 
 		key = cube.createKey("");
-		System.out.printf("write to %s modified %d cells.%n", key, cube.setCellValue(key, meBookings, 1248 * 2));
+		System.out.printf("write to %s modified %d cells.%n", key, cube.setCellValue(key, meBookings, (double)(1248 * 2)));
 
 		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
 		DataDump.printValues(System.out, cube, dimTime, dimOT , meBookings);
 
 		key = cube.createKey("[AOO]");
-		System.out.printf("write to %s modified %d cells.%n", key, cube.setCellValue(key, meBookings, 1600));
+		System.out.printf("write to %s modified %d cells.%n", key, cube.setCellValue(key, meBookings, 1600d));
 
 		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
 		DataDump.printValues(System.out, cube, dimTime, dimOT , meBookings);
 
 	}
+	
+	public void testClear() {
 
+		Key key = cube.createKey("[AOO][Hardware][2008]");
+		System.out.printf("write to %s modified %d cells.%n", key, cube.setCellValue(key, meBookings, 300.0));
+
+		assertEquals(300.0, cube.getCellValue("[AOO][Hardware][2008]", meBookings));
+		assertEquals(150.0, cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
+		
+		System.out.println(" ---------------------- BEFORE CLEAR --------------------");
+		DataDump.printValues(System.out, cube, dimLOB, dimTime, meBookings);
+		cube.clear();
+
+		System.out.println(" ---------------------- AFTER CLEAR --------------------");
+		DataDump.printValues(System.out, cube, dimLOB, dimTime, meBookings);
+		
+		assertNull(cube.getCellValue("[AOO][Hardware][2008]", meBookings));
+		assertNull(cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
+		
+	}
+	
+	public void testClearMeasure() {
+
+		Key key = cube.createKey("[AOO][Hardware][2008]");
+		System.out.printf("write to %s modified %d cells.%n", key, cube.setCellValue(key, meBookings, 300.0));
+		System.out.printf("Cube size: %d%n", cube.getSize());
+		
+		key = cube.createKey("[AOO][PS][2008]");
+		System.out.printf("write to %s modified %d cells.%n", key, cube.setCellValue(key, mePlan, 600.0));
+		System.out.printf("Cube size: %d%n", cube.getSize());
+		
+		assertEquals(300.0, cube.getCellValue("[AOO][Hardware][2008]", meBookings));
+		assertEquals(150.0, cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
+		
+		System.out.println(" ---------------------- BEFORE CLEAR Bookings --------------------");
+		DataDump.printValues(System.out, cube, dimLOB, dimOT, meBookings);
+		cube.clear(meBookings);
+
+		System.out.println(" ---------------------- AFTER CLEAR Bookings --------------------");
+		DataDump.printValues(System.out, cube, dimLOB, dimOT, meBookings);
+		System.out.printf("Cube size: %d%n", cube.getSize());
+		
+		assertNull(cube.getCellValue("[AOO][Hardware][2008]", meBookings));
+		assertNull(cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
+		assertEquals(600.0, cube.getCellValue("[AOO][PS][2008]", mePlan));
+		assertEquals(300.0, cube.getCellValue("[AOO][PS][2008/Q1]", mePlan));
+		
+	}
+
+	public void testClearMeasureAndKey() {
+
+		Key key = cube.createKey("[AOO][Hardware][2008]");
+		System.out.printf("write to %s modified %d cells.%n", key, cube.setCellValue(key, meBookings, 300.0));
+		System.out.printf("Cube size: %d%n", cube.getSize());
+		
+		key = cube.createKey("[AOO][PS][2008]");
+		System.out.printf("write to %s modified %d cells.%n", key, cube.setCellValue(key, meBookings, 600.0));
+		System.out.printf("Cube size: %d%n", cube.getSize());
+		
+		assertEquals(900, cube.getCellValue("[AOO][*][2008]", meBookings).intValue());
+		assertEquals(300.0, cube.getCellValue("[AOO][Hardware][2008]", meBookings));
+		assertEquals(150.0, cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
+		
+		System.out.println(" ---------------------- BEFORE CLEAR Bookings --------------------");
+		DataDump.printValues(System.out, cube, dimLOB, dimOT, meBookings);
+		
+		cube.clear(meBookings, cube.createKey("[AOO][Hardware][2008]"));
+
+		System.out.println(" ---------------------- AFTER CLEAR Bookings --------------------");
+		DataDump.printValues(System.out, cube, dimLOB, dimOT, meBookings);
+		System.out.printf("Cube size: %d%n", cube.getSize());
+		
+		assertEquals(600, cube.getCellValue("[AOO][*][2008]", meBookings).intValue());
+		assertNull(cube.getCellValue("[AOO][Hardware][2008]", meBookings));
+		assertNull(cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
+		
+	}
 	
 }

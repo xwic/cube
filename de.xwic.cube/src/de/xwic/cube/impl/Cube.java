@@ -153,14 +153,20 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	 * @param measure
 	 * @param value
 	 */
-	private int splashAndWriteValue(int idx, Key key, int measureIndex, double value) {
+	private int splashAndWriteValue(int idx, Key key, int measureIndex, Double value) {
 		
 		int cellsModified = 0;
 		if (key.containsLeafsOnly()) {
-			ICell cell = getCell(key, true);
+			ICell cell = getCell(key, value != null);
+			
+			if (cell == null) { // can only happens when the value is null too
+				// simply exit, because the data is null anyway
+				return 0;
+			}
 			
 			Double oldValue = cell.getValue(measureIndex);
-			double diff = (oldValue != null ? value - oldValue.doubleValue() : value);
+			double newValue = value != null ? value.doubleValue() : 0.0d;
+			double diff = (oldValue != null ? newValue - oldValue.doubleValue() : newValue);
 			
 //			System.out.println("Start ApplyChange to: " + key);
 			cellsModified += applyValueChange(0, key, measureIndex, diff);
@@ -170,20 +176,40 @@ public class Cube extends Identifyable implements ICube, Serializable {
 			if (!elmCurr.isLeaf()) {
 				Key subKey = key.clone();
 				// splash and iterate over children
-				double total = elmCurr.getElementsTotalWeight();
-				double atom = total != 0 ? value / total : 0;
-				double rest = value;
-				for (Iterator<IDimensionElement> it =  elmCurr.getDimensionElements().iterator(); it.hasNext(); ) {
-					IDimensionElement de = it.next();
-					double elmValue =  it.hasNext() ? de.getWeight() * atom : rest;
-					rest -= elmValue;
-					subKey.setDimensionElement(idx, de);
-					cellsModified += splashAndWriteValue(idx, subKey, measureIndex, elmValue);
+				if (value != null) {
+					double total = elmCurr.getElementsTotalWeight();
+					double atom = total != 0 ? value / total : 0;
+					double rest = value;
+					for (Iterator<IDimensionElement> it =  elmCurr.getDimensionElements().iterator(); it.hasNext(); ) {
+						IDimensionElement de = it.next();
+						double elmValue =  it.hasNext() ? de.getWeight() * atom : rest;
+						rest -= elmValue;
+						subKey.setDimensionElement(idx, de);
+						cellsModified += splashAndWriteValue(idx, subKey, measureIndex, elmValue);
+					}
+				} else {
+					for (Iterator<IDimensionElement> it =  elmCurr.getDimensionElements().iterator(); it.hasNext(); ) {
+						IDimensionElement de = it.next();
+						subKey.setDimensionElement(idx, de);
+						cellsModified += splashAndWriteValue(idx, subKey, measureIndex, null);
+					}
 				}
 			} else {
 				cellsModified += splashAndWriteValue(idx + 1, key, measureIndex, value);
 			}
 		}
+
+		// remove empty cells 
+		if (value == null) {
+			Cell cell = getCell(key, false);
+			if (cell != null) {
+				cell.setValue(measureIndex, null);
+				if (cell.isEmpty()) {
+					data.remove(key);
+				}
+			}
+		}
+		
 		return cellsModified;
 	}
 
@@ -234,7 +260,39 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	 * @see de.xwic.cube.ICube#reset()
 	 */
 	public void reset() {
+		clear();
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#clear()
+	 */
+	public void clear() {
 		data.clear();
+	}
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#clear(de.xwic.cube.IMeasure)
+	 */
+	public void clear(IMeasure measure) {
+		int mIdx = getMeasureIndex(measure);
+		for (Iterator<Key> it = data.keySet().iterator(); it.hasNext(); ) {
+			Key key = it.next();
+			Cell cell = data.get(key);
+			cell.setValue(mIdx, null);
+			if (cell.isEmpty()) {
+				it.remove();
+			}
+		}
+		
+	}
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#clear(de.xwic.cube.IMeasure, de.xwic.cube.Key)
+	 */
+	public void clear(IMeasure measure, Key key) {
+		
+		// start removing the value 
+		int measureIndex = getMeasureIndex(measure);
+		splashAndWriteValue(0, key, measureIndex, null);
+		
 	}
 	
 	/* (non-Javadoc)

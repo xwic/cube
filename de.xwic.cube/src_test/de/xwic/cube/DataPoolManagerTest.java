@@ -65,17 +65,17 @@ public class DataPoolManagerTest extends TestCase {
 		assertNotNull(cube);
 		
 		Key key = new Key(new IDimensionElement[] { elmAOO, elmInst });
-		cube.setCellValue(key, meBookings, 100);
+		cube.setCellValue(key, meBookings, 100.0d);
 		
 		key = new Key(new IDimensionElement[] { elmAOO, elmED });
-		cube.setCellValue(key, meBookings, 200);
+		cube.setCellValue(key, meBookings, 200d);
 
 		Double value = cube.getCellValue(key, meBookings);
 		assertNotNull(value);
 		assertEquals(200.0, value.doubleValue());
 		
 		key = new Key(new IDimensionElement[] { elmAOO, elmConsulting });
-		cube.setCellValue(key, meBookings, 50);
+		cube.setCellValue(key, meBookings, 50d);
 
 		
 		key = new Key(new IDimensionElement[] { elmAOO, dimLOB });
