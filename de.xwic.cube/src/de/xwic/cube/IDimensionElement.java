@@ -104,4 +104,12 @@ public interface IDimensionElement extends IIdentifyable {
 	 */
 	public abstract double getElementsTotalWeight();
 
+	/**
+	 * Returns the element specified in this path. The keys in the path
+	 * are separated by a slash.
+	 * @param path
+	 * @return
+	 */
+	public IDimensionElement parsePath(String path);
+
 }

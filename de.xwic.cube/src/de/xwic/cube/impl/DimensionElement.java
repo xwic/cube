@@ -215,4 +215,31 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 		}
 		return total;
 	}
+	
+	/**
+	 * Returns the element specified in this path. The keys in the path
+	 * are separated by a slash.
+	 * @param path
+	 * @return
+	 */
+	public IDimensionElement parsePath(String path) {
+		
+		IDimensionElement element = this;
+		int idxPathSep;
+		int idxPathStart = 0;
+		do {
+			idxPathSep = path.indexOf('/', idxPathStart);
+			String elmKey;
+			if (idxPathSep == -1) {
+				elmKey = path.substring(idxPathStart);
+			} else {
+				elmKey = path.substring(idxPathStart, idxPathSep);
+			}
+			element = element.getDimensionElement(elmKey);
+			idxPathStart = idxPathSep + 1;
+		} while (idxPathSep != -1);
+		return element;
+
+	}
+	
 }
