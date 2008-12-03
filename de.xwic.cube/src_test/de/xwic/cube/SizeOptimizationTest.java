@@ -13,11 +13,6 @@ import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
  */
 public class SizeOptimizationTest extends TestCase {
 
-	private ICube cube = null;
-	private IDataPoolManager manager;
-	private IDataPool pool;
-
-	@SuppressWarnings("unused")
 	public void testCreateAndSave() {
 		
 		File dataDir = new File("data");
