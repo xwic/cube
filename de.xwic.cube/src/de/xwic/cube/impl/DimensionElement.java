@@ -224,6 +224,10 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 */
 	public IDimensionElement parsePath(String path) {
 		
+		if (path.length() == 0) {
+			return this;
+		}
+		
 		IDimensionElement element = this;
 		int idxPathSep;
 		int idxPathStart = 0;

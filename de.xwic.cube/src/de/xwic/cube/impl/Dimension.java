@@ -28,6 +28,14 @@ public class Dimension extends DimensionElement implements IDimension, Serializa
 		this.dimension = this;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.DimensionElement#getPath()
+	 */
+	@Override
+	public String getPath() {
+		return ""; // the path of the dimension is always empty.
+	}
+	
 	/**
 	 * @return the dataPool
 	 */
