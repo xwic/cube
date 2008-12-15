@@ -3,6 +3,7 @@
 	## add your custom META, SCRIPT or LINK tags here
 	<link rel="stylesheet" type="text/css" href="sample.css">
 	<link rel="stylesheet" type="text/css" href="$contextPath/xwiccube/xwiccube.css">
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/json2.js"></SCRIPT>
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/xwiccube.js"></SCRIPT>
 
 #parse("jwic/jwic.page.body")
