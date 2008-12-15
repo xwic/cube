@@ -3,10 +3,18 @@
  */
 package de.xwic.cube.webui.controls;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+
 import de.jwic.base.IControlContainer;
+import de.jwic.base.IResourceControl;
 import de.jwic.controls.HTMLElement;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
@@ -22,7 +30,7 @@ import de.xwic.cube.webui.viewer.IDimensionFilter;
  * 
  * @author lippisch
  */
-public class LeafDimensionSelectorControl extends HTMLElement {
+public class LeafDimensionSelectorControl extends HTMLElement implements IResourceControl{
 
 	private IDimensionElement dimensionElement = null;
 	private List<IDimensionElement> flatList = new ArrayList<IDimensionElement>();
@@ -184,4 +192,26 @@ public class LeafDimensionSelectorControl extends HTMLElement {
 			setDimensionElement(flatList.get(0));
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.jwic.base.IResourceControl#attachResource(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
+	public void attachResource(HttpServletRequest req, HttpServletResponse res) throws IOException {
+		
+		res.setContentType("text/json");
+		PrintWriter pw = res.getWriter();
+		
+		JSONArray ja = new JSONArray();
+		for (IDimensionElement de : flatList) {
+			ja.put(de.getKey());
+		}
+		
+		
+		pw.println(ja);
+		
+		pw.close();
+		res.getOutputStream().close();
+		
+	}
+	
 }

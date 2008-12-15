@@ -1,6 +1,6 @@
 #set($prev = $control.prev)
 #set($next = $control.next)
-<table cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass">
+<table cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl_${control.controlID}">
  <tr>
   <td width="22" valign="middle">
 #if($prev)
@@ -9,7 +9,7 @@
 	<img src="$jwic.contextPath/xwiccube/images/resultset_previous_dis.gif" border="0">
 #end
   </td>
-  <td valign="top">$control.getDimensionElement().path</td>
+  <td valign="middle"><a href="#" onClick="xcube_showTree('$control.controlID');return false;">$control.getDimensionElement().path</a></td>
 <td width="22" valign="middle">
 #if($next)
   <a href="$control.createActionURL("next", "")"><img title="$next.key" src="$jwic.contextPath/xwiccube/images/resultset_next.gif" border="0"></a>
@@ -19,3 +19,4 @@
 </td>
  </tr>
 </table>
+<div id="xcubeLeafselBox_${control.controlID}" class="xcube-leafsel-box" style="display: none;">Loading...</div>
