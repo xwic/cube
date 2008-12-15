@@ -1,6 +1,10 @@
 Change Notes
 ============
 
+2008-12-15	FLI
+	- IDimension.getPath() now returns an empty string (as expected) and IDimensionElement.parsePath()
+	  returns "this" if the argument is an empty string. 
+
 2008-12-01	FLI
 	- Added cube.clear(), cube.clear(IMeasure) and cube.clear(IMeasure, Key) to 
 	  remove cells by measure/key.
