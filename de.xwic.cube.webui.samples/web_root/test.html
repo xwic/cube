@@ -1,0 +1,70 @@
+<html>
+<head>
+
+<style>
+ /*#myBlock {
+ 	display: none;
+ }*/
+ 
+ td {
+ 	background-color: blue;
+ }
+ 
+ tr.hover td {
+ 	background-color: red;
+ }
+ 
+</style>
+
+<script>
+	function toggleView(myButton) {
+		var elm = document.getElementById("myBlock");
+		if (elm.style.display == "none") {
+			elm.style.display = "inline";
+			myButton.innerHtml = "Hide";
+		} else {
+			elm.style.display = "none";
+			myButton.innerHtml = "Show";
+		}
+	}
+</script>
+
+</head>
+<body>
+
+<button onClick="toggleView(this)">Show</button>
+<br>
+
+<div id="myBlock" style="display: none;">
+ Here goes your stuff
+ <p>that you want to
+ <li>hide
+ <li>or show
+ </p>
+</div>
+
+<br>
+<br>
+Text that follows...
+
+<table>
+	<tr>
+		<td>This is cell A</td>
+		<td>This is cell B</td>
+	</tr>
+	<tr onMouseOver="this.className='hover';" onMouseOut="this.className=''">
+		<td>This is cell A</td>
+		<td>This is cell B</td>
+	</tr>
+	<tr>
+		<td>This is cell A</td>
+		<td>This is cell B</td>
+	</tr>
+	<tr>
+		<td>This is cell A</td>
+		<td>This is cell B</td>
+	</tr>
+</table>
+
+</body>
+</html>
