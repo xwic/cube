@@ -19,7 +19,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
-import de.xwic.cube.webui.controls.DimensionSelectorControl;
+import de.xwic.cube.webui.controls.ClassicDimensionSelectorControl;
 
 /**
  * @author lippisch
@@ -31,7 +31,7 @@ public class CubeWriter extends ControlContainer {
 	private ListBoxControl lbcMeasures;
 	private InputBoxControl inpValue;
 	
-	private Map<IDimension, DimensionSelectorControl> selectors = new HashMap<IDimension, DimensionSelectorControl>();
+	private Map<IDimension, ClassicDimensionSelectorControl> selectors = new HashMap<IDimension, ClassicDimensionSelectorControl>();
 
 	/**
 	 * @param container
@@ -109,7 +109,7 @@ public class CubeWriter extends ControlContainer {
 		
 		for (IDimension dim : cube.getDimensions()) {
 			
-			DimensionSelectorControl dimSel = new DimensionSelectorControl(this, "sel_" + dim.getKey(), dim);
+			ClassicDimensionSelectorControl dimSel = new ClassicDimensionSelectorControl(this, "sel_" + dim.getKey(), dim);
 			selectors.put(dim, dimSel);
 			
 		}

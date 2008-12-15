@@ -17,8 +17,7 @@ import de.jwic.events.ElementSelectedListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
-import de.xwic.cube.webui.controls.DimensionSelectorControl;
-import de.xwic.cube.webui.controls.LeafDimensionSelectorControl;
+import de.xwic.cube.webui.controls.DimensionElementSelector;
 
 /**
  * @author Florian Lippisch
@@ -98,16 +97,27 @@ public class CubeFilter extends ControlContainer {
 	 * that dimension.
 	 * @param dimension
 	 */
-	public void addDimension(IDimension dimension) {
+	public DimensionElementSelector addDimension(IDimension dimension) {
+		return addDimension(dimension, null);
+	}
+	
+	/**
+	 * 
+	 * @param dimension
+	 * @param filter
+	 * @return
+	 */
+	public DimensionElementSelector addDimension(IDimension dimension, IDimensionFilter filter) {
 		dimensions.add(dimension);
 		
-		DimensionSelectorControl dsc = new DimensionSelectorControl(this, null, dimension);
+		DimensionElementSelector dsc = new DimensionElementSelector(this, null, dimension, filter);
 		dsc.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
-				filterSelection((String)event.getElement());
+				filterSelection((IDimensionElement)event.getElement());
 			}
 		});
 		dimCtrlMap.put(dimension.getKey(), dsc.getName());
+		return dsc;
 		
 	}
 	
@@ -115,23 +125,14 @@ public class CubeFilter extends ControlContainer {
 	 * Add a LeafDimensionSelector for the specified dimension.
 	 * @param dimension
 	 * @param filter
+	 * @deprecated Use addDimension(..).setSelectedLeafsOnly(true);
 	 */
-	public void addDimensionLeafSelector(IDimension dimension, IDimensionFilter filter) {
+	public DimensionElementSelector addDimensionLeafSelector(IDimension dimension, IDimensionFilter filter) {
 		dimensions.add(dimension);
 		
-		LeafDimensionSelectorControl dsc = new LeafDimensionSelectorControl(this, null, dimension, filter);
-		dsc.addElementSelectedListener(new ElementSelectedListener() {
-			public void elementSelected(ElementSelectedEvent event) {
-				filterSelection((IDimensionElement)event.getElement());
-			}
-		});
-		dimCtrlMap.put(dimension.getKey(), dsc.getName());
-		
-		IDimensionElement elmSet = model.getFilterDimension(dimension);
-		if (elmSet != null && elmSet.isLeaf()) {
-			dsc.setDimensionElement(elmSet);
-		}
-		
+		DimensionElementSelector dsc = addDimension(dimension, filter);
+		dsc.setSelectLeafsOnly(true);
+		return dsc;
 	}
 	
 	/**
