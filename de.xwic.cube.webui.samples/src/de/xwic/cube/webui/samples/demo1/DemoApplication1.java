@@ -19,7 +19,7 @@ import de.xwic.cube.Key;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
-import de.xwic.cube.webui.controls.LeafDimensionSelectorControl;
+import de.xwic.cube.webui.controls.DimensionElementSelector;
 import de.xwic.cube.webui.viewer.CubeFilter;
 import de.xwic.cube.webui.viewer.CubeViewer;
 import de.xwic.cube.webui.viewer.CubeViewerModel;
@@ -86,17 +86,11 @@ public class DemoApplication1 extends Application {
 		CubeFilter filter = new CubeFilter(page, "filter", model);
 		filter.setSelectMeasure(true);
 		filter.addDimension(dimOT);
+		filter.addDimension(dimGEO);
+		filter.addDimension(dimTime).setSelectLeafsOnly(true);
 		
 		// create writer
 		new CubeWriter(page, "writer", model);
-		
-		LeafDimensionSelectorControl lfd = new LeafDimensionSelectorControl(page, "timeSelection", dimTime);
-		lfd.addElementSelectedListener(new ElementSelectedListener() {
-			public void elementSelected(ElementSelectedEvent event) {
-				model.applyFilter((IDimensionElement) event.getElement());
-			}
-		});
-		lfd.setWidth(150);
 		
 		return page;
 	}
@@ -125,6 +119,24 @@ public class DemoApplication1 extends Application {
 		
 		IDimension dimTime = pool.createDimension("Time");
 		IDimensionElement deY = dimTime.createDimensionElement("2009");
+		de = deY.createDimensionElement("Q1");
+		de.createDimensionElement("May");
+		de.createDimensionElement("Jun");
+		de.createDimensionElement("Jul");
+		de = deY.createDimensionElement("Q2");
+		de.createDimensionElement("Aug");
+		de.createDimensionElement("Sep");
+		de.createDimensionElement("Oct");
+		de = deY.createDimensionElement("Q3");
+		de.createDimensionElement("Nov");
+		de.createDimensionElement("Dec");
+		de.createDimensionElement("Jan");
+		de = deY.createDimensionElement("Q4");
+		de.createDimensionElement("Feb");
+		de.createDimensionElement("Mar");
+		de.createDimensionElement("Apr");
+		
+		deY = dimTime.createDimensionElement("2010");
 		de = deY.createDimensionElement("Q1");
 		de.createDimensionElement("May");
 		de.createDimensionElement("Jun");

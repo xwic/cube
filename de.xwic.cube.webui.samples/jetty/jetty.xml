@@ -53,17 +53,19 @@
     -->
     
     <!-- AJP1.3 connector -->
+<!-- 
 	<Call name="addConnector">
 	  <Arg>
 	    <New class="org.mortbay.jetty.ajp.Ajp13SocketConnector">
 	      <Set name="port">8099</Set>
-<!--	      <Set name="Acceptors">30</Set>
+< !- -	      <Set name="Acceptors">30</Set>
 	      <Set name="maxIdleTime">30000</Set> 
 	      <Set name="acceptQueueSize">10</Set>
--->
+- - >
 	    </New>
 	  </Arg>
 	</Call>
+-->
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- To add a HTTPS SSL listener                                     -->

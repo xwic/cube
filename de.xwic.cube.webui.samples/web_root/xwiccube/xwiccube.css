@@ -144,3 +144,17 @@ div.xcube-leafsel-box {
 	left: 0px;
 	top: 0px;
 }
+div.xcube-leafsel-box td {
+	font-size: 8pt;
+}
+div.xcube-leafsel-box td.selected {
+	font-weight: bold;
+}
+div.xcube-leafsel-box td.xcube_tree_actionnode {
+	cursor: pointer;
+}
+div.xcube-leafsel-box a:hover {
+	background-color: #2020A0;
+	color: #ffffff;
+	text-decoration: none;
+}
