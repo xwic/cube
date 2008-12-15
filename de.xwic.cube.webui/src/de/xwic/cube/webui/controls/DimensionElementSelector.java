@@ -11,7 +11,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONWriter;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IResourceControl;
@@ -30,12 +31,15 @@ import de.xwic.cube.webui.viewer.IDimensionFilter;
  * 
  * @author lippisch
  */
-public class LeafDimensionSelectorControl extends HTMLElement implements IResourceControl{
+public class DimensionElementSelector extends HTMLElement implements IResourceControl{
 
+	private IDimension dimension;
 	private IDimensionElement dimensionElement = null;
 	private List<IDimensionElement> flatList = new ArrayList<IDimensionElement>();
+	private boolean selectLeafsOnly = false;
 	
 	private List<ElementSelectedListener> listeners = new ArrayList<ElementSelectedListener>();
+	private final IDimensionFilter filter;
 	
 	/**
 	 * Constructor.
@@ -43,15 +47,17 @@ public class LeafDimensionSelectorControl extends HTMLElement implements IResour
 	 * @param name
 	 * @param dimension
 	 */
-	public LeafDimensionSelectorControl(IControlContainer container, String name, IDimension dimension) {
+	public DimensionElementSelector(IControlContainer container, String name, IDimension dimension) {
 		this(container, name, dimension, null);
 	}
 	/**
 	 * @param container
 	 * @param name
 	 */
-	public LeafDimensionSelectorControl(IControlContainer container, String name, IDimension dimension, IDimensionFilter filter) {
+	public DimensionElementSelector(IControlContainer container, String name, IDimension dimension, IDimensionFilter filter) {
 		super(container, name);
+		this.dimension = dimension;
+		this.filter = filter;
 		
 		setCssClass("xcube-leafsel");
 		
@@ -76,13 +82,16 @@ public class LeafDimensionSelectorControl extends HTMLElement implements IResour
 	 */
 	private void addLeafs(IDimensionElement elm, IDimensionFilter filter) {
 		if (filter == null || filter.accept(elm)) {
-			if (elm.isLeaf()) {
+			if (!selectLeafsOnly || elm.isLeaf()) {
 				flatList.add(elm);
-			} else {
+				
+			}
+			if (!elm.isLeaf()) {
 				for (IDimensionElement de : elm.getDimensionElements()) {
 					addLeafs(de, filter);
 				}
 			}
+
 		}
 		
 	}
@@ -156,6 +165,15 @@ public class LeafDimensionSelectorControl extends HTMLElement implements IResour
 	}
 	
 	/**
+	 * Element selected.
+	 * @param path
+	 */
+	public void actionSelection(String path) {
+		IDimensionElement elm = dimension.parsePath(path);
+		setDimensionElement(elm);
+	}
+	
+	/**
 	 * Select next leaf.
 	 */
 	public void actionNext() {
@@ -193,25 +211,80 @@ public class LeafDimensionSelectorControl extends HTMLElement implements IResour
 		}
 	}
 	
+	/**
+	 * @return the dimension
+	 */
+	public IDimension getDimension() {
+		return dimension;
+	}
+
+
 	/* (non-Javadoc)
 	 * @see de.jwic.base.IResourceControl#attachResource(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	public void attachResource(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		
+		log.info("Data Requested..");
 		res.setContentType("text/json");
 		PrintWriter pw = res.getWriter();
 		
-		JSONArray ja = new JSONArray();
-		for (IDimensionElement de : flatList) {
-			ja.put(de.getKey());
+		// build object tree and send it...
+		
+		JSONWriter jw = new JSONWriter(pw);
+		try {
+			
+			jw.object();
+			jw.key("dimension");
+			jw.value(dimension.getDimension().getKey());
+			jw.key("selection").value(dimensionElement != null ? dimensionElement.getPath() : null);
+			jw.key("elements");
+			jw.array();
+			addData(jw, dimension.getDimensionElements());
+			jw.endArray();
+			
+			jw.endObject();
+			
+		} catch (JSONException e) {
+			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error: " + e);
+			log.error("Error while sending dimension elements...", e);
 		}
 		
-		
-		pw.println(ja);
-		
 		pw.close();
-		res.getOutputStream().close();
 		
 	}
+	/**
+	 * @param jw
+	 * @param dimension2
+	 * @throws JSONException 
+	 */
+	private void addData(JSONWriter jw, List<IDimensionElement> list) throws JSONException {
+		
+		for (IDimensionElement child : list) {
+			jw.object();
+			jw.key("key").value(child.getKey());
+			jw.key("title").value(child.getTitle());
+			jw.key("elements");
+			jw.array();
+			addData(jw, child.getDimensionElements());
+			jw.endArray();
+			jw.endObject();
+		}
+	}
+
+	/**
+	 * @return the selectLeafsOnly
+	 */
+	public boolean isSelectLeafsOnly() {
+		return selectLeafsOnly;
+	}
+	/**
+	 * @param selectLeafsOnly the selectLeafsOnly to set
+	 */
+	public void setSelectLeafsOnly(boolean selectLeafsOnly) {
+		this.selectLeafsOnly = selectLeafsOnly;
+		flatList = new ArrayList<IDimensionElement>();
+		addLeafs(dimension, filter);
+	}
+
 	
 }

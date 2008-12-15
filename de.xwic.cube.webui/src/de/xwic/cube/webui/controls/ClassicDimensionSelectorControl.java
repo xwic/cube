@@ -12,9 +12,10 @@ import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 
 /**
+ * Uses a classic combo box to select a dimension element.
  * @author Florian Lippisch
  */
-public class DimensionSelectorControl extends ControlContainer {
+public class ClassicDimensionSelectorControl extends ControlContainer {
 
 	private final IDimension dimension;
 	private ListBoxControl lbDim;
@@ -23,7 +24,7 @@ public class DimensionSelectorControl extends ControlContainer {
 	 * @param container
 	 * @param name
 	 */
-	public DimensionSelectorControl(IControlContainer container, String name, IDimension dimension) {
+	public ClassicDimensionSelectorControl(IControlContainer container, String name, IDimension dimension) {
 		super(container, name);
 		this.dimension = dimension;
 		

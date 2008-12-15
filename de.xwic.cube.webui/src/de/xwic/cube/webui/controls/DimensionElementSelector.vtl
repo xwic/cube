@@ -1,3 +1,5 @@
+#set($currElm = $control.getDimensionElement())
+#if ($currElm.dimension == $currElm) #set($title = "- All -") #else #set($title = $currElm.path) #end
 #set($prev = $control.prev)
 #set($next = $control.next)
 <table cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl_${control.controlID}">
@@ -9,7 +11,7 @@
 	<img src="$jwic.contextPath/xwiccube/images/resultset_previous_dis.gif" border="0">
 #end
   </td>
-  <td valign="middle"><a href="#" onClick="xcube_showTree('$control.controlID');return false;">$control.getDimensionElement().path</a></td>
+  <td valign="middle"><a href="#" onClick="xcube_showTree('$control.controlID');return false;">$title</a></td>
 <td width="22" valign="middle">
 #if($next)
   <a href="$control.createActionURL("next", "")"><img title="$next.key" src="$jwic.contextPath/xwiccube/images/resultset_next.gif" border="0"></a>
@@ -19,4 +21,6 @@
 </td>
  </tr>
 </table>
-<div id="xcubeLeafselBox_${control.controlID}" class="xcube-leafsel-box" style="display: none;">Loading...</div>
+<div id="xcubeLeafselBox_${control.controlID}" class="xcube-leafsel-box" style="display: none;" 
+#if($control.selectLeafsOnly) xwcSelectionMode="leaf" #else xwcSelectionMode="all" #end
+>Loading...</div>
