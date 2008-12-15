@@ -128,8 +128,6 @@ public class CubeFilter extends ControlContainer {
 	 * @deprecated Use addDimension(..).setSelectedLeafsOnly(true);
 	 */
 	public DimensionElementSelector addDimensionLeafSelector(IDimension dimension, IDimensionFilter filter) {
-		dimensions.add(dimension);
-		
 		DimensionElementSelector dsc = addDimension(dimension, filter);
 		dsc.setSelectLeafsOnly(true);
 		return dsc;
