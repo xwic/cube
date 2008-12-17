@@ -260,14 +260,16 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	private void addData(JSONWriter jw, List<IDimensionElement> list) throws JSONException {
 		
 		for (IDimensionElement child : list) {
-			jw.object();
-			jw.key("key").value(child.getKey());
-			jw.key("title").value(child.getTitle());
-			jw.key("elements");
-			jw.array();
-			addData(jw, child.getDimensionElements());
-			jw.endArray();
-			jw.endObject();
+			if (filter == null || filter.accept(child)) {
+				jw.object();
+				jw.key("key").value(child.getKey());
+				jw.key("title").value(child.getTitle());
+				jw.key("elements");
+				jw.array();
+				addData(jw, child.getDimensionElements());
+				jw.endArray();
+				jw.endObject();
+			}
 		}
 	}
 
@@ -284,6 +286,11 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		this.selectLeafsOnly = selectLeafsOnly;
 		flatList = new ArrayList<IDimensionElement>();
 		addLeafs(dimension, filter);
+		
+		if (!dimensionElement.isLeaf() && flatList.size() > 0) {
+			dimensionElement = flatList.get(0);
+		}
+		
 	}
 
 	
