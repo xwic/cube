@@ -1,6 +1,13 @@
 Change Notes
 =============
 
+2008-12-15	FLI
+	- Renamed DimensionSelectorControl to ClassicDimensionSelectorControl as it got replaced
+	  by an extended version of the LeafDimensionSelectorControl which is now named 
+	  DimensionElementSelector.
+	  This new control implements a drop-down box that dynamically loads the dimension elements
+	  on click and displays them as a tree.
+	   
 2008-11-25  FLI
 	- Added LeafDimensionSelection support into the CubeFilter
 	- Added row highlighting support for IE6 browser
