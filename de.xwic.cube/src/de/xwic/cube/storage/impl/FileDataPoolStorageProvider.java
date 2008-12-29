@@ -6,8 +6,10 @@ package de.xwic.cube.storage.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.xwic.cube.IDataPool;
@@ -43,8 +45,18 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 	 * @see de.xwic.cube.IDataPoolStorageProvider#listDataPools()
 	 */
 	public List<String> listDataPools() throws StorageException {
-		// TODO Auto-generated method stub
-		return null;
+		File[] files = dataDir.listFiles(new FilenameFilter() {
+			public boolean accept(File dir, String filename) {
+				return filename.toLowerCase().endsWith(".datapool");
+			}
+		});
+		List<String> keys = new ArrayList<String>();
+		for (File f : files) {
+			String name = f.getName();
+			name = name.substring(0, name.length() - ".datapool".length());
+			keys.add(name);
+		}
+		return keys;
 	}
 
 	/* (non-Javadoc)

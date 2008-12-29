@@ -3,6 +3,8 @@
  */
 package de.xwic.cube;
 
+import java.util.List;
+
 
 /**
  * @author Florian Lippisch
@@ -40,5 +42,10 @@ public interface IDataPoolManager {
 	 */
 	public abstract boolean containsDataPool(String key) throws StorageException;
 	
-
+	/**
+	 * List the available DataPool keys.
+	 * @return
+	 * @throws StorageException
+	 */
+	public abstract List<String> listDataPoolKeys() throws StorageException;
 }

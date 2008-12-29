@@ -1,6 +1,7 @@
 package de.xwic.cube.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.xwic.cube.IDataPool;
@@ -132,6 +133,19 @@ public class DataPoolManager implements IDataPoolManager {
 	 */
 	public boolean containsDataPool(String key) throws StorageException {
 		return poolMap.containsKey(key) || storageProvider.containsDataPool(key);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDataPoolManager#listDataPoolKeys()
+	 */
+	public List<String> listDataPoolKeys() throws StorageException {
+		List<String> keys = storageProvider.listDataPools();
+		for (String loadedKey : poolMap.keySet()) {
+			if (!keys.contains(loadedKey)) {
+				keys.add(loadedKey);
+			}
+		}
+		return keys;
 	}
 	
 }
