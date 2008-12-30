@@ -1,6 +1,10 @@
 Change Notes
 ============
 
+2008-12-30	FLI
+	- Added IDataPoolManager.isDataPoolLoaded() method, to check if a DataPool is already loaded into memory.
+	- Implemented JDBCSerializerUtil.restoreDimensions()
+	
 2008-12-29	FLI
 	- Added listDataPoolKeys() to DataPoolManager.
 	- Added JDBCSerializerUtil

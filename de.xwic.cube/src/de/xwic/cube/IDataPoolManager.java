@@ -43,6 +43,13 @@ public interface IDataPoolManager {
 	public abstract boolean containsDataPool(String key) throws StorageException;
 	
 	/**
+	 * Returns true if the DataPool with the specified key is already loaded into memory.
+	 * @param key
+	 * @return
+	 */
+	public abstract boolean isDataPoolLoaded(String key);
+	
+	/**
 	 * List the available DataPool keys.
 	 * @return
 	 * @throws StorageException

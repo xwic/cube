@@ -95,7 +95,6 @@ public class JDBCSerializerUtil {
 	 */
 	public static void storeDimensions(Connection connection, IDataPool pool, String dimTableName, String dimElmTableName) throws SQLException {
 		
-		Statement stmt = connection.createStatement();
 		PreparedStatement psUpdateDim = connection.prepareStatement("UPDATE [" + dimTableName + "] SET [Title] = ? WHERE [Key] = ?");
 		PreparedStatement psInsertDim = connection.prepareStatement("INSERT INTO [" + dimTableName + "] ([Key], [Title]) VALUES (?, ?)");
 		PreparedStatement psDeleteDim = connection.prepareStatement("DELETE FROM [" + dimTableName + "] WHERE [Key] = ?");
@@ -105,6 +104,7 @@ public class JDBCSerializerUtil {
 		PreparedStatement psInsertDimElm = connection.prepareStatement("INSERT INTO [" + dimElmTableName + "] ([ID], [ParentID], [DimensionKey], [Key], [Title], [weight]) VALUES (?, ?, ?, ?, ?, ?)");
 		PreparedStatement psDeleteDimElm = connection.prepareStatement("DELETE FROM [" + dimElmTableName + "] WHERE [ID] = ?");
 		
+		Statement stmt = connection.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT [Key] FROM [" + dimTableName + "]");
 		Set<String> keys = new HashSet<String>();
 		while (rs.next()) {
@@ -199,6 +199,70 @@ public class JDBCSerializerUtil {
 		}
 
 
+		
+	}
+
+	/**
+	 * @param connection
+	 * @param pool
+	 * @throws SQLException 
+	 */
+	public static void restoreDimensions(Connection connection, IDataPool pool, String dimTableName, String dimElmTableName) throws SQLException {
+		
+		// restores dimensions.
+		PreparedStatement psSelectDimElm = connection.prepareStatement("SELECT [Key], [Title], [weight] FROM [" + dimElmTableName + "] WHERE [DimensionKey] = ? AND [ParentID] = ?");
+		
+		Statement stmt = connection.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT [Key], [Title] FROM [" + dimTableName + "]");
+		while (rs.next()) {
+			String key = rs.getString(1);
+			String title = rs.getString(2);
+			IDimension dim;
+			if (!pool.containsDimension(key)) {
+				dim = pool.createDimension(key);
+			} else {
+				dim = pool.getDimension(key);
+			}
+			dim.setTitle(title);
+			
+			// load child elements
+			restoreChilds(dim, psSelectDimElm);
+		}
+		rs.close();
+		stmt.close();
+		
+	}
+
+	/**
+	 * @param dim
+	 * @param psSelectDimElm
+	 * @throws SQLException 
+	 */
+	private static void restoreChilds(IDimensionElement elm, PreparedStatement psSelectDimElm) throws SQLException {
+		
+		psSelectDimElm.clearParameters();
+		psSelectDimElm.setString(1, elm.getDimension().getKey());
+		psSelectDimElm.setString(2, elm.getID());
+		
+		ResultSet rs = psSelectDimElm.executeQuery();
+		while (rs.next()) {
+			String key = rs.getString("Key");
+			String title = rs.getString("Title");
+			double weight = rs.getDouble("weight");
+			IDimensionElement child;
+			if (elm.containsDimensionElement(key)) {
+				child = elm.getDimensionElement(key);
+			} else {
+				child = elm.createDimensionElement(key);
+			}
+			child.setTitle(title);
+			child.setWeight(weight);
+		}
+		rs.close();
+		
+		for (IDimensionElement child : elm.getDimensionElements()) {
+			restoreChilds(child, psSelectDimElm);
+		}
 		
 	}
 }
