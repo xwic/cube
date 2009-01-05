@@ -224,7 +224,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 */
 	public void attachResource(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		
-		log.info("Data Requested..");
+		log.debug("Data Requested..");
 		res.setContentType("text/json");
 		PrintWriter pw = res.getWriter();
 		
