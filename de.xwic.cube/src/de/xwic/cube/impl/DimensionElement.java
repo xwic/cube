@@ -43,6 +43,9 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 		if (elementMap.containsKey(key)) {
 			throw new IllegalArgumentException("An element with that key already exists.");
 		}
+		if (key.indexOf('/') != -1) {
+			throw new IllegalArgumentException("A key can not contain a '/' character.");
+		}
 		DimensionElement element = new DimensionElement(dimension, this, key);
 		elementMap.put(key, element);
 		elements.add(element);

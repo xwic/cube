@@ -63,8 +63,8 @@ public class Cube extends Identifyable implements ICube, Serializable {
 			}
 			measureMap.put(measure.getKey(), measure);
 		}
-
-		data = new HashMap<Key, Cell>(capacity);
+		
+		data = new HashMap<Key, Cell>(500);
 		
 	}
 

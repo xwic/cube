@@ -1,6 +1,10 @@
 Change Notes
 ============
 
+2009-01-13	FLI
+	- The cube no longer creates the internal HashMap with the theoretical maximum capacity
+	- DimensionElements with a '/' character in the key can no longer be created
+	 
 2008-12-30	FLI
 	- Added IDataPoolManager.isDataPoolLoaded() method, to check if a DataPool is already loaded into memory.
 	- Implemented JDBCSerializerUtil.restoreDimensions()
