@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2009-01-14	FLI
+	- Added KValueFormatProvider
+	
 2009-01-13	FLI
 	- The cube no longer creates the internal HashMap with the theoretical maximum capacity
 	- DimensionElements with a '/' character in the key can no longer be created
