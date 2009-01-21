@@ -180,7 +180,7 @@ public class JDBCSerializerUtil {
 				}
 				keys.remove(dimElm.getID());
 			} else {
-				// ([ID], [ParentID], [DimensionKey], [Key], [Title], [weight])
+				// ([ID], [ParentID], [DimensionKey], [Key], [Title], [weight], [order_index])
 				psInsertDimElm.clearParameters();
 				psInsertDimElm.setString(1, dimElm.getID());
 				psInsertDimElm.setString(2, elm.getID());
