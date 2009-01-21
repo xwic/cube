@@ -76,6 +76,12 @@ public interface IDimensionElement extends IIdentifyable {
 	public abstract String getPath();
 
 	/**
+	 * Returns the index position within the parent's dimension element collection.
+	 * @return
+	 */
+	public abstract int getIndex();
+	
+	/**
 	 * Returns the total number of child elements in this dimension/element.
 	 * @return
 	 */
@@ -112,4 +118,11 @@ public interface IDimensionElement extends IIdentifyable {
 	 */
 	public IDimensionElement parsePath(String path);
 
+	/**
+	 * Change the child elements index position.
+	 * @param childElement
+	 * @param newIndex
+	 */
+	public void reindex(IDimensionElement childElement, int newIndex);
+	
 }

@@ -1,5 +1,10 @@
 Change Notes
 ============
+2009-01-21	FLI
+	- Added possibility to reorder dimension elements
+	- DifferenceFunction now can "negate" the result
+	- PercentageValueFormat is creating the result with a NOBR tag to prevent line break
+	- JDBCUtil stores the order_index of dimension elements to restore them in the same order. This requires a new database column!
 
 2009-01-14	FLI
 	- Added KValueFormatProvider
