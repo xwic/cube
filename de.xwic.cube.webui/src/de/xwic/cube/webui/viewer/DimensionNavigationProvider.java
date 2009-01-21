@@ -24,6 +24,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private boolean showRoot = false;
 	private boolean hideTotals = false;
 	private boolean clickable = false;
+	private IDimensionFilter filter = null;
 	
 	private int indention = 0;
 	
@@ -103,7 +104,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 			childs = new ArrayList<INavigationElement>();
 			if (element.getDimensionElements().size() != 0) {
 				for (IDimensionElement elm : element.getDimensionElements()) {
-					if (!hideEmptyElements || !isEmpty(elm, chain)) {
+					if ((filter == null || filter.accept(elm)) && (!hideEmptyElements || !isEmpty(elm, chain))) {
 						childs.add(new DimensionNavigationElement(elm, chain));
 					}
 				}
@@ -113,7 +114,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 				// is the same as the leaf element.
 				DimensionChain next = chain.nextDimensionChain(element);
 				for (IDimensionElement elm : next.getNext().getDimensionElements()) {
-					if (!hideEmptyElements || !isEmpty(elm, next)) {
+					if ((filter == null || filter.accept(elm)) && (!hideEmptyElements || !isEmpty(elm, next))) {
 						childs.add(new DimensionNavigationElement(elm, next));
 					}
 				}
@@ -195,15 +196,6 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		this.model = model;
 		initialize();
 	}
-	/**
-	 * Create a DimensionProvider with one dimension.
-	 * @param dimension
-	 */
-	public DimensionNavigationProvider(CubeViewerModel model, IDimensionElement dimension) {
-		this.model = model;
-		dimensions.add(dimension);
-		initialize();
-	}
 
 	/**
 	 * Create a DimensionProvider with one dimension.
@@ -227,6 +219,18 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		initialize();
 	}
 
+	/**
+	 * Create a DimensionProvider with one dimension.
+	 * @param dimension
+	 */
+	public DimensionNavigationProvider(CubeViewerModel model, IDimensionFilter filter, IDimensionElement... dimensions) {
+		this.model = model;
+		this.filter = filter;
+		for (IDimensionElement dim : dimensions) {
+			this.dimensions.add(dim);
+		}
+		initialize();
+	}
 
 	/**
 	 * @param elm
@@ -283,7 +287,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 				rootNavElements.add(new DimensionNavigationElement(dim, chain));
 			} else {
 				for (IDimensionElement elm : dim.getDimensionElements()) {
-					if (!hideEmptyElements || !isEmpty(elm, chain)) {
+					if ((filter == null || filter.accept(elm)) && (!hideEmptyElements || !isEmpty(elm, chain))) {
 						rootNavElements.add(new DimensionNavigationElement(elm, chain));
 					}
 				}
@@ -401,6 +405,19 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public void setIndention(int indention) {
 		this.indention = indention;
+	}
+	/**
+	 * @return the filter
+	 */
+	public IDimensionFilter getFilter() {
+		return filter;
+	}
+	/**
+	 * @param filter the filter to set
+	 */
+	public void setFilter(IDimensionFilter filter) {
+		this.filter = filter;
+		createNavigationElements();
 	}
 
 }
