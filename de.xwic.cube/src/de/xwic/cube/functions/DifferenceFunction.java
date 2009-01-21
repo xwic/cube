@@ -23,6 +23,7 @@ public class DifferenceFunction implements IMeasureFunction, Serializable {
 	private int measureIndexA = -1;
 	private int measureIndexB = -1;
 	private boolean asPercent = false;
+	private boolean negate = false;
 
 	/**
 	 * @param measureA
@@ -71,6 +72,9 @@ public class DifferenceFunction implements IMeasureFunction, Serializable {
 				valB = 0.0;
 			}
 			double diff = valA - valB;
+			if (negate) {
+				diff = -diff;
+			}
 			if (asPercent) {
 				if (valB == 0.0) {
 					return null;
@@ -94,6 +98,20 @@ public class DifferenceFunction implements IMeasureFunction, Serializable {
 	 */
 	public void setAsPercent(boolean asPercent) {
 		this.asPercent = asPercent;
+	}
+
+	/**
+	 * @return the negate
+	 */
+	public boolean isNegate() {
+		return negate;
+	}
+
+	/**
+	 * @param negate the negate to set
+	 */
+	public void setNegate(boolean negate) {
+		this.negate = negate;
 	}
 
 }

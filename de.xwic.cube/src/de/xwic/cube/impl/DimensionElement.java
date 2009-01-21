@@ -248,5 +248,29 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 		return element;
 
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDimensionElement#getIndex()
+	 */
+	public int getIndex() {
+		return parent.elements.indexOf(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDimensionElement#reindex(de.xwic.cube.IDimensionElement, int)
+	 */
+	public void reindex(IDimensionElement childElement, int newIndex) {
+		if (!elements.contains(childElement)) {
+			throw new IllegalArgumentException("The specified element is not a child member");
+		}
+		if (newIndex > (elements.size() - 1)) {
+			// simply put at the end of the list.
+			elements.remove(childElement);
+			elements.add(childElement);
+		} else {
+			elements.remove(childElement);
+			elements.add(newIndex, childElement);
+		}
+	}
 	
 }

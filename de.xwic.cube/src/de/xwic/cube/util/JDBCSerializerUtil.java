@@ -100,8 +100,8 @@ public class JDBCSerializerUtil {
 		PreparedStatement psDeleteDim = connection.prepareStatement("DELETE FROM [" + dimTableName + "] WHERE [Key] = ?");
 
 		PreparedStatement psSelectDimElm = connection.prepareStatement("SELECT [ID] FROM [" + dimElmTableName + "] WHERE [DimensionKey] = ? AND [ParentID] = ?");
-		PreparedStatement psUpdateDimElm = connection.prepareStatement("UPDATE [" + dimElmTableName + "] SET [Title] = ?, [weight] = ? WHERE [ID] = ?");
-		PreparedStatement psInsertDimElm = connection.prepareStatement("INSERT INTO [" + dimElmTableName + "] ([ID], [ParentID], [DimensionKey], [Key], [Title], [weight]) VALUES (?, ?, ?, ?, ?, ?)");
+		PreparedStatement psUpdateDimElm = connection.prepareStatement("UPDATE [" + dimElmTableName + "] SET [Title] = ?, [weight] = ?, [order_index] = ? WHERE [ID] = ?");
+		PreparedStatement psInsertDimElm = connection.prepareStatement("INSERT INTO [" + dimElmTableName + "] ([ID], [ParentID], [DimensionKey], [Key], [Title], [weight], [order_index]) VALUES (?, ?, ?, ?, ?, ?, ?)");
 		PreparedStatement psDeleteDimElm = connection.prepareStatement("DELETE FROM [" + dimElmTableName + "] WHERE [ID] = ?");
 		
 		Statement stmt = connection.createStatement();
@@ -166,12 +166,14 @@ public class JDBCSerializerUtil {
 		}
 		rs.close();
 		
+		int index = 0;
 		for (IDimensionElement dimElm : elm.getDimensionElements()) {
 			if (keys.contains(dimElm.getID())) {
 				psUpdateDimElm.clearParameters();
 				psUpdateDimElm.setString(1, dimElm.getTitle());
 				psUpdateDimElm.setDouble(2, dimElm.getWeight());
-				psUpdateDimElm.setString(3, dimElm.getID());
+				psUpdateDimElm.setInt(3, index++);
+				psUpdateDimElm.setString(4, dimElm.getID());
 				int updates = psUpdateDimElm.executeUpdate();
 				if (updates != 1) {
 					System.out.println("DimensionElement update failed for " + dimElm.getKey()); 
@@ -186,6 +188,7 @@ public class JDBCSerializerUtil {
 				psInsertDimElm.setString(4, dimElm.getKey());
 				psInsertDimElm.setString(5, dimElm.getTitle());
 				psInsertDimElm.setDouble(6, dimElm.getWeight());
+				psInsertDimElm.setInt(7, index++);
 				psInsertDimElm.executeUpdate();
 			}
 			updateDimensionElements(dimElm, psSelectDimElm, psInsertDimElm, psUpdateDimElm, psDeleteDimElm);
@@ -210,7 +213,7 @@ public class JDBCSerializerUtil {
 	public static void restoreDimensions(Connection connection, IDataPool pool, String dimTableName, String dimElmTableName) throws SQLException {
 		
 		// restores dimensions.
-		PreparedStatement psSelectDimElm = connection.prepareStatement("SELECT [Key], [Title], [weight] FROM [" + dimElmTableName + "] WHERE [DimensionKey] = ? AND [ParentID] = ?");
+		PreparedStatement psSelectDimElm = connection.prepareStatement("SELECT [Key], [Title], [weight] FROM [" + dimElmTableName + "] WHERE [DimensionKey] = ? AND [ParentID] = ? ORDER BY order_index ASC");
 		
 		Statement stmt = connection.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT [Key], [Title] FROM [" + dimTableName + "]");

@@ -30,7 +30,7 @@ public class PercentageValueFormat implements IValueFormat {
 	 */
 	public String format(Double value) {
 		if (value != null) {
-			return nf.format(value.doubleValue() * 100) + " %";
+			return "<nobr>" + nf.format(value.doubleValue() * 100) + " %</nobr>";
 		}
 		return null;
 	}
