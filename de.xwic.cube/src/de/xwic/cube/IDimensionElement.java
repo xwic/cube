@@ -125,4 +125,11 @@ public interface IDimensionElement extends IIdentifyable {
 	 */
 	public void reindex(IDimensionElement childElement, int newIndex);
 	
+	/**
+	 * Returns the depth of this element. The IDimension returns 0, the dimensions
+	 * child 1 and so on..
+	 * @return
+	 */
+	public int getDepth();
+	
 }
