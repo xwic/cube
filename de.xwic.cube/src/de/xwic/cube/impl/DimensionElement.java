@@ -257,6 +257,19 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	}
 	
 	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDimensionElement#getDepth()
+	 */
+	public int getDepth() {
+		int depth = 0;
+		IDimensionElement p = parent;
+		while (p != null) {
+			depth++;
+			p = p.getParent();
+		}
+		return depth;
+	}
+	
+	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDimensionElement#reindex(de.xwic.cube.IDimensionElement, int)
 	 */
 	public void reindex(IDimensionElement childElement, int newIndex) {

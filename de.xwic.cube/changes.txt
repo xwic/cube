@@ -1,5 +1,10 @@
 Change Notes
 ============
+
+2009-01-23	FLI
+	- Implemented Externalizable interface for the cube's cell object, to speed up the serialization and
+	  deserialization process and reduce the memory requirements during the load.
+
 2009-01-21	FLI
 	- Added possibility to reorder dimension elements
 	- DifferenceFunction now can "negate" the result
