@@ -14,7 +14,7 @@ import de.xwic.cube.Key;
  */
 public class DefaultDimensionDataProvider implements ICubeDataProvider {
 
-	private IMeasure fixedMeasure = null;
+	protected IMeasure fixedMeasure = null;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.webui.viewer.ICubeDataProvider#getCellData(de.xwic.cube.webui.viewer.CubeViewerModel, de.xwic.cube.webui.viewer.ContentInfo, de.xwic.cube.webui.viewer.ContentInfo)

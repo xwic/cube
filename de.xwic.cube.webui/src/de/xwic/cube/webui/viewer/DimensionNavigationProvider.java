@@ -420,4 +420,18 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		createNavigationElements();
 	}
 
+	/**
+	 * @return the dataProvider
+	 */
+	public ICubeDataProvider getDataProvider() {
+		return dataProvider;
+	}
+
+	/**
+	 * @param dataProvider the dataProvider to set
+	 */
+	public void setDataProvider(ICubeDataProvider dataProvider) {
+		this.dataProvider = dataProvider;
+	}
+
 }

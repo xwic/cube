@@ -18,6 +18,7 @@ public class TotalNavigationProvider implements INavigationProvider {
 	private IMeasure fixedMeasure = null;
 	public boolean clickable = false;
 	private int indention = 0;
+	private ICubeDataProvider dataProvider = new DefaultDimensionDataProvider();
 
 	private class TotalNavigationElement implements INavigationElement {
 
@@ -25,8 +26,6 @@ public class TotalNavigationProvider implements INavigationProvider {
 		 * @see de.xwic.cube.webui.viewer.INavigationElement#getContentInfo()
 		 */
 		public ContentInfo getContentInfo() {
-			DefaultDimensionDataProvider dataProvider = new DefaultDimensionDataProvider();
-			dataProvider.setFixedMeasure(fixedMeasure);
 			ContentInfo ci = new ContentInfo (dataProvider);
 			ci.setClickable(clickable );
 			return ci;
@@ -124,6 +123,9 @@ public class TotalNavigationProvider implements INavigationProvider {
 	 */
 	public void setFixedMeasure(IMeasure fixedMeasure) {
 		this.fixedMeasure = fixedMeasure;
+		if (dataProvider instanceof DefaultDimensionDataProvider) {
+			((DefaultDimensionDataProvider)dataProvider).setFixedMeasure(fixedMeasure);
+		}
 	}
 
 	/**
@@ -152,6 +154,20 @@ public class TotalNavigationProvider implements INavigationProvider {
 	 */
 	public void setIndention(int indention) {
 		this.indention = indention;
+	}
+
+	/**
+	 * @return the dataProvider
+	 */
+	public ICubeDataProvider getDataProvider() {
+		return dataProvider;
+	}
+
+	/**
+	 * @param dataProvider the dataProvider to set
+	 */
+	public void setDataProvider(ICubeDataProvider dataProvider) {
+		this.dataProvider = dataProvider;
 	}
 
 }
