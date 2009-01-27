@@ -6,7 +6,6 @@ package de.xwic.cube;
 import java.util.Collection;
 
 import de.xwic.cube.impl.Cube;
-import de.xwic.cube.impl.Dimension;
 import de.xwic.cube.impl.Measure;
 
 /**
@@ -19,7 +18,7 @@ public interface IDataPool extends IIdentifyable {
 	 * Returns the list of dimensions.
 	 * @return the dimensions
 	 */
-	public abstract Collection<Dimension> getDimensions();
+	public abstract Collection<IDimension> getDimensions();
 
 	/**
 	 * Create a new dimension.
@@ -74,7 +73,7 @@ public interface IDataPool extends IIdentifyable {
 	/**
 	 * @return the measures
 	 */
-	public abstract Collection<Measure> getMeasures();
+	public abstract Collection<IMeasure> getMeasures();
 
 	/**
 	 * Create a new cube.
