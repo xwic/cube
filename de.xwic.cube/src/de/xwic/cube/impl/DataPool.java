@@ -24,8 +24,8 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 
 	private static final long serialVersionUID = -8857844492316508015L;
 	private Map<String, Cube> cubeMap = new LinkedHashMap<String, Cube>();
-	private Map<String, Dimension> dimensionMap = new LinkedHashMap<String, Dimension>();
-	private Map<String, Measure> measureMap = new LinkedHashMap<String, Measure>();
+	private Map<String, IDimension> dimensionMap = new LinkedHashMap<String, IDimension>();
+	private Map<String, IMeasure> measureMap = new LinkedHashMap<String, IMeasure>();
 	private transient DataPoolManager dataPoolManager;
 
 	
@@ -41,7 +41,7 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDataPool#getDimensions()
 	 */
-	public Collection<Dimension> getDimensions() {
+	public Collection<IDimension> getDimensions() {
 		return Collections.unmodifiableCollection(dimensionMap.values());
 	}
 
@@ -115,7 +115,7 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDataPool#getMeasures()
 	 */
-	public Collection<Measure> getMeasures() {
+	public Collection<IMeasure> getMeasures() {
 		return Collections.unmodifiableCollection(measureMap.values());
 	}
 
