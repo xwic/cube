@@ -3,6 +3,8 @@
  */
 package de.xwic.cube.webui.viewer;
 
+import de.xwic.cube.Key;
+
 /**
  * Provides the cell data for the cube viewer. The data may be retrieved from
  * the cube or from some other source.
@@ -26,5 +28,15 @@ public interface ICubeDataProvider {
 	 * @return
 	 */
 	public String getCellData(CubeViewerModel model, ContentInfo row, ContentInfo col);
-	
+
+	/**
+	 * Used by getCellData to retrieve the cell from the cube.
+	 * Null is allowed for row and col.
+	 * @param model
+	 * @param row
+	 * @param col
+	 * @return
+	 */
+	public Key createCursor(CubeViewerModel model, ContentInfo row, ContentInfo col);
+
 }
