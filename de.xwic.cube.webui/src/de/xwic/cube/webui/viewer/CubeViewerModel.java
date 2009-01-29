@@ -27,22 +27,22 @@ import de.xwic.cube.Key;
 public class CubeViewerModel implements Serializable {
 
 	private enum EventType { FILTER_UPDATE, CUBE_UPDATED, CELL_SELECTION }; 
-		private ICube cube = null;
+	private ICube cube = null;
 
-	private IMeasure measure = null;
-	private List<INavigationProvider> rowProvider = new ArrayList<INavigationProvider>();
-	private List<INavigationProvider> columnProvider = new ArrayList<INavigationProvider>();
+	protected IMeasure measure = null;
+	protected List<INavigationProvider> rowProvider = new ArrayList<INavigationProvider>();
+	protected List<INavigationProvider> columnProvider = new ArrayList<INavigationProvider>();
 	
-	private Map<IDimension, IDimensionElement> filter = new HashMap<IDimension, IDimensionElement>(); 
+	protected Map<IDimension, IDimensionElement> filter = new HashMap<IDimension, IDimensionElement>(); 
 	
-	private Set<String> expandedElements = new HashSet<String>(); 
+	protected Set<String> expandedElements = new HashSet<String>(); 
 	
-	private IValueFormat valueFormat;
-	private Key baseKey = null;
+	protected IValueFormat valueFormat;
+	protected Key baseKey = null;
 	
-	private List<ICubeViewerModelListener> listeners = new ArrayList<ICubeViewerModelListener>();
+	protected List<ICubeViewerModelListener> listeners = new ArrayList<ICubeViewerModelListener>();
 
-	private final Locale locale;
+	protected final Locale locale;
 	
 	/**
 	 * Constructor.

@@ -25,6 +25,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private boolean hideTotals = false;
 	private boolean clickable = false;
 	private IDimensionFilter filter = null;
+	private boolean hideEmptyRoot = false;
 	
 	private int indention = 0;
 	
@@ -147,7 +148,9 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		 * @see de.xwic.cube.webui.viewer.INavigationElement#getTitle()
 		 */
 		public String getTitle() {
-			return element.getTitle() == null || element.getTitle().length() == 0 ? element.getKey() : element.getTitle();
+			String title = element.getTitle() == null || element.getTitle().length() == 0 ? element.getKey() : element.getTitle();
+			//title = title.replace(" ", "&nbsp;");
+			return title;
 		}
 
 		/* (non-Javadoc)
@@ -242,7 +245,8 @@ public class DimensionNavigationProvider implements INavigationProvider {
 			return true;
 		}
 		ICube cube = model.getCube();
-		Key cursor = model.createCursor();
+		//Key cursor = model.createCursor();
+		Key cursor = dataProvider.createCursor(model, null, null);
 
 		int idx = cube.getDimensionIndex(elm.getDimension());
 		cursor.setDimensionElement(idx, elm);
@@ -278,15 +282,12 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		});
 	}
 
-	/**
-	 * (Re-)creates the navigation elements based on the current settings. 
-	 */
-	public void createNavigationElements() {
+	private void createNavigationElements() {
 		rootNavElements = new ArrayList<INavigationElement>();
 		DimensionChain chain = new DimensionChain();
 		if (dimensions.size() > 0) {
 			IDimensionElement dim = dimensions.get(0); // first one.
-			if (showRoot) {
+			if (showRoot && (!hideEmptyRoot || !isEmpty(dim, chain))) {
 				rootNavElements.add(new DimensionNavigationElement(dim, chain));
 			} else {
 				for (IDimensionElement elm : dim.getDimensionElements()) {
@@ -309,7 +310,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public void setHideEmptyElements(boolean hideEmptyElements) {
 		this.hideEmptyElements = hideEmptyElements;
-		// force reinitialization
+		// force re-initialization
 		createNavigationElements();
 	}
 	
@@ -424,17 +425,32 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	}
 
 	/**
-	 * @return the dataProvider
-	 */
-	public ICubeDataProvider getDataProvider() {
-		return dataProvider;
-	}
-
-	/**
 	 * @param dataProvider the dataProvider to set
 	 */
 	public void setDataProvider(ICubeDataProvider dataProvider) {
 		this.dataProvider = dataProvider;
 	}
-
+	
+	/**
+	 * @return the dataProvider
+	 */
+	public ICubeDataProvider getDataProvider() {
+		return dataProvider;
+	}
+	
+	/**
+	 * @param hideEmptyRoot the hideEmptyRoot to set
+	 */
+	public void setHideEmptyRoot(boolean hideEmptyRoot) {
+		this.hideEmptyRoot = hideEmptyRoot;
+		// force re-initialization
+		createNavigationElements();
+	}
+	
+	/**
+	 * @return the hideEmptyRoot
+	 */
+	public boolean isHideEmptyRoot() {
+		return hideEmptyRoot;
+	}
 }
