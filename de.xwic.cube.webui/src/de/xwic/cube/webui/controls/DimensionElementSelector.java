@@ -287,7 +287,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		flatList = new ArrayList<IDimensionElement>();
 		addLeafs(dimension, filter);
 		
-		if (!dimensionElement.isLeaf() && flatList.size() > 0) {
+		if (dimensionElement != null && !dimensionElement.isLeaf() && flatList.size() > 0) {
 			dimensionElement = flatList.get(0);
 		}
 		
