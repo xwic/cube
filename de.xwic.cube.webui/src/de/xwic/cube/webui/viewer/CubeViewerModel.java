@@ -260,5 +260,18 @@ public class CubeViewerModel implements Serializable {
 		}
 		
 	}
+
+	/**
+	 * Expands the element and all its child elements.
+	 * @param dimGEO
+	 */
+	public void expandAll(IDimensionElement de) {
+
+		expand(de.getID());
+		for (IDimensionElement child : de.getDimensionElements()) {
+			expandAll(child);
+		}
+		
+	}
 	
 }

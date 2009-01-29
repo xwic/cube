@@ -278,7 +278,10 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		});
 	}
 
-	private void createNavigationElements() {
+	/**
+	 * (Re-)creates the navigation elements based on the current settings. 
+	 */
+	public void createNavigationElements() {
 		rootNavElements = new ArrayList<INavigationElement>();
 		DimensionChain chain = new DimensionChain();
 		if (dimensions.size() > 0) {
