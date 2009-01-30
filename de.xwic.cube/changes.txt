@@ -1,0 +1,44 @@
+Change Notes
+============
+
+2009-01-23	FLI
+	- Implemented Externalizable interface for the cube's cell object, to speed up the serialization and
+	  deserialization process and reduce the memory requirements during the load.
+
+2009-01-21	FLI
+	- Added possibility to reorder dimension elements
+	- DifferenceFunction now can "negate" the result
+	- PercentageValueFormat is creating the result with a NOBR tag to prevent line break
+	- JDBCUtil stores the order_index of dimension elements to restore them in the same order. This requires a new database column!
+
+2009-01-14	FLI
+	- Added KValueFormatProvider
+	
+2009-01-13	FLI
+	- The cube no longer creates the internal HashMap with the theoretical maximum capacity
+	- DimensionElements with a '/' character in the key can no longer be created
+	 
+2008-12-30	FLI
+	- Added IDataPoolManager.isDataPoolLoaded() method, to check if a DataPool is already loaded into memory.
+	- Implemented JDBCSerializerUtil.restoreDimensions()
+	
+2008-12-29	FLI
+	- Added listDataPoolKeys() to DataPoolManager.
+	- Added JDBCSerializerUtil
+	
+2008-12-15	FLI
+	- IDimension.getPath() now returns an empty string (as expected) and IDimensionElement.parsePath()
+	  returns "this" if the argument is an empty string. 
+
+2008-12-01	FLI
+	- Added cube.clear(), cube.clear(IMeasure) and cube.clear(IMeasure, Key) to 
+	  remove cells by measure/key.
+	- Set cube.reset() to deprecated. Use .clear() instead. 
+	- Fixed a StackOverflowException in the equals() method of the DimensionElement
+	  that could happen when two elements are compared that are from different 
+	  dimensions.
+	  
+2008-11-25	FLI
+	- Optimized memory usage by refactoring the internal data model. This has
+	  lead to a few API changes, but also improved performance. The memory
+	  usage decreased by 24%, performance gain is at about 33%. 
