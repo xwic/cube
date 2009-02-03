@@ -62,9 +62,6 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	 */
 	public IDimension getDimension(String key) {
 		IDimension dim = dimensionMap.get(key);
-		if (dim == null) {
-			throw new IllegalArgumentException("A dimension with that key does not exist: " + key);
-		}
 		return dim;
 	}
 	
@@ -136,9 +133,6 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	 */
 	public IMeasure getMeasure(String key) {
 		IMeasure measure = measureMap.get(key);
-		if (measure == null) {
-			throw new IllegalArgumentException("A measure with that key does not exist: " + key);
-		}
 		return measure;
 	}
 	
