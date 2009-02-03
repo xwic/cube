@@ -10,8 +10,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.xwic.cube.ICell;
+import de.xwic.cube.ICellListener;
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
@@ -416,6 +418,17 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	 */
 	public int getSize() {
 		return data.size();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#forEachCell(de.xwic.cube.ICellListener)
+	 */
+	public void forEachCell(ICellListener listener) {
+		for(Entry<Key, Cell> entry: data.entrySet()) {
+			if(!listener.onCell(entry.getKey(), entry.getValue())) {
+				return;
+			}
+		}
 	}
 	
 }
