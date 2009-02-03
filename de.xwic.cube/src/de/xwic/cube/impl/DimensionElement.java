@@ -64,9 +64,6 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 */
 	public IDimensionElement getDimensionElement(String key) {
 		IDimensionElement element = elementMap.get(key);
-		if (element == null) {
-			throw new IllegalArgumentException("An element with the key '" + key + "' does not exist.");
-		}
 		return element;
 	}
 
