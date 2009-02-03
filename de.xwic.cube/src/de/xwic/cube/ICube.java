@@ -139,5 +139,12 @@ public interface ICube extends IIdentifyable {
 	 * @return
 	 */
 	public int getMeasureIndex(IMeasure measure);
+	
+	/**
+	 * Iterates through the cells.
+	 * 
+	 * @param listener
+	 */
+	public void forEachCell(ICellListener listener);
 
 }
