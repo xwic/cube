@@ -4,8 +4,8 @@
 
 	<name>XWicCubeDemo1</name>
 	<class>de.xwic.cube.webui.samples.demo1.DemoApplication1</class>
+	<serializable>false</serializable>
 	<singlesession>true</singlesession>
 	<requireauth>false</requireauth>
-	<serializable>false</serializable>
 	
 </application>
