@@ -27,6 +27,8 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private IDimensionFilter filter = null;
 	private boolean hideEmptyRoot = false;
 	
+	private String rootTitle = null;
+	
 	private int indention = 0;
 	
 	/**
@@ -95,6 +97,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		private IDimensionElement element;
 		private List<INavigationElement> childs;
 		private final DimensionChain chain;
+		private String fixedTitle = null;
 		/**
 		 * @param element
 		 */
@@ -148,9 +151,8 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		 * @see de.xwic.cube.webui.viewer.INavigationElement#getTitle()
 		 */
 		public String getTitle() {
-			String title = element.getTitle() == null || element.getTitle().length() == 0 ? element.getKey() : element.getTitle();
-			//title = title.replace(" ", "&nbsp;");
-			return title;
+			return fixedTitle != null ? fixedTitle : 
+				(element.getTitle() == null || element.getTitle().length() == 0 ? element.getKey() : element.getTitle());
 		}
 
 		/* (non-Javadoc)
@@ -188,6 +190,20 @@ public class DimensionNavigationProvider implements INavigationProvider {
 			ContentInfo contentInfo = new ContentInfo(dataProvider, elements);
 			contentInfo.setClickable(clickable);
 			return contentInfo;
+		}
+
+		/**
+		 * @return the fixedTitle
+		 */
+		public String getFixedTitle() {
+			return fixedTitle;
+		}
+
+		/**
+		 * @param fixedTitle the fixedTitle to set
+		 */
+		public void setFixedTitle(String fixedTitle) {
+			this.fixedTitle = fixedTitle;
 		}
 		
 	}
@@ -282,13 +298,18 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		});
 	}
 
-	private void createNavigationElements() {
+	/**
+	 * (Re-)creates the navigation elements based on the current settings. 
+	 */
+	public void createNavigationElements() {
 		rootNavElements = new ArrayList<INavigationElement>();
 		DimensionChain chain = new DimensionChain();
 		if (dimensions.size() > 0) {
 			IDimensionElement dim = dimensions.get(0); // first one.
 			if (showRoot && (!hideEmptyRoot || !isEmpty(dim, chain))) {
-				rootNavElements.add(new DimensionNavigationElement(dim, chain));
+				DimensionNavigationElement e = new DimensionNavigationElement(dim, chain);
+				e.setFixedTitle(rootTitle);
+				rootNavElements.add(e);
 			} else {
 				for (IDimensionElement elm : dim.getDimensionElements()) {
 					if ((filter == null || filter.accept(elm)) && (!hideEmptyElements || !isEmpty(elm, chain))) {
@@ -425,13 +446,6 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	}
 
 	/**
-	 * @param dataProvider the dataProvider to set
-	 */
-	public void setDataProvider(ICubeDataProvider dataProvider) {
-		this.dataProvider = dataProvider;
-	}
-	
-	/**
 	 * @return the dataProvider
 	 */
 	public ICubeDataProvider getDataProvider() {
@@ -448,9 +462,34 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	}
 	
 	/**
+	 * @param dataProvider the dataProvider to set
+	 */
+	public void setDataProvider(ICubeDataProvider dataProvider) {
+		this.dataProvider = dataProvider;
+	}
+
+	/**
+	 * @return the rootTitle
+	 */
+	public String getRootTitle() {
+		return rootTitle;
+	}
+
+	/**
+	 * @param rootTitle the rootTitle to set
+	 */
+	public void setRootTitle(String rootTitle) {
+		this.rootTitle = rootTitle;
+		if (showRoot) {
+			createNavigationElements();
+		}
+	}
+
+	/**
 	 * @return the hideEmptyRoot
 	 */
-	public boolean isHideEmptyRoot() {
+	protected boolean isHideEmptyRoot() {
 		return hideEmptyRoot;
 	}
+
 }
