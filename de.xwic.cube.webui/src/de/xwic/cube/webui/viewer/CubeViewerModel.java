@@ -42,7 +42,7 @@ public class CubeViewerModel implements Serializable {
 	
 	protected List<ICubeViewerModelListener> listeners = new ArrayList<ICubeViewerModelListener>();
 
-	protected final Locale locale;
+	private final Locale locale;
 	
 	/**
 	 * Constructor.
@@ -245,7 +245,8 @@ public class CubeViewerModel implements Serializable {
 	 * @return
 	 */
 	public IDimensionElement getFilterDimension(IDimension dimension) {
-		return filter.get(dimension);
+		IDimensionElement element = filter.get(dimension);
+		return element == null ? dimension : element;
 	}
 
 	/**
