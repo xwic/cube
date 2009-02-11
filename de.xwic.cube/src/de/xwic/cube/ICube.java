@@ -48,6 +48,26 @@ public interface ICube extends IIdentifyable {
 	public abstract Key createKey(String key);
 	
 	/**
+	 * Create an empty query.
+	 * @return
+	 */
+	public abstract IQuery createQuery();
+	
+	/**
+	 * Create a new query.
+	 * @param query
+	 * @return
+	 */
+	public abstract IQuery createQuery(String query);
+	
+	/**
+	 * Create a query for the specified key.
+	 * @param key
+	 * @return
+	 */
+	public abstract IQuery createQuery(Key key);
+	
+	/**
 	 * Returns the cell for the specified key.
 	 * @param key
 	 * @return
@@ -87,6 +107,14 @@ public interface ICube extends IIdentifyable {
 	 * @return
 	 */
 	public abstract Double getCellValue(Key key, IMeasure measure);
+	
+	/**
+	 * Returns the value defined by the query.
+	 * @param query
+	 * @param measure
+	 * @return
+	 */
+	public abstract Double getCellValue(IQuery query, IMeasure measure);
 	
 	/**
 	 * Returns the value in a cell or NULL if the cell contains no value.
