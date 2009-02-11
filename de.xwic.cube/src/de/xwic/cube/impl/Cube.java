@@ -18,6 +18,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.IQuery;
 import de.xwic.cube.Key;
 
 /**
@@ -259,6 +260,23 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	}
 	
 	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#getCellValue(de.xwic.cube.IQuery, de.xwic.cube.IMeasure)
+	 */
+	public Double getCellValue(IQuery query, IMeasure measure) {
+
+		boolean isNull = true;
+		double total = 0.0d;
+		for (Key key : query.createKeys()) {
+			Double value = getCellValue(key, measure);
+			if (value != null) {
+				total += value.doubleValue();
+				isNull = false;
+			}
+		}
+		return isNull ? null : new Double(total);
+	}
+	
+	/* (non-Javadoc)
 	 * @see de.xwic.cube.ICube#reset()
 	 */
 	public void reset() {
@@ -367,6 +385,29 @@ public class Cube extends Identifyable implements ICube, Serializable {
 			idx++;
 		}
 		return new Key(elements);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#createQuery()
+	 */
+	public IQuery createQuery() {
+		return new Query(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#createQuery(java.lang.String)
+	 */
+	public IQuery createQuery(String query) {
+		
+		return new Query(this, query);
+	}
+	
+	public IQuery createQuery(Key key) {
+		Query query = new Query(this);
+		for (IDimensionElement el : key.getDimensionElements()) {
+			query.selectDimensionElements(el);
+		}
+		return query;
 	}
 	
 	/* (non-Javadoc)

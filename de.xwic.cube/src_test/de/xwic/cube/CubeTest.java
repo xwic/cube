@@ -4,6 +4,7 @@
 package de.xwic.cube;
 
 import java.io.File;
+import java.util.List;
 
 import junit.framework.TestCase;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
@@ -293,4 +294,35 @@ public class CubeTest extends TestCase {
 		
 	}
 	
+	public void testQuery() {
+
+		cube.setCellValue(cube.createKey(""), meBookings, 1000000.0d);
+		
+		
+		IQuery query = cube.createQuery();
+		
+		List<Key> keys = query.createKeys();
+		System.out.println("Keys: " + keys.toString());
+		assertEquals(1, keys.size());
+		
+		query.selectDimensionElements(dimOT.parsePath("AOO"));
+		keys = query.createKeys();
+		System.out.println("Keys: " + keys.toString());
+		System.out.println("Value: " + cube.getCellValue(query, meBookings));
+		assertEquals(1, keys.size());
+		
+		query.selectDimensionElements(dimTime.parsePath("2008/Q1/Jan"), dimTime.parsePath("2008/Q1/Feb"));
+		keys = query.createKeys();
+		System.out.println("Keys: " + keys.toString());
+		System.out.println("Value: " + cube.getCellValue(query, meBookings));
+		assertEquals(2, keys.size());
+
+		query.selectDimensionElements(dimOT.parsePath("COO"));
+		keys = query.createKeys();
+		System.out.println("Keys: " + keys.toString());
+		System.out.println("Value: " + cube.getCellValue(query, meBookings));
+		assertEquals(4, keys.size());
+		
+		
+	}	
 }

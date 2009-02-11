@@ -3,6 +3,8 @@
  */
 package de.xwic.cube.storage.impl;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -71,10 +73,13 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 				throw new IllegalArgumentException("A datapool with the key " + key + " does not exist.");
 			}
 			FileInputStream fis = new FileInputStream(file);
-			ObjectInputStream ois = new ObjectInputStream(fis);
+			BufferedInputStream bip = new BufferedInputStream(fis);
+			ObjectInputStream ois = new ObjectInputStream(bip);
 	
 			IDataPool pool = (IDataPool) ois.readObject();
 			ois.close();
+			bip.close();
+			fis.close();
 			return pool;
 		} catch (Exception e) {
 			throw new StorageException("Error loading DataPool " + key + ": " + e, e);
@@ -89,10 +94,16 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 		try {
 			String filename = dataPool.getKey() + ".datapool";
 			FileOutputStream fos = new FileOutputStream(new File(dataDir, filename));
-			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			BufferedOutputStream bufOut = new BufferedOutputStream(fos);
+			ObjectOutputStream oos = new ObjectOutputStream(bufOut);
 	
 			oos.writeObject(dataPool);
+			
+			oos.flush();
 			oos.close();
+			bufOut.flush();
+			bufOut.close();
+			fos.close();
 
 		} catch (Exception e) {
 			throw new StorageException("Error storing DataPool " + dataPool.getKey() + ": " + e, e);
