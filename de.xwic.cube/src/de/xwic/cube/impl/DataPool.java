@@ -62,7 +62,7 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	 */
 	public IDimension getDimension(String key) {
 		IDimension dim = dimensionMap.get(key);
-		if (dim == null) { 
+		if (dim == null) {
 			throw new IllegalArgumentException("A dimension with that key does not exist: " + key);
 		}
 		return dim;
@@ -248,8 +248,9 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	 * @see de.xwic.cube.IDataPool#parseDimensionElementId(java.lang.String)
 	 */
 	public IDimensionElement parseDimensionElementId(String id) {
-		
-		
+		/**
+		 * Copied to CubeUtil.parseDimensionElementId(String) and used there as well ! ! !
+		 */ 
 		int start = id.indexOf('[');
 		if (start == -1) {
 			throw new IllegalArgumentException("Missing starting [");

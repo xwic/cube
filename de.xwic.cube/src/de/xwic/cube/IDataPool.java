@@ -6,7 +6,6 @@ package de.xwic.cube;
 import java.util.Collection;
 
 import de.xwic.cube.impl.Cube;
-import de.xwic.cube.impl.Measure;
 
 /**
  * Container for dimensions, measures and cubes.
