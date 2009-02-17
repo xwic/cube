@@ -13,9 +13,10 @@ import de.xwic.cube.IValueFormatProvider;
  */
 public class DefaultValueFormatProvider implements IValueFormatProvider {
 
+	private final static long serialVersionUID = -6670502215136438943l;
+	
 	private int minFractionDigits = 2;
 	private int maxFractionDigits = 2;
-	
 	
 	/**
 	 * 
@@ -51,4 +52,33 @@ public class DefaultValueFormatProvider implements IValueFormatProvider {
 		return new DefaultValueFormat(locale, minFractionDigits, maxFractionDigits);
 	}
 
+	/**
+	 * @return the minFractionDigits
+	 */
+	public int getMinimumFractionDigits() {
+		return minFractionDigits;
+	}
+
+	/**
+	 * @param minFractionDigits the minFractionDigits to set
+	 */
+	public void setMinimumFractionDigits(int minFractionDigits) {
+		this.minFractionDigits = minFractionDigits;
+	}
+
+	/**
+	 * @return the maxFractionDigits
+	 */
+	public int getMaximumFractionDigits() {
+		return maxFractionDigits;
+	}
+
+	/**
+	 * @param maxFractionDigits the maxFractionDigits to set
+	 */
+	public void setMaximumFractionDigits(int maxFractionDigits) {
+		this.maxFractionDigits = maxFractionDigits;
+	}
+
+	
 }
