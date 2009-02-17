@@ -4,7 +4,9 @@
 package de.xwic.cube.webui.viewer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimensionElement;
@@ -30,7 +32,9 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private String rootTitle = null;
 	
 	private int indention = 0;
-	
+
+	private Set<IDimensionElement> contentFilter = new HashSet<IDimensionElement>();
+
 	/**
 	 * Used to chain multiple dimensions in one navigation.
 	 * @author Lippisch
@@ -187,6 +191,13 @@ public class DimensionNavigationProvider implements INavigationProvider {
 				}
 				dc = dc.getParent();
 			}
+			// add custom content filter
+			//ICube cube = model.getCube();
+			for (IDimensionElement elm : getContentFilter()) {
+				//int idx = cube.getDimensionIndex(elm.getDimension());
+				elements.add(elm);
+			}
+			
 			ContentInfo contentInfo = new ContentInfo(dataProvider, elements);
 			contentInfo.setClickable(clickable);
 			return contentInfo;
@@ -492,4 +503,10 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		return hideEmptyRoot;
 	}
 
+	/**
+	 * @return the contentFilter
+	 */
+	public Set<IDimensionElement> getContentFilter() {
+		return contentFilter;
+	}
 }
