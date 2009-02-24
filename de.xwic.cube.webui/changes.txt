@@ -1,6 +1,11 @@
 Change Notes
 =============
 
+2009-02-24	FLI
+	- Added customUserObject property to TotalProvider, that is provided in the ContentInfo
+	  for special DataProviders
+	- DefaultDimensionDataProvider: Added priority property
+
 2008-12-15	FLI
 	- Renamed DimensionSelectorControl to ClassicDimensionSelectorControl as it got replaced
 	  by an extended version of the LeafDimensionSelectorControl which is now named 

@@ -18,6 +18,7 @@ public class TotalNavigationProvider implements INavigationProvider {
 	private IMeasure fixedMeasure = null;
 	public boolean clickable = false;
 	private int indention = 0;
+	private Object contentUserObject = null;
 	private ICubeDataProvider dataProvider = new DefaultDimensionDataProvider();
 
 	private class TotalNavigationElement implements INavigationElement {
@@ -28,6 +29,7 @@ public class TotalNavigationProvider implements INavigationProvider {
 		public ContentInfo getContentInfo() {
 			ContentInfo ci = new ContentInfo (dataProvider);
 			ci.setClickable(clickable );
+			ci.setUserData(contentUserObject);
 			return ci;
 		}
 
@@ -168,6 +170,20 @@ public class TotalNavigationProvider implements INavigationProvider {
 	 */
 	public void setDataProvider(ICubeDataProvider dataProvider) {
 		this.dataProvider = dataProvider;
+	}
+
+	/**
+	 * @return the contentUserObject
+	 */
+	public Object getContentUserObject() {
+		return contentUserObject;
+	}
+
+	/**
+	 * @param contentUserObject the contentUserObject to set
+	 */
+	public void setContentUserObject(Object contentUserObject) {
+		this.contentUserObject = contentUserObject;
 	}
 
 }
