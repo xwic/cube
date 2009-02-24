@@ -3,6 +3,9 @@
  */
 package de.xwic.cube.webui.viewer;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
@@ -14,6 +17,7 @@ import de.xwic.cube.Key;
  */
 public class DefaultDimensionDataProvider implements ICubeDataProvider {
 
+	protected int priority = 1;
 	protected IMeasure fixedMeasure = null;
 	
 	/* (non-Javadoc)
@@ -57,7 +61,7 @@ public class DefaultDimensionDataProvider implements ICubeDataProvider {
 	 * @see de.xwic.cube.webui.viewer.ICubeDataProvider#getPriority()
 	 */
 	public int getPriority() {
-		return 1;
+		return priority;
 	}
 
 	/**
@@ -74,4 +78,10 @@ public class DefaultDimensionDataProvider implements ICubeDataProvider {
 		this.fixedMeasure = fixedMeasure;
 	}
 
+	/**
+	 * @param priority the priority to set
+	 */
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
 }
