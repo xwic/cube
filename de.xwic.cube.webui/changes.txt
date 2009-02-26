@@ -1,0 +1,23 @@
+Change Notes
+=============
+
+2009-02-24	FLI
+	- Added customUserObject property to TotalProvider, that is provided in the ContentInfo
+	  for special DataProviders
+	- DefaultDimensionDataProvider: Added priority property
+
+2008-12-15	FLI
+	- Renamed DimensionSelectorControl to ClassicDimensionSelectorControl as it got replaced
+	  by an extended version of the LeafDimensionSelectorControl which is now named 
+	  DimensionElementSelector.
+	  This new control implements a drop-down box that dynamically loads the dimension elements
+	  on click and displays them as a tree.
+	   
+2008-11-25  FLI
+	- Added LeafDimensionSelection support into the CubeFilter
+	- Added row highlighting support for IE6 browser
+	- Fixed changes due to performance optimizations in the cube API
+	
+2008-11-13	FLI
+	Added an indention level for navigation providers. This allows to better customize the viewer
+	when using multiple NavigationProviders, for example a Total and some Dimensions.
