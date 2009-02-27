@@ -104,4 +104,12 @@ public class Dimension extends DimensionElement implements IDimension, Serializa
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDimension#removeDimensionElements()
+	 * TODO check that cube is empty (no cells exist).
+	 */
+	public void removeDimensionElements() {
+		elements.clear();
+		elementMap.clear();
+	}
 }

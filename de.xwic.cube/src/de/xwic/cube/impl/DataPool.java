@@ -155,6 +155,7 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	 */
 	void removeDimension(Dimension dimension) {
 		// TODO check if cubes exist that use this dimension.
+		// TODO check that cube is empty (no cells exist).
 		if (dimensionMap.containsKey(dimension.getKey())) {
 			dimensionMap.remove(dimension.getKey());
 		}
