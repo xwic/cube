@@ -16,6 +16,12 @@ public interface IDimension extends IDimensionElement {
 	 * dimension contains DimensionElements, they are removed as well.
 	 */
 	public abstract void remove();
+	
+	/**
+	 * Remove all dimension elements belonging to this dimension.
+	 * As the remove() only an unused dimension can be cleared.
+	 */
+	public abstract void removeDimensionElements();
 
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.DimensionElement#getDimension()
