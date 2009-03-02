@@ -275,6 +275,12 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		//Key cursor = model.createCursor();
 		Key cursor = dataProvider.createCursor(model, null, null);
 
+		// add content filter as well
+		for (IDimensionElement de : getContentFilter()) {
+			int idx = cube.getDimensionIndex(de.getDimension());
+			cursor.setDimensionElement(idx, de);
+		}
+		
 		int idx = cube.getDimensionIndex(elm.getDimension());
 		cursor.setDimensionElement(idx, elm);
 		DimensionChain dc = dimChain;
@@ -314,7 +320,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public void createNavigationElements() {
 		rootNavElements = new ArrayList<INavigationElement>();
-		DimensionChain chain = new DimensionChain();
+		DimensionChain chain = new DimensionChain();chain.toString();
 		if (dimensions.size() > 0) {
 			IDimensionElement dim = dimensions.get(0); // first one.
 			if (showRoot && (!hideEmptyRoot || !isEmpty(dim, chain))) {
