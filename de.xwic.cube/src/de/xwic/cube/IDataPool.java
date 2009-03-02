@@ -5,8 +5,6 @@ package de.xwic.cube;
 
 import java.util.Collection;
 
-import de.xwic.cube.impl.Cube;
-
 /**
  * Container for dimensions, measures and cubes.
  * @author Florian Lippisch
@@ -44,7 +42,7 @@ public interface IDataPool extends IIdentifyable {
 	/**
 	 * @return the cubes
 	 */
-	public abstract Collection<Cube> getCubes();
+	public abstract Collection<ICube> getCubes();
 
 	/**
 	 * Create a new cube.
