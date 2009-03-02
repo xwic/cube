@@ -23,7 +23,7 @@ import de.xwic.cube.StorageException;
 public class DataPool extends Identifyable implements IDataPool, Serializable {
 
 	private static final long serialVersionUID = -8857844492316508015L;
-	private Map<String, Cube> cubeMap = new LinkedHashMap<String, Cube>();
+	private Map<String, ICube> cubeMap = new LinkedHashMap<String, ICube>();
 	private Map<String, IDimension> dimensionMap = new LinkedHashMap<String, IDimension>();
 	private Map<String, IMeasure> measureMap = new LinkedHashMap<String, IMeasure>();
 	private transient DataPoolManager dataPoolManager;
@@ -78,7 +78,7 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDataPool#getCubes()
 	 */
-	public Collection<Cube> getCubes() {
+	public Collection<ICube> getCubes() {
 		return Collections.unmodifiableCollection(cubeMap.values());
 	}
 	
