@@ -18,13 +18,19 @@ import de.xwic.cube.IDimensionElement;
  */
 public class DimensionElement extends Identifyable implements IDimensionElement, Serializable {
 
-	private static final long serialVersionUID = -4979495250481486969L;
+	private static final long serialVersionUID = -4979495250481486970L;
 	protected Map<String, IDimensionElement> elementMap = new HashMap<String, IDimensionElement>();
 	protected List<IDimensionElement> elements = new ArrayList<IDimensionElement>();
-	protected DimensionElement parent;
+	protected final DimensionElement parent;
 	protected Dimension dimension;
 	
 	protected double weight = 1.0;
+	
+	// because the parent, dimension and key of an element is final after
+	// the creation, the hashcode stays the same. Caching the hashcode 
+	// improves performance a lot.
+	private boolean isHashed = false;
+	private int myHashcode = -1;
 
 	/**
 	 * @param dataPool 
@@ -141,11 +147,16 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 */
 	@Override
 	public int hashCode() {
+		if (isHashed) {
+			return myHashcode;
+		}
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result
 				+ ((dimension == null || dimension == this) ? 0 : dimension.hashCode());
 		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+		myHashcode = result;
+		isHashed = true;
 		return result;
 	}
 

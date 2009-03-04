@@ -5,6 +5,7 @@ package de.xwic.cube;
 
 import java.io.File;
 import java.util.List;
+import java.util.Scanner;
 
 import junit.framework.TestCase;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
@@ -217,6 +218,7 @@ public class CubeTest extends TestCase {
 
 	}
 	
+
 	public void testClear() {
 
 		Key key = cube.createKey("[AOO][Hardware][2008]");
