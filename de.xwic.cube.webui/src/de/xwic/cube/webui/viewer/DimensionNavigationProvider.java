@@ -4,11 +4,14 @@
 package de.xwic.cube.webui.viewer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.xwic.cube.ICube;
+import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.Key;
 
@@ -32,6 +35,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private String rootTitle = null;
 	
 	private int indention = 0;
+	private Map<IDimension, Integer> dimensionsDepth = null;
 
 	private Set<IDimensionElement> contentFilter = new HashSet<IDimensionElement>();
 
@@ -110,7 +114,13 @@ public class DimensionNavigationProvider implements INavigationProvider {
 			this.element = element;
 			this.chain = chain;
 			childs = new ArrayList<INavigationElement>();
-			if (element.getDimensionElements().size() != 0) {
+			boolean limitDepth = false;
+			if (dimensionsDepth != null) {
+				// check if at a specified maximum depth level the navigation has to stop
+				Integer depth = dimensionsDepth.get(element.getDimension());
+				limitDepth = depth != null && element.getDepth() > depth; 
+			}
+			if (element.getDimensionElements().size() != 0 && !limitDepth) {
 				for (IDimensionElement elm : element.getDimensionElements()) {
 					if ((filter == null || filter.accept(elm)) && (!hideEmptyElements || !isEmpty(elm, chain))) {
 						childs.add(new DimensionNavigationElement(elm, chain));
@@ -320,7 +330,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public void createNavigationElements() {
 		rootNavElements = new ArrayList<INavigationElement>();
-		DimensionChain chain = new DimensionChain();chain.toString();
+		DimensionChain chain = new DimensionChain();
 		if (dimensions.size() > 0) {
 			IDimensionElement dim = dimensions.get(0); // first one.
 			if (showRoot && (!hideEmptyRoot || !isEmpty(dim, chain))) {
@@ -514,5 +524,33 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public Set<IDimensionElement> getContentFilter() {
 		return contentFilter;
+	}
+	
+	/**
+	 * @return the dimensions
+	 */
+	public List<IDimensionElement> getDimensions() {
+		return dimensions;
+	}
+	
+	/**
+	 * @return the dimensionsDepth
+	 */
+	public Map<IDimension, Integer> getDimensionsDepth() {
+		return dimensionsDepth;
+	}
+	
+	/**
+	 * Add a maximum depth for a dimension (inclusively).
+	 * Calls createNavigationElements() method to create updated structure.
+	 * @param dimension
+	 * @param depth
+	 */
+	public void addDimensionsDepth(IDimensionElement dimension, int depth) {
+		if (dimensionsDepth == null) {
+			dimensionsDepth = new HashMap<IDimension, Integer>(dimensions.size());
+		}
+		dimensionsDepth.put(dimension.getDimension(), depth);
+		createNavigationElements();
 	}
 }
