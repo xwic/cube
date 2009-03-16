@@ -15,7 +15,7 @@ import de.xwic.cube.util.DataDump;
 /**
  * @author Florian Lippisch
  */
-public class CubeTest extends TestCase {
+public class CubeFlexCalcTest extends TestCase {
 
 	ICube cube = null;
 	private IMeasure meBookings;
@@ -74,7 +74,7 @@ public class CubeTest extends TestCase {
 		meDiff.setFunction(function);
 		meDiff.setValueFormatProvider(new PercentageValueFormatProvider());
 		
-		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings, mePlan, meDiff });
+		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.FLEX_CALC);
 		
 	}
 	
@@ -127,6 +127,8 @@ public class CubeTest extends TestCase {
 		long duration = System.currentTimeMillis() - start;
 		System.out.println("Duration: " + duration);
 		
+		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
+		
 		assertEquals(220.0, cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
 		assertEquals(220.0, cube.getCellValue("[*][Hardware]", meBookings));
 		assertEquals(270.0, cube.getCellValue("[AOO][*]", meBookings));
@@ -134,7 +136,6 @@ public class CubeTest extends TestCase {
 		assertEquals(250.0, cube.getCellValue("[LOB:PS]", meBookings));
 		assertEquals(470.0, cube.getCellValue("", meBookings));
 
-		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
 		
 	}
 	

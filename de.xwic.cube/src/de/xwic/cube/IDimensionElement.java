@@ -131,5 +131,13 @@ public interface IDimensionElement extends IIdentifyable {
 	 * @return
 	 */
 	public int getDepth();
+
+	/**
+	 * Returns true if the specified element is a child of this element. This includes
+	 * childs in any depth. 
+	 * @param dimensionElement
+	 * @return
+	 */
+	public boolean isChild(IDimensionElement dimensionElement);
 	
 }

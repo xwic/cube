@@ -117,4 +117,17 @@ public class Key implements Serializable {
 		return elements;
 	}
 	
+	/**
+	 * Returns true if the key's elements match these
+	 * @param key
+	 * @return
+	 */
+	public boolean isSubKey(Key key) {
+		for (int i = 0; i < elementKeys.length; i++) {
+			if (!(elementKeys[i].equals(key.elementKeys[i]) || elementKeys[i].isChild(key.elementKeys[i]))) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
