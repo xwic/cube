@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IQuery;
@@ -29,14 +30,14 @@ import de.xwic.cube.Key;
  */
 public class Query implements IQuery {
 
-	private final Cube cube;
+	private final ICube cube;
 	private Map<IDimension, Set<IDimensionElement>> selection = new HashMap<IDimension, Set<IDimensionElement>>();
 	private IDimension[] dimensions;
 	
 	/**
 	 * @param cube
 	 */
-	public Query(Cube cube) {
+	public Query(ICube cube) {
 		this.cube = cube;
 		dimensions = new IDimension[cube.getDimensions().size()];
 		dimensions = cube.getDimensions().toArray(dimensions);
@@ -46,7 +47,7 @@ public class Query implements IQuery {
 	 * @param cube
 	 * @param query
 	 */
-	public Query(Cube cube, String query) {
+	public Query(ICube cube, String query) {
 		this.cube = cube;
 		dimensions = new IDimension[cube.getDimensions().size()];
 		dimensions = cube.getDimensions().toArray(dimensions);

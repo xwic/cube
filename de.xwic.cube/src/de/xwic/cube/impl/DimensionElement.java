@@ -296,5 +296,22 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 			elements.add(newIndex, childElement);
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDimensionElement#isChild(de.xwic.cube.IDimensionElement)
+	 */
+	public boolean isChild(IDimensionElement elm) {
+		IDimensionElement de = elm.getParent();
+		do {
+			if (de.equals(this)) {
+				return true;
+			} else {
+				if (de instanceof IDimension) {
+					return false;
+				}
+				de = de.getParent();
+			}
+		} while(true);
+	}
 	
 }

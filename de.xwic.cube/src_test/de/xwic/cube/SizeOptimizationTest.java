@@ -62,7 +62,8 @@ public class SizeOptimizationTest extends TestCase {
 		// 2nd   size=17,706,798 bytes ; 91per cell; (12.861 sec)
 		// 3rd   size=13,817,225 bytes ; 71per cell; (8.875 sec)
 		// 4th   size=12,844,790 bytes ; 66per cell; (8.719 sec)
-		
+		// 5th   size=11,289,259 bytes ; 58per cell; (4.019 sec)   -- cell use externalizable
+		// 6th   size=8,177,352 bytes  ; 42per cell; (3.453 sec)   -- cube uses externalizable
 		
 		
 		File file = new File("data/sizetest.datapool");

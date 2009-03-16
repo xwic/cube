@@ -86,10 +86,23 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	 * @see de.xwic.cube.IDataPool#createCube(java.lang.String, de.xwic.cube.Dimension[], de.xwic.cube.Measure[])
 	 */
 	public synchronized ICube createCube(String key, IDimension[] dimensions, IMeasure[] measures) {
+		return createCube(key, dimensions, measures, CubeType.DEFAULT);
+	}
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDataPool#createCube(java.lang.String, de.xwic.cube.Dimension[], de.xwic.cube.Measure[], de.xwic.cube.IDataPool.CubeType)
+	 */
+	public synchronized ICube createCube(String key, IDimension[] dimensions, IMeasure[] measures, CubeType type) {
 		if (cubeMap.containsKey(key)) {
 			throw new IllegalArgumentException("A cube with that key already exists: " + key);
 		}
-		Cube newCube = new Cube(this, key, dimensions, measures);
+		Cube newCube;
+		switch (type) {
+		case FLEX_CALC:
+			newCube = new CubeFlexCalc(this, key, dimensions, measures);
+			break;
+		default:
+			newCube = new Cube(this, key, dimensions, measures);
+		}
 		cubeMap.put(key, newCube);
 		return newCube;
 	}

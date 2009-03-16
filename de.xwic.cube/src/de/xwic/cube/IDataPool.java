@@ -11,6 +11,19 @@ import java.util.Collection;
  */
 public interface IDataPool extends IIdentifyable {
 
+	public enum CubeType {
+		/**
+		 * The default cube implementation calculates and stores all aggregation variations.
+		 * It is the fastest cube, but requires the most memory.
+		 */
+		DEFAULT,
+		
+		/**
+		 * This variation stores only the leaf values permanently. Aggregated values are cached.
+		 */
+		FLEX_CALC
+	}
+	
 	/**
 	 * Returns the list of dimensions.
 	 * @return the dimensions
@@ -45,13 +58,21 @@ public interface IDataPool extends IIdentifyable {
 	public abstract Collection<ICube> getCubes();
 
 	/**
-	 * Create a new cube.
+	 * Create a new cube with the default implementation.
 	 * @param key
 	 * @return
 	 */
 	public abstract ICube createCube(String key, IDimension[] dimensions,
 			IMeasure[] measures);
 
+	/**
+	 * Create a new cube with the specified implementation type.
+	 * @param key
+	 * @return
+	 */
+	public abstract ICube createCube(String key, IDimension[] dimensions, IMeasure[] measures, CubeType type);
+
+	
 	/**
 	 * Returns the cube with the specified key. If the cube does not exist, 
 	 * an IllegalArgumentException is thrown. 

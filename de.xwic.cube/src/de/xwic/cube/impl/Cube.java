@@ -3,7 +3,10 @@
  */
 package de.xwic.cube.impl;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,16 +27,23 @@ import de.xwic.cube.Key;
 /**
  * @author Florian Lippisch
  */
-public class Cube extends Identifyable implements ICube, Serializable {
+public class Cube extends Identifyable implements ICube, Externalizable {
 
 	private static final long serialVersionUID = -970760385292258831L;
-	private final DataPool dataPool;
-	private Map<String, IDimension> dimensionMap = new LinkedHashMap<String, IDimension>();
-	private Map<String, IMeasure> measureMap = new LinkedHashMap<String, IMeasure>();
-	private Map<Key, Cell> data;
+	protected DataPool dataPool;
+	protected Map<String, IDimension> dimensionMap = new LinkedHashMap<String, IDimension>();
+	protected Map<String, IMeasure> measureMap = new LinkedHashMap<String, IMeasure>();
+	protected Map<Key, Cell> data;
 	
-	private boolean allowSplash = true;
+	protected boolean allowSplash = true;
 
+	/**
+	 * INTERNAL: This constructor is used by the serialization mechanism. 
+	 */
+	public Cube() {
+		super(null); 
+	}
+	
 	/**
 	 * @param dataPool 
 	 * @param key
@@ -99,7 +109,7 @@ public class Cube extends Identifyable implements ICube, Serializable {
 		return getCell(key, false);
 	}
 	
-	private Cell getCell(Key key, boolean createNew) {
+	protected Cell getCell(Key key, boolean createNew) {
 		Cell cell = data.get(key);
 		if (cell == null && createNew) {
 			cell = new Cell(measureMap.size());
@@ -156,7 +166,7 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	 * @param measure
 	 * @param value
 	 */
-	private int splashAndWriteValue(int idx, Key key, int measureIndex, Double value) {
+	protected int splashAndWriteValue(int idx, Key key, int measureIndex, Double value) {
 		
 		int cellsModified = 0;
 		if (key.containsLeafsOnly()) {
@@ -222,7 +232,7 @@ public class Cube extends Identifyable implements ICube, Serializable {
 	 * @param measure
 	 * @param diff
 	 */
-	private int applyValueChange(int idx, Key key, int measureIndex, double diff) {
+	protected int applyValueChange(int idx, Key key, int measureIndex, double diff) {
 		
 		int cellsModified = 0;
 		if (idx == dimensionMap.size()) {
@@ -470,6 +480,69 @@ public class Cube extends Identifyable implements ICube, Serializable {
 				return;
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
+	 */
+	@SuppressWarnings("unchecked")
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+
+		int version = in.readInt();
+		if (version != 1) {
+			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected 1");
+		}
+		key = (String) in.readObject();
+		title = (String) in.readObject();
+		allowSplash = in.readBoolean();
+		dataPool = (DataPool) in.readObject();
+		dimensionMap = (Map<String, IDimension>) in.readObject();
+		measureMap = (Map<String, IMeasure>) in.readObject();
+		
+		// read data
+		int size = in.readInt();
+		int dimSize = dimensionMap.size();
+		
+		data = new HashMap<Key, Cell>(size);
+		for (int i = 0; i < size; i++) {
+			IDimensionElement[] keyElements = new IDimensionElement[dimSize];
+			for (int dIdx = 0; dIdx < dimSize; dIdx++) {
+				keyElements[dIdx] = (IDimensionElement)in.readObject();
+			}
+			Key key = new Key(keyElements);
+			Cell cell = (Cell)in.readObject();
+			data.put(key, cell);
+		}
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
+	 */
+	public void writeExternal(ObjectOutput out) throws IOException {
+
+		// serialize -> write the cube data.
+		out.writeInt(1); // version number
+		out.writeObject(key);
+		out.writeObject(title);
+		out.writeBoolean(allowSplash);
+		out.writeObject(dataPool);
+		out.writeObject(dimensionMap);
+		out.writeObject(measureMap);
+		
+		// write data...
+		out.writeInt(data.size());
+		for(Entry<Key, Cell> entry: data.entrySet()) {
+			
+			for (IDimensionElement elm : entry.getKey().getDimensionElements()) {
+				out.writeObject(elm);
+			}
+			out.writeObject(entry.getValue());
+			
+		}
+		
+		
 	}
 	
 }
