@@ -38,6 +38,10 @@ public class DimensionSelectorControl extends ControlContainer {
 
 	}
 	
+	public void setWidth(int width) {
+		lbDim.setWidth(width);
+	}
+	
 	/**
 	 * @param lbc
 	 * @param i
