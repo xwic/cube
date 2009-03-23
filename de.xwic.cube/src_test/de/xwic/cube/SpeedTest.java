@@ -56,6 +56,8 @@ public class SpeedTest extends TestCase {
 		elmPS.createDimensionElement("Consulting");
 		elmPS.createDimensionElement("Service");
 		dimLOB.createDimensionElement("Education");
+		dimLOB.createDimensionElement("Licences");
+		dimLOB.createDimensionElement("Software");
 		 
 		
 		dimTime = pool.createDimension("Time");
@@ -82,6 +84,7 @@ public class SpeedTest extends TestCase {
 		util.setDataPool(pool);
 		util.parseDimensionElementId("[GEO:EMEA/Germany]");
 		util.parseDimensionElementId("[GEO:EMEA/UK]");
+		util.parseDimensionElementId("[GEO:EMEA/France]");
 		util.parseDimensionElementId("[GEO:EMEA/SNEE/NEE/Nordics]");
 		util.parseDimensionElementId("[GEO:EMEA/SNEE/eMed/SA]");
 		util.parseDimensionElementId("[GEO:America/This/Is/Depth1]");
@@ -93,57 +96,99 @@ public class SpeedTest extends TestCase {
 		util.parseDimensionElementId("[Account:TEA/SAP]");
 		util.parseDimensionElementId("[Account:TEA/NOKIA]");
 		util.parseDimensionElementId("[Account:EA/RBS]");
+		util.parseDimensionElementId("[Account:EA/BMW]");
+		util.parseDimensionElementId("[Account:EA/XYZ]");
+		util.parseDimensionElementId("[Account:EA/ABC]");
+		util.parseDimensionElementId("[Account:EA/Test]");
+		util.parseDimensionElementId("[Account:EA/Bla Bla]");
+		for (int i = 0; i < 50; i++) {
+			util.parseDimensionElementId("[Account:Territory/Test" + i + "]");
+		}
+		
 
 		DifferenceFunction function = new DifferenceFunction(meBookings, mePlan, true); 
 		meDiff.setFunction(function);
 		meDiff.setValueFormatProvider(new PercentageValueFormatProvider());
 		
 		cubeDefault = pool.createCube("testDef", new IDimension[] { dimOT, dimLOB, dimTime, dimGEO, dimAccount }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.DEFAULT);
-		cubeFlex = pool.createCube("testFlex", new IDimension[] { dimOT, dimLOB, dimTime, dimGEO, dimAccount }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.FLEX_CALC);
+		cubeFlex = pool.createCube("testFlex", new IDimension[] { dimAccount, dimLOB, dimOT, dimTime, dimGEO, }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.FLEX_CALC);
 		
 	}
 	
 	public void testSpeed() {
 
-		long duration = runSpeedTest(cubeDefault);
-		System.out.println("Duration (DEFAULT): " + duration);
+		long duration = 0;
+//		long duration = runSpeedTest(cubeDefault);
+//		System.out.println("Duration (DEFAULT): " + duration);
+//		System.out.println("Cube Size: " + cubeDefault.getSize());
 
 		long durationFlex = runSpeedTest(cubeFlex);
 		System.out.println("Duration (FLEX): " + durationFlex);
+		System.out.println("Cube Size: " + cubeFlex.getSize());
+
 		
 		System.out.println("Duration (FLEX): " + durationFlex + " vs. DEFAULT = " + duration);
 		
+		/*
+		Result
+		Write; 	Total;
+		78		4578		// starting values
+		109		4594		// added rootIndex
+		140		437			// changed dimension order (now starts with Account)
+		203		1594		// changed dimension order (now starts with LOB);
 		
+		 */
+
+		((CubeFlexCalc)cubeFlex).refreshCache();
+		for (int i = 0; i < 50; i++) { 
+			cubeFlex.getCellValue("[Account:Territory][LOB:Software]", meBookings);
+		}
+		DataDump.printValues(System.out, cubeFlex, dimTime, dimLOB, meBookings);
+		((CubeFlexCalc)cubeFlex).refreshCache();
+		DataDump.printValues(System.out, cubeFlex, dimGEO, dimAccount, meBookings);
+		((CubeFlexCalc)cubeFlex).refreshCache();
+		
+		((CubeFlexCalc)cubeFlex).printStats(System.out);
+
+		((CubeFlexCalc)cubeFlex).printCacheProfile(System.out);
 
 	}
 	
 	private long runSpeedTest(ICube cube) {
 		long start = System.currentTimeMillis();
-		Key key = cube.createKey("[AOO][Hardware][2008/Q1/Jan]");
+		
+		cube.beginMassUpdate();
+		
+		// splash from the top -> make sure all cell's are written.
+		cube.setCellValue(cube.createKey(), meBookings, 10000);
+		
+		Key key = cube.createKey("[OrderType:AOO][LOB:Hardware][Time:2008/Q1/Jan]");
 		cube.setCellValue(key, meBookings, 100.0);
 
-		key = cube.createKey("[AOO][Hardware][2008/Q1/Feb]");
+		key = cube.createKey("[OrderType:AOO][LOB:Hardware][Time:2008/Q1/Feb]");
 		cube.setCellValue(key, meBookings, 40.0);
 
-		key = cube.createKey("[AOO][Hardware][2008/Q1/Mar]");
+		key = cube.createKey("[OrderType:AOO][LOB:Hardware][Time:2008/Q1/Mar]");
 		cube.setCellValue(key, meBookings, 80.0);
 		
-		key = cube.createKey("[AOO][PS/Consulting][2008/Q1/Feb]");
+		key = cube.createKey("[OrderType:AOO][LOB:PS/Consulting][Time:2008/Q1/Feb]");
 		cube.setCellValue(key, meBookings, 50.0);
 
-		key = cube.createKey("[COO][PS/Consulting][2008/Q1/Mar]");
+		key = cube.createKey("[OrderType:COO][LOB:PS/Consulting][Time:2008/Q1/Mar]");
 		cube.setCellValue(key, meBookings, 200.0);
+		
+		cube.massUpdateFinished();
 		
 		System.out.println("write perf: " + (System.currentTimeMillis() - start));
 		
-		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
+		DataDump.printValues(System.out, cube, dimAccount, dimLOB, meBookings);
 
 		long duration = System.currentTimeMillis() - start;
 		
 		return duration;
 	}
 	
-	public void testBigCube() throws StorageException {
+	public void xtestBigCube() throws StorageException {
 		
 		File dataDir = new File("..\\NGS Dashboard\\WEB-INF\\xcube");
 		assertTrue(dataDir.exists());
