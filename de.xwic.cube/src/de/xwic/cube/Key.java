@@ -75,11 +75,22 @@ public class Key implements Serializable {
 		Key clone = new Key(cloneKeys);
 		return clone;
 	}
+	
+	
+	/**
+	 * Returns true if this key is based upon leafs only.
+	 * @deprecated - use isLeaf() instead.x
+	 * @return
+	 */
+	public boolean containsLeafsOnly() {
+		return isLeaf();
+	}
+	
 	/**
 	 * Returns true if this key is based upon leafs only.
 	 * @return
 	 */
-	public boolean containsLeafsOnly() {
+	public boolean isLeaf() {
 		for (IDimensionElement elm : elementKeys) {
 			if (!elm.isLeaf()) {
 				return false;

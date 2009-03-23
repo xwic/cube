@@ -124,7 +124,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	 */
 	public int setCellValue(Key key, IMeasure measure, double value) {
 		
-		if (!allowSplash && !key.containsLeafsOnly()) {
+		if (!allowSplash && !key.isLeaf()) {
 			// splash not implemented yet.
 			throw new IllegalArgumentException("The key must contain only leafs.");
 		}
@@ -146,7 +146,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	 */
 	public int addCellValue(Key key, IMeasure measure, double value) {
 		
-		if (!allowSplash && !key.containsLeafsOnly()) {
+		if (!allowSplash && !key.isLeaf()) {
 			// splash not implemented yet.
 			throw new IllegalArgumentException("The key must contain only leafs.");
 		}
@@ -169,7 +169,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	protected int splashAndWriteValue(int idx, Key key, int measureIndex, Double value) {
 		
 		int cellsModified = 0;
-		if (key.containsLeafsOnly()) {
+		if (key.isLeaf()) {
 			ICell cell = getCell(key, value != null);
 			
 			if (cell == null) { // can only happens when the value is null too
@@ -323,6 +323,34 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		int measureIndex = getMeasureIndex(measure);
 		splashAndWriteValue(0, key, measureIndex, null);
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#beginMassUpdate()
+	 */
+	public void beginMassUpdate() {
+		// Default Cube implementation does nothing.
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#writeFinished()
+	 */
+	public void massUpdateFinished() {
+		// Default Cube implementation does nothing.
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#createKey()
+	 */
+	public Key createKey() {
+		IDimensionElement[] elements = new IDimensionElement[dimensionMap.size()];
+		// prefill with the dimension elements
+		int idx = 0;
+		for (IDimension dim : dimensionMap.values()) {
+			elements[idx++] = dim;
+		}
+		return new Key(elements);
 	}
 	
 	/* (non-Javadoc)

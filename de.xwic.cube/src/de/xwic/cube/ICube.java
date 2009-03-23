@@ -48,6 +48,13 @@ public interface ICube extends IIdentifyable {
 	public abstract Key createKey(String key);
 	
 	/**
+	 * Create a new Key. 
+	 * @return
+	 */
+	public Key createKey();
+
+
+	/**
 	 * Create an empty query.
 	 * @return
 	 */
@@ -79,6 +86,20 @@ public interface ICube extends IIdentifyable {
 	 * @return
 	 */
 	public abstract IDataPool getDataPool();
+	
+	/**
+	 * Notify the cube that a large number of data will be
+	 * written. This helps the cube to optimize write
+	 * performance.
+	 */
+	public abstract void beginMassUpdate();
+	
+	/**
+	 * Notify the cube that writing of data is now completed so
+	 * that the cube can perform operations to enhance read
+	 * performance like indexing. 
+	 */
+	public abstract void massUpdateFinished();
 	
 	/**
 	 * Add a value to the existing value in the specified cell.

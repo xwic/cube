@@ -302,16 +302,19 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 */
 	public boolean isChild(IDimensionElement elm) {
 		IDimensionElement de = elm.getParent();
-		do {
-			if (de.equals(this)) {
-				return true;
-			} else {
-				if (de instanceof IDimension) {
-					return false;
+		if (de != null) {
+			do {
+				if (de.equals(this)) {
+					return true;
+				} else {
+					if (de instanceof IDimension) {
+						return false;
+					}
+					de = de.getParent();
 				}
-				de = de.getParent();
-			}
-		} while(true);
+			} while(true);
+		}
+		return false;
 	}
 	
 }
