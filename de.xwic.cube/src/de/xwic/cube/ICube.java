@@ -3,8 +3,16 @@
  */
 package de.xwic.cube;
 
+import java.io.PrintStream;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map.Entry;
+
+import de.xwic.cube.impl.CubeFlexCalc.CacheCellComparator;
+import de.xwic.cube.impl.CubeFlexCalc.CachedCell;
 
 /**
  * The cube contains a data structure based on a fixed number of dimensions. Data can 
@@ -195,5 +203,16 @@ public interface ICube extends IIdentifyable {
 	 * @param listener
 	 */
 	public void forEachCell(ICellListener listener);
+
+	/**
+	 * Print cache details to the stream. The details
+	 * are a list of keys in the cache, including the hit count
+	 * and leaf count. Format:
+	 * 
+	 * [score]; [hit count]; [leaf count]; [unused count]; [key]
+	 * 
+	 * @param out
+	 */
+	public void printCacheProfile(PrintStream out);
 
 }
