@@ -4,6 +4,8 @@
 package de.xwic.cube.webui.viewer;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +33,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private boolean clickable = false;
 	private IDimensionFilter filter = null;
 	private boolean hideEmptyRoot = false;
+	private Comparator<INavigationElement> sortComparator = null;
 	
 	private String rootTitle = null;
 	
@@ -138,6 +141,10 @@ public class DimensionNavigationProvider implements INavigationProvider {
 				}
 				
 			}
+			if (sortComparator != null) {
+				Collections.sort(childs, sortComparator);
+			}
+
 		}
 
 		/* (non-Javadoc)
@@ -344,6 +351,9 @@ public class DimensionNavigationProvider implements INavigationProvider {
 					}
 				}
 			}
+		}
+		if (sortComparator != null) {
+			Collections.sort(rootNavElements, sortComparator);
 		}
 	}
 
@@ -552,5 +562,19 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		}
 		dimensionsDepth.put(dimension.getDimension(), depth);
 		createNavigationElements();
+	}
+
+	/**
+	 * @return the sortComparator
+	 */
+	public Comparator<INavigationElement> getSortComparator() {
+		return sortComparator;
+	}
+
+	/**
+	 * @param sortComparator the sortComparator to set
+	 */
+	public void setSortComparator(Comparator<INavigationElement> sortComparator) {
+		this.sortComparator = sortComparator;
 	}
 }
