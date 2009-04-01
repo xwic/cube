@@ -3,8 +3,11 @@
  */
 package de.xwic.cube.impl;
 
+import java.io.BufferedReader;
 import java.io.Externalizable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.PrintStream;
@@ -18,9 +21,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import de.xwic.cube.ICube;
+import de.xwic.cube.ICubeCacheControl;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
@@ -32,11 +37,11 @@ import de.xwic.cube.Key;
  * 
  * @author Florian Lippisch
  */
-public class CubeFlexCalc extends Cube implements ICube, Externalizable {
+public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCacheControl {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Map<Key, CachedCell> cache = new HashMap<Key, CachedCell>();
+	public Map<Key, CachedCell> cache = new HashMap<Key, CachedCell>();
 	private Map<IDimensionElement, Set<Key>> rootIndex = new HashMap<IDimensionElement, Set<Key>>();
 
 	private boolean massUpdateMode = false;
@@ -46,7 +51,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable {
 	 * @author lippisch
 	 *
 	 */
-	private final class CacheCellComparator implements
+	public final class CacheCellComparator implements
 			Comparator<Entry<Key, CachedCell>> {
 		/* (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -64,7 +69,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable {
 		}
 	}
 
-	private class CachedCell implements Serializable {
+	public class CachedCell implements Serializable {
 		private static final long serialVersionUID = 2L;
 		Cell cell;
 		/** Number of times the cell has been accessed */
@@ -77,7 +82,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable {
 			this.cell = cell;
 		}
 		public long score() {
-			return ((hits / 10) + 1) * leafCount * 2 / (unusedCount + 1);
+			return ((hits / 10) + 1) / (unusedCount + 1);
 		}
 	}
 	
@@ -289,8 +294,8 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable {
 			ClassNotFoundException {
 
 		int version = in.readInt();
-		if (version != 1) {
-			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected 1");
+		if (version < 1 || version > 2) {
+			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected 1 or 2");
 		}
 		key = (String) in.readObject();
 		title = (String) in.readObject();
@@ -314,16 +319,20 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable {
 			data.put(key, cell);
 		}
 		
-		size = in.readInt();
-		cache = new HashMap<Key, CachedCell>(size);
-		for (int i = 0; i < size; i++) {
-			IDimensionElement[] keyElements = new IDimensionElement[dimSize];
-			for (int dIdx = 0; dIdx < dimSize; dIdx++) {
-				keyElements[dIdx] = (IDimensionElement)in.readObject();
+		if (version > 1) {
+			size = in.readInt();
+			cache = new HashMap<Key, CachedCell>(size);
+			for (int i = 0; i < size; i++) {
+				IDimensionElement[] keyElements = new IDimensionElement[dimSize];
+				for (int dIdx = 0; dIdx < dimSize; dIdx++) {
+					keyElements[dIdx] = (IDimensionElement)in.readObject();
+				}
+				Key key = new Key(keyElements);
+				CachedCell cell = (CachedCell)in.readObject();
+				cache.put(key, cell);
 			}
-			Key key = new Key(keyElements);
-			CachedCell cell = (CachedCell)in.readObject();
-			cache.put(key, cell);
+		} else {
+			cache = new HashMap<Key, CachedCell>();
 		}
 		
 		buildIndex();
@@ -380,7 +389,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable {
 	public void writeExternal(ObjectOutput out) throws IOException {
 
 		// serialize -> write the cube data.
-		out.writeInt(1); // version number
+		out.writeInt(2); // version number
 		out.writeObject(key);
 		out.writeObject(title);
 		out.writeBoolean(allowSplash);
@@ -480,21 +489,15 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable {
 		
 	}
 	
-	/**
-	 * Print cache details to the stream. The details
-	 * are a list of keys in the cache, including the hit count
-	 * and leaf count. Format:
-	 * 
-	 * [score]; [hit count]; [leaf count]; [unused count]; [key]
-	 * 
-	 * @param out
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.ICubeCacheControl#printCacheProfile(java.io.PrintStream)
 	 */
 	public void printCacheProfile(PrintStream out) {
 		
 		List<Entry<Key, CachedCell>> entries = new ArrayList<Entry<Key,CachedCell>>();
 		entries.addAll(cache.entrySet());
 		Collections.sort(entries, new CacheCellComparator());
-		
+		out.println("score;hits;leafs;unusedCycles;key");
 		for (Entry<Key, CachedCell> entry : entries) {
 			CachedCell cc = entry.getValue();
 			out.print(cc.score());
@@ -510,10 +513,53 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable {
 		
 	}
 	
-	/**
-	 * Refresh and compact the cache. Updates unused counters on cells
-	 * and removes cells from the cache if the cache exceeds a certain 
-	 * size. 
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICubeCacheControl#buildCacheFromStats(java.io.InputStream)
+	 */
+	public synchronized void buildCacheFromStats(InputStream stream) throws IOException {
+		
+		cache.clear();
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(stream));
+		String line = in.readLine(); // skip header
+		
+		Map<Key, CachedCell> cellMap = new HashMap<Key, CachedCell>();
+		
+		while ((line = in.readLine()) != null) {
+			StringTokenizer stk = new StringTokenizer(line, ";");
+			/*int score = */ Integer.parseInt(stk.nextToken());
+			CachedCell cc = new CachedCell(null);
+			cc.hits = Integer.parseInt(stk.nextToken());
+			cc.leafCount = Integer.parseInt(stk.nextToken());
+			cc.unusedCount = Integer.parseInt(stk.nextToken());
+			String keyString = stk.nextToken("");
+			try {
+				Key key = createKey(keyString);
+				cellMap.put(key, cc);
+			} catch (IllegalArgumentException ie) {
+				// the key is (no longer) supported. -> Simply ignore.
+			}
+		}
+		
+		// now batch-refresh cache
+		Key[] keys = new Key[cellMap.size()];
+		int idx = 0;
+		for (Key key : cellMap.keySet()) {
+			keys[idx++] = key;
+		}
+		
+		CachedCell[] cells = serialCalc(keys);
+		for (int i = 0; i < cells.length; i++) {
+			CachedCell oldCell = cellMap.get(keys[i]);
+			cells[i].hits = oldCell.hits;
+			cells[i].unusedCount = oldCell.unusedCount + 1;
+			cache.put(keys[i], cells[i]);
+		}
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.ICubeCacheControl#refreshCache()
 	 */
 	public synchronized void refreshCache() {
 
@@ -534,16 +580,23 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable {
 		}
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICubeCacheControl#getCacheSize()
+	 */
+	public int getCacheSize() {
+		return cache.size();
+	}
 
-	/**
-	 * @return the maxCacheSize
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.ICubeCacheControl#getMaxCacheSize()
 	 */
 	public int getMaxCacheSize() {
 		return maxCacheSize;
 	}
 
-	/**
-	 * @param maxCacheSize the maxCacheSize to set
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.ICubeCacheControl#setMaxCacheSize(int)
 	 */
 	public void setMaxCacheSize(int maxCacheSize) {
 		this.maxCacheSize = maxCacheSize;

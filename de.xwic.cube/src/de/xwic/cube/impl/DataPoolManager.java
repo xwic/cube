@@ -99,8 +99,11 @@ public class DataPoolManager implements IDataPoolManager {
 		} else {
 			if (storageProvider.containsDataPool(key)) {
 				DataPool pool = (DataPool)storageProvider.loadDataPool(key);
-				poolMap.put(key, pool);
+				if (pool == null) {
+					throw new StorageException("StorageProvider.loadDataPool('" + key + "') returned NULL."); 
+				}
 				pool.setDataPoolManager(this);
+				poolMap.put(key, pool);
 				return pool;
 			}
 		}

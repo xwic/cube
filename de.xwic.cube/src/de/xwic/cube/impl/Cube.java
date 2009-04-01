@@ -7,6 +7,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -570,6 +571,13 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			
 		}
 		
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#printCacheProfile(java.io.PrintStream)
+	 */
+	public void printCacheProfile(PrintStream out) {
 		
 	}
 	
