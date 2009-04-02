@@ -1,6 +1,12 @@
 Change Notes
 ============
 
+2009-04-02	FLI
+	- Added ICube.clear(Key);
+	
+2009 Jan till April
+	- Added CubeFlexCalc implementation
+
 2009-01-23	FLI
 	- Implemented Externalizable interface for the cube's cell object, to speed up the serialization and
 	  deserialization process and reduce the memory requirements during the load.

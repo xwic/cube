@@ -5,14 +5,7 @@ package de.xwic.cube;
 
 import java.io.PrintStream;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map.Entry;
-
-import de.xwic.cube.impl.CubeFlexCalc.CacheCellComparator;
-import de.xwic.cube.impl.CubeFlexCalc.CachedCell;
 
 /**
  * The cube contains a data structure based on a fixed number of dimensions. Data can 
@@ -176,7 +169,14 @@ public interface ICube extends IIdentifyable {
 	 * @param key
 	 */
 	public abstract void clear(IMeasure measure, Key key);
-	
+
+	/**
+	 * Empty all values for the specified key and all measures.
+	 * @param measure
+	 * @param key
+	 */
+	public abstract void clear(Key key);
+
 	/**
 	 * Returns the key index position for this dimension.
 	 * @param dimVert
