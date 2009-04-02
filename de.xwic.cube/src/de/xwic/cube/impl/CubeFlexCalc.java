@@ -246,6 +246,16 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.Cube#removeEmptyCells(de.xwic.cube.Key, int)
+	 */
+	@Override
+	protected void removeEmptyCells(Key key, int measureIndex) {
+		if (key.isLeaf()) { // only execute on leafs...
+			super.removeEmptyCells(key, measureIndex);
+		}
+	}
+	
 	/**
 	 * @param i
 	 * @param key
@@ -438,6 +448,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 */
 	protected void clearCache() {
 		cache.clear();
+		rootIndex.clear();
 	}
 	
 	/* (non-Javadoc)

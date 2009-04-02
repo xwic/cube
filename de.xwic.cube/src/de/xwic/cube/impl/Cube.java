@@ -215,16 +215,25 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 
 		// remove empty cells 
 		if (value == null) {
-			Cell cell = getCell(key, false);
-			if (cell != null) {
-				cell.setValue(measureIndex, null);
-				if (cell.isEmpty()) {
-					data.remove(key);
-				}
-			}
+			removeEmptyCells(key, measureIndex);
 		}
 		
 		return cellsModified;
+	}
+	
+	/**
+	 * Remove empty non-leaf cells during clear(...)
+	 * @param key
+	 * @param measureIndex
+	 */
+	protected void removeEmptyCells(Key key, int measureIndex) {
+		Cell cell = getCell(key, false);
+		if (cell != null) {
+			cell.setValue(measureIndex, null);
+			if (cell.isEmpty()) {
+				data.remove(key);
+			}
+		}
 	}
 
 	/**
@@ -324,6 +333,16 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		int measureIndex = getMeasureIndex(measure);
 		splashAndWriteValue(0, key, measureIndex, null);
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#clear(de.xwic.cube.Key)
+	 */
+	public void clear(Key key) {
+		// TODO This implementation is simple, but needs to run for each measure. Could get optimized...
+		for (IMeasure measure : measureMap.values()) {
+			clear(measure, key);
+		}
 	}
 	
 	/* (non-Javadoc)
