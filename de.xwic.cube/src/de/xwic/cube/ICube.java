@@ -6,6 +6,7 @@ package de.xwic.cube;
 import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * The cube contains a data structure based on a fixed number of dimensions. Data can 
@@ -215,4 +216,12 @@ public interface ICube extends IIdentifyable {
 	 */
 	public void printCacheProfile(PrintStream out);
 
+	/**
+	 * Returns list of ICubeListener.
+	 * Use list to add or remove listeners.
+	 * Never returns null.
+	 * List is serialized.
+	 * @return
+	 */
+	public List<ICubeListener> getCellValueChangedListeners();
 }

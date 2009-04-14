@@ -112,4 +112,12 @@ public class Dimension extends DimensionElement implements IDimension, Serializa
 		elements.clear();
 		elementMap.clear();
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.Identifyable#toString()
+	 */
+	@Override
+	public String toString() {
+		return getKey();
+	}
 }

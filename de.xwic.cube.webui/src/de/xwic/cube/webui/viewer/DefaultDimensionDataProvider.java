@@ -3,9 +3,6 @@
  */
 package de.xwic.cube.webui.viewer;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;

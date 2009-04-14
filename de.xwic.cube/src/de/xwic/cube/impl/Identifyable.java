@@ -13,6 +13,8 @@ import de.xwic.cube.IIdentifyable;
  */
 public abstract class Identifyable implements IIdentifyable, Serializable {
 
+	private final static long serialVersionUID = 7536280682401900824L;
+	
 	protected String key = null;
 	protected String title = null;
 
@@ -90,6 +92,5 @@ public abstract class Identifyable implements IIdentifyable, Serializable {
 			return false;
 		return true;
 	}
-	
-	
+
 }

@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 
 import de.xwic.cube.ICube;
 import de.xwic.cube.ICubeCacheControl;
+import de.xwic.cube.ICubeListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
@@ -304,8 +305,8 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			ClassNotFoundException {
 
 		int version = in.readInt();
-		if (version < 1 || version > 2) {
-			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected 1 or 2");
+		if (version < 1 || version > 3) {
+			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected 1..3");
 		}
 		key = (String) in.readObject();
 		title = (String) in.readObject();
@@ -314,6 +315,10 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		dimensionMap = (Map<String, IDimension>) in.readObject();
 		measureMap = (Map<String, IMeasure>) in.readObject();
 		
+		if (version > 2) {
+			cellValueChangedListeners = (List<ICubeListener>)in.readObject();
+		}
+
 		// read data
 		int size = in.readInt();
 		int dimSize = dimensionMap.size();
@@ -399,13 +404,15 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	public void writeExternal(ObjectOutput out) throws IOException {
 
 		// serialize -> write the cube data.
-		out.writeInt(2); // version number
+		int version = 3;
+		out.writeInt(version); // version number
 		out.writeObject(key);
 		out.writeObject(title);
 		out.writeBoolean(allowSplash);
 		out.writeObject(dataPool);
 		out.writeObject(dimensionMap);
 		out.writeObject(measureMap);
+		out.writeObject(cellValueChangedListeners);
 		
 		// write data...
 		out.writeInt(data.size());
