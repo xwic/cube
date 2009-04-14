@@ -316,5 +316,12 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 		}
 		return false;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.Identifyable#toString()
+	 */
+	@Override
+	public String toString() {
+		return getPath();
+	}
 }

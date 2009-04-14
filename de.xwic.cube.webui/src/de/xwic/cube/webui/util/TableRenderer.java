@@ -138,7 +138,7 @@ public class TableRenderer {
 	 * @param data
 	 */
 	public void setColumnData(int col, Object data) {
-		if (columnData.size() < col) {
+		if (columnData.size() <= col) {
 			throw new IndexOutOfBoundsException("Column index out of range");
 		}
 		columnData.set(col, data);

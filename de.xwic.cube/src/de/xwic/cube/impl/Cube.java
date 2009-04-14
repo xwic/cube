@@ -8,16 +8,19 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICellListener;
+import de.xwic.cube.ICubeListener;
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
@@ -35,6 +38,8 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	protected Map<String, IDimension> dimensionMap = new LinkedHashMap<String, IDimension>();
 	protected Map<String, IMeasure> measureMap = new LinkedHashMap<String, IMeasure>();
 	protected Map<Key, Cell> data;
+	
+	protected List<ICubeListener> cellValueChangedListeners = new ArrayList<ICubeListener>();
 	
 	protected boolean allowSplash = true;
 
@@ -250,6 +255,8 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			Double oldValue = cell.getValue(measureIndex);
 			cell.setValue(measureIndex, oldValue != null ? oldValue.doubleValue() + diff : diff);
 			cellsModified = 1;
+			// invoke CellValueChangedListener
+			onCellValueChanged(key, cell, measureIndex, diff);
 			//System.out.println("Changed Cell " + key + " from " + oldValue + " to " + cell.getValue(measure));
 		} else {
 			Key myCursor = key.clone();
@@ -486,7 +493,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			}
 			idx++;
 		}
-		throw new IllegalArgumentException("The specified dimension is not used in this cube.");
+		throw new IllegalArgumentException("The specified dimension " + dimVert.toString() + " is not used in cube " + this + " .");
 	}
 
 	/**
@@ -496,6 +503,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	 */
 	public int getMeasureIndex(IMeasure measure) {
 		int idx = 0;
+		// TODO why not use a helper HashMap for that, is this loop faster?
 		for (IMeasure m : measureMap.values()) {
 			if (m.equals(measure)) {
 				return idx;
@@ -538,8 +546,8 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			ClassNotFoundException {
 
 		int version = in.readInt();
-		if (version != 1) {
-			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected 1");
+		if (version > 2) {
+			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected 1 or 2");
 		}
 		key = (String) in.readObject();
 		title = (String) in.readObject();
@@ -547,6 +555,10 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		dataPool = (DataPool) in.readObject();
 		dimensionMap = (Map<String, IDimension>) in.readObject();
 		measureMap = (Map<String, IMeasure>) in.readObject();
+		
+		if (version > 1) {
+			cellValueChangedListeners = (List<ICubeListener>)in.readObject();
+		}
 		
 		// read data
 		int size = in.readInt();
@@ -571,13 +583,15 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	public void writeExternal(ObjectOutput out) throws IOException {
 
 		// serialize -> write the cube data.
-		out.writeInt(1); // version number
+		int version = 2;
+		out.writeInt(version); // version number
 		out.writeObject(key);
 		out.writeObject(title);
 		out.writeBoolean(allowSplash);
 		out.writeObject(dataPool);
 		out.writeObject(dimensionMap);
 		out.writeObject(measureMap);
+		out.writeObject(cellValueChangedListeners);
 		
 		// write data...
 		out.writeInt(data.size());
@@ -600,4 +614,35 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#getCellValueChangedListeners()
+	 */
+	public List<ICubeListener> getCellValueChangedListeners() {
+		return cellValueChangedListeners;
+	}
+	
+	/**
+	 * Invoke all cell value changed listeners
+	 * @param key
+	 * @param cell
+	 * @param measureIndex
+	 * @param diff
+	 */
+	protected void onCellValueChanged(Key key, Cell cell, int measureIndex, double diff) {
+		if (cellValueChangedListeners.size() == 0) {
+			return;
+		}
+		
+		for (ICubeListener listener : cellValueChangedListeners) {
+			listener.onCellValueChanged(key, cell, measureIndex, diff);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.Identifyable#toString()
+	 */
+	@Override
+	public String toString() {
+		return getKey() + " (Size:" + data.size() + ")";
+	}
 }

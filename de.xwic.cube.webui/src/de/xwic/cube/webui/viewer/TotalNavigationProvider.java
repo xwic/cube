@@ -28,7 +28,7 @@ public class TotalNavigationProvider implements INavigationProvider {
 		 */
 		public ContentInfo getContentInfo() {
 			ContentInfo ci = new ContentInfo (dataProvider);
-			ci.setClickable(clickable );
+			ci.setClickable(clickable);
 			ci.setUserData(contentUserObject);
 			return ci;
 		}

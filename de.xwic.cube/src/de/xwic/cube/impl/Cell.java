@@ -33,13 +33,15 @@ public class Cell implements ICell, Externalizable {
 	 * @see de.xwic.cube.ICell#getValue(de.xwic.cube.IMeasure)
 	 */
 	public Double getValue(int measureIndex) {
+		// FIXME Functions always return null, why does values contains that index? Could be used for caching?
+		// Function measureIndex used by DummyFunction...
 		return values[measureIndex];
 	}
 	
 	/*
 	 * Change the value in this cell.
 	 */
-	void setValue(int measureIndex, Double value) {
+	public void setValue(int measureIndex, Double value) {
 		values[measureIndex] = value;
 	}
 	
