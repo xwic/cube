@@ -39,7 +39,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	protected Map<String, IMeasure> measureMap = new LinkedHashMap<String, IMeasure>();
 	protected Map<Key, Cell> data;
 	
-	protected List<ICubeListener> cellValueChangedListeners = new ArrayList<ICubeListener>();
+	protected List<ICubeListener> cubeListeners = new ArrayList<ICubeListener>();
 	
 	protected boolean allowSplash = true;
 
@@ -83,8 +83,17 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			measureMap.put(measure.getKey(), measure);
 		}
 		
-		data = new HashMap<Key, Cell>(500);
+		data = newHashMap(500);
 		
+	}
+
+	/**
+	 * @param size
+	 * @return
+	 */
+	protected Map<Key, Cell> newHashMap(int size) {
+		Map<Key, Cell> map = new HashMap<Key, Cell>(size);
+		return map;
 	}
 
 	/* (non-Javadoc)
@@ -557,14 +566,14 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		measureMap = (Map<String, IMeasure>) in.readObject();
 		
 		if (version > 1) {
-			cellValueChangedListeners = (List<ICubeListener>)in.readObject();
+			cubeListeners = (List<ICubeListener>)in.readObject();
 		}
 		
 		// read data
 		int size = in.readInt();
 		int dimSize = dimensionMap.size();
 		
-		data = new HashMap<Key, Cell>(size);
+		data = newHashMap(size);
 		for (int i = 0; i < size; i++) {
 			IDimensionElement[] keyElements = new IDimensionElement[dimSize];
 			for (int dIdx = 0; dIdx < dimSize; dIdx++) {
@@ -591,7 +600,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		out.writeObject(dataPool);
 		out.writeObject(dimensionMap);
 		out.writeObject(measureMap);
-		out.writeObject(cellValueChangedListeners);
+		out.writeObject(cubeListeners);
 		
 		// write data...
 		out.writeInt(data.size());
@@ -615,10 +624,10 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.cube.ICube#getCellValueChangedListeners()
+	 * @see de.xwic.cube.ICube#getCubeListeners()
 	 */
-	public List<ICubeListener> getCellValueChangedListeners() {
-		return cellValueChangedListeners;
+	public List<ICubeListener> getCubeListeners() {
+		return cubeListeners;
 	}
 	
 	/**
@@ -629,15 +638,32 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	 * @param diff
 	 */
 	protected void onCellValueChanged(Key key, Cell cell, int measureIndex, double diff) {
-		if (cellValueChangedListeners.size() == 0) {
+		if (cubeListeners.size() == 0) {
 			return;
 		}
 		
-		for (ICubeListener listener : cellValueChangedListeners) {
+		for (ICubeListener listener : cubeListeners) {
 			listener.onCellValueChanged(key, cell, measureIndex, diff);
 		}
 	}
 
+	/**
+	 * Invoke all cell aggregated listeners
+	 * @param childKey
+	 * @param childCell
+	 * @param parentKey
+	 * @param parentCell
+	 */
+	protected void onCellAggregated(Key childKey, Cell childCell, Key parentKey, Cell parentCell) {
+		if (cubeListeners.size() == 0) {
+			return;
+		}
+		
+		for (ICubeListener listener : cubeListeners) {
+			listener.onCellAggregated(childKey, childCell, parentKey, parentCell);
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.impl.Identifyable#toString()
 	 */

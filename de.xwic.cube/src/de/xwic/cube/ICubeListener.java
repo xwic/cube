@@ -11,6 +11,8 @@
  */
 package de.xwic.cube;
 
+import de.xwic.cube.impl.Cell;
+
 
 /**
  * Created on Apr 8, 2009
@@ -27,5 +29,14 @@ public interface ICubeListener {
 	 * @param diff
 	 */
 	void onCellValueChanged(Key key, ICell cell, int measureIndex, double diff);
+
+	/**
+	 * Cell aggregated event
+	 * @param childKey
+	 * @param childCell
+	 * @param parentKey
+	 * @param parentCell
+	 */
+	void onCellAggregated(Key childKey, Cell childCell, Key parentKey, Cell parentCell);
 
 }

@@ -116,6 +116,9 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		Cell cell = getCell(key, true);
 		Double oldValue = cell.getValue(measureIndex);
 		cell.setValue(measureIndex, oldValue != null ? oldValue.doubleValue() + diff : diff);
+		
+		// invoke CellValueChangedListener
+		onCellValueChanged(key, cell, measureIndex, diff);
 		return 1;
 		
 	}
@@ -189,8 +192,9 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 							cc.cell = new Cell(measureMap.size());
 						}
 						aggregateCells(cc.cell, rawCell);
+						// invoke ICubeListener
+						onCellAggregated(key, rawCell, searchKey, cc.cell);
 					}
-					
 				}
 			}
 		}
@@ -237,7 +241,8 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 						cachedCells[i].cell = new Cell(measureMap.size());
 					}
 					aggregateCells(cachedCells[i].cell, rawCell);
-					
+					// invoke ICubeListener
+					onCellAggregated(entry.getKey(), rawCell, keys[i], cachedCells[i].cell);
 				}
 			}
 			
@@ -316,7 +321,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		measureMap = (Map<String, IMeasure>) in.readObject();
 		
 		if (version > 2) {
-			cellValueChangedListeners = (List<ICubeListener>)in.readObject();
+			cubeListeners = (List<ICubeListener>)in.readObject();
 		}
 
 		// read data
@@ -412,7 +417,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		out.writeObject(dataPool);
 		out.writeObject(dimensionMap);
 		out.writeObject(measureMap);
-		out.writeObject(cellValueChangedListeners);
+		out.writeObject(cubeListeners);
 		
 		// write data...
 		out.writeInt(data.size());
