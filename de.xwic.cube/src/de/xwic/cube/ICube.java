@@ -4,7 +4,6 @@
 package de.xwic.cube;
 
 import java.io.PrintStream;
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,7 +44,7 @@ public interface ICube extends IIdentifyable {
 	 * 
 	 * @param key
 	 * @return
-	 * @throws ParseException 
+	 * @throws IllegalArgumentException 
 	 */
 	public abstract Key createKey(String key);
 	
@@ -141,6 +140,7 @@ public interface ICube extends IIdentifyable {
 	
 	/**
 	 * Returns the value in a cell or NULL if the cell contains no value.
+	 * Calls createKey(keyString) to create a Key that might throws an IllegalArgumentException.
 	 * @param key
 	 * @param measure
 	 * @return
@@ -223,5 +223,5 @@ public interface ICube extends IIdentifyable {
 	 * List is serialized.
 	 * @return
 	 */
-	public List<ICubeListener> getCellValueChangedListeners();
+	public List<ICubeListener> getCubeListeners();
 }

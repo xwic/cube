@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDataPoolStorageProvider;
@@ -24,6 +25,7 @@ import de.xwic.cube.StorageException;
  */
 public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 
+	private static Logger log = Logger.getLogger(FileDataPoolStorageProvider.class.getName());
 	private File dataDir;
 	
 	/**
@@ -93,6 +95,7 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 		
 		try {
 			String filename = dataPool.getKey() + ".datapool";
+			log.info("Saving DataPool " + filename + " with cubes " + dataPool.getCubes() + "...");
 			FileOutputStream fos = new FileOutputStream(new File(dataDir, filename));
 			BufferedOutputStream bufOut = new BufferedOutputStream(fos);
 			ObjectOutputStream oos = new ObjectOutputStream(bufOut);

@@ -20,6 +20,8 @@ import java.util.Set;
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICubeListener;
 import de.xwic.cube.Key;
+import de.xwic.cube.impl.AbstractCubeListener;
+import de.xwic.cube.impl.Cell;
 
 /**
  * CountLoader counts distinct objects and stores the count number in the cell for specified measure.
@@ -32,7 +34,7 @@ import de.xwic.cube.Key;
  * @author JBORNEMA
  */
 
-public class CountLoader implements ICubeListener, Serializable {
+public class CountLoader extends AbstractCubeListener implements ICubeListener, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -99,6 +101,27 @@ public class CountLoader implements ICubeListener, Serializable {
 		value = value != null ? value + 1d : 1d;
 		cell.setValue(this.measureIndex, value);
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.AbstractCubeListener#onCellAggregated(de.xwic.cube.Key, de.xwic.cube.impl.Cell, de.xwic.cube.Key, de.xwic.cube.impl.Cell)
+	 */
+	@Override
+	public void onCellAggregated(Key childKey, Cell childCell, Key parentKey, Cell parentCell) {
+		Set<Object> childObjects = keyCounts.get(childKey);
+		if (childObjects == null) {
+			// nothing to count
+			return;
+		}
+		
+		Set<Object> objects = keyCounts.get(parentKey);
+		if (objects == null) {
+			objects = new HashSet<Object>();
+			keyCounts.put(parentKey.clone(), objects);
+		}
+		objects.addAll(childObjects);
+		// set count
+		parentCell.setValue(this.measureIndex, (double)objects.size());
+	}
 
 	/**
 	 * @return the measureIndex
@@ -156,6 +179,15 @@ public class CountLoader implements ICubeListener, Serializable {
 		if (srcLoader.keyCounts != null) {
 			keyCounts = srcLoader.keyCounts;
 		}
+	}
+
+	/**
+	 * Clear the loader
+	 */
+	public void clear() {
+		countOn = null;
+		mapCounts.clear();
+		keyCounts.clear();
 	}
 
 }
