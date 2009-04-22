@@ -20,13 +20,15 @@ import java.util.Map.Entry;
 
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICellListener;
-import de.xwic.cube.ICubeListener;
 import de.xwic.cube.ICube;
+import de.xwic.cube.ICubeListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.IQuery;
 import de.xwic.cube.Key;
+import de.xwic.cube.event.CellAggregatedEvent;
+import de.xwic.cube.event.CellValueChangedEvent;
 
 /**
  * @author Florian Lippisch
@@ -641,26 +643,23 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		if (cubeListeners.size() == 0) {
 			return;
 		}
-		
+		CellValueChangedEvent event = new CellValueChangedEvent(this, key, cell, measureIndex, diff);
 		for (ICubeListener listener : cubeListeners) {
-			listener.onCellValueChanged(key, cell, measureIndex, diff);
+			listener.onCellValueChanged(event);
 		}
 	}
 
 	/**
 	 * Invoke all cell aggregated listeners
-	 * @param childKey
-	 * @param childCell
-	 * @param parentKey
-	 * @param parentCell
+	 * @param CellAggregatedEvent
 	 */
-	protected void onCellAggregated(Key childKey, Cell childCell, Key parentKey, Cell parentCell) {
+	protected void onCellAggregated(CellAggregatedEvent event) {
 		if (cubeListeners.size() == 0) {
 			return;
 		}
 		
 		for (ICubeListener listener : cubeListeners) {
-			listener.onCellAggregated(childKey, childCell, parentKey, parentCell);
+			listener.onCellAggregated(event);
 		}
 	}
 	

@@ -19,7 +19,10 @@ import java.util.Set;
 
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICubeListener;
+import de.xwic.cube.IMeasureLoader;
 import de.xwic.cube.Key;
+import de.xwic.cube.event.CellAggregatedEvent;
+import de.xwic.cube.event.CellValueChangedEvent;
 import de.xwic.cube.impl.AbstractCubeListener;
 import de.xwic.cube.impl.Cell;
 
@@ -34,7 +37,7 @@ import de.xwic.cube.impl.Cell;
  * @author JBORNEMA
  */
 
-public class CountLoader extends AbstractCubeListener implements ICubeListener, Serializable {
+public class CountLoader extends AbstractCubeListener implements IMeasureLoader, ICubeListener, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -56,7 +59,7 @@ public class CountLoader extends AbstractCubeListener implements ICubeListener, 
 	 */
 	@Override
 	public int hashCode() {
-		return measureIndex;
+		return getClass().hashCode() * 31 + measureIndex;
 	}
 	
 	/* (non-Javadoc)
@@ -75,9 +78,12 @@ public class CountLoader extends AbstractCubeListener implements ICubeListener, 
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.cube.ICubeListener#onCellValueChanged(de.xwic.cube.Key, de.xwic.cube.impl.Cell, int, double)
+	 * @see de.xwic.cube.impl.AbstractCubeListener#onCellValueChanged(de.xwic.cube.event.CellValueChangedEvent)
 	 */
-	public void onCellValueChanged(Key key, ICell cell, int measureIndex, double diff) {
+	public void onCellValueChanged(CellValueChangedEvent event) {
+		Key key = event.getKey();
+		ICell cell = event.getCell();
+		int measureIndex = event.getMeasureIndex();
 		if (countOnMeasureIndex != null && measureIndex != countOnMeasureIndex) {
 			// don't count on with this measure
 			return;
@@ -103,10 +109,13 @@ public class CountLoader extends AbstractCubeListener implements ICubeListener, 
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.cube.impl.AbstractCubeListener#onCellAggregated(de.xwic.cube.Key, de.xwic.cube.impl.Cell, de.xwic.cube.Key, de.xwic.cube.impl.Cell)
+	 * @see de.xwic.cube.impl.AbstractCubeListener#onCellAggregated(de.xwic.cube.event.CellAggregatedEvent)
 	 */
 	@Override
-	public void onCellAggregated(Key childKey, Cell childCell, Key parentKey, Cell parentCell) {
+	public void onCellAggregated(CellAggregatedEvent event) {
+		Key childKey = event.getChildKey();
+		Key parentKey = event.getParentKey();
+		Cell parentCell = event.getParentCell();
 		Set<Object> childObjects = keyCounts.get(childKey);
 		if (childObjects == null) {
 			// nothing to count
@@ -146,12 +155,12 @@ public class CountLoader extends AbstractCubeListener implements ICubeListener, 
 
 	/**
 	 * Set object count is applied on. Ensure it is set before cube values are set.
-	 * @param countOn the countOn to set
+	 * @see de.xwic.cube.IMeasureLoader#setObjectFocus(java.lang.Object)
 	 */
-	public void setCountOn(Object countOn) {
-		Object obj = mapCounts.get(countOn);
+	public void setObjectFocus(Object objectFocus) {
+		Object obj = mapCounts.get(objectFocus);
 		if (obj == null) {
-			obj = countOn;
+			obj = objectFocus;
 			mapCounts.put(obj, obj);
 		}
 		this.countOn = obj;
@@ -175,7 +184,11 @@ public class CountLoader extends AbstractCubeListener implements ICubeListener, 
 	 * Configures this loader to use configuration from srcLoader.
 	 * @param srcLoader
 	 */
-	public void configure(CountLoader srcLoader) {
+	public void configure(IMeasureLoader fromLoader) {
+		if (!(fromLoader instanceof CountLoader)) {
+			return;
+		}
+		CountLoader srcLoader = (CountLoader)fromLoader;
 		if (srcLoader.keyCounts != null) {
 			keyCounts = srcLoader.keyCounts;
 		}
@@ -190,4 +203,11 @@ public class CountLoader extends AbstractCubeListener implements ICubeListener, 
 		keyCounts.clear();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IMeasureLoader#isExtension()
+	 */
+	public boolean isExtension() {
+		// count logic is completely different to existing sum aggregation
+		return false;
+	}
 }

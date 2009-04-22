@@ -11,27 +11,31 @@
  */
 package de.xwic.cube.impl;
 
-import de.xwic.cube.ICell;
 import de.xwic.cube.ICubeListener;
-import de.xwic.cube.Key;
+import de.xwic.cube.event.CellAggregatedEvent;
+import de.xwic.cube.event.CellValueChangedEvent;
 
 /**
  * Created on Apr 16, 2009
  * @author JBORNEMA
  */
 
-public class AbstractCubeListener implements ICubeListener {
+public abstract class AbstractCubeListener implements ICubeListener {
 
 	/* (non-Javadoc)
-	 * @see de.xwic.cube.ICubeListener#onCellAggregated(de.xwic.cube.Key, de.xwic.cube.impl.Cell, de.xwic.cube.Key, de.xwic.cube.impl.Cell)
+	 * @see de.xwic.cube.ICubeListener#onCellAggregated(de.xwic.cube.event.CellAggregatedEvent)
 	 */
-	public void onCellAggregated(Key childKey, Cell childCell, Key parentKey, Cell parentCell) {
+	public void onCellAggregated(CellAggregatedEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.cube.ICubeListener#onCellValueChanged(de.xwic.cube.Key, de.xwic.cube.ICell, int, double)
+	 * @see de.xwic.cube.ICubeListener#onCellValueChanged(de.xwic.cube.event.CellValueChangedEvent)
 	 */
-	public void onCellValueChanged(Key key, ICell cell, int measureIndex, double diff) {
+	public void onCellValueChanged(CellValueChangedEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

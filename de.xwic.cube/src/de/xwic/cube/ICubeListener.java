@@ -11,7 +11,8 @@
  */
 package de.xwic.cube;
 
-import de.xwic.cube.impl.Cell;
+import de.xwic.cube.event.CellAggregatedEvent;
+import de.xwic.cube.event.CellValueChangedEvent;
 
 
 /**
@@ -23,20 +24,14 @@ public interface ICubeListener {
 
 	/**
 	 * Cell value changed event
-	 * @param key
-	 * @param cell
-	 * @param measureIndex
-	 * @param diff
+	 * @param CellValueChangedEvent
 	 */
-	void onCellValueChanged(Key key, ICell cell, int measureIndex, double diff);
+	void onCellValueChanged(CellValueChangedEvent event);
 
 	/**
 	 * Cell aggregated event
-	 * @param childKey
-	 * @param childCell
-	 * @param parentKey
-	 * @param parentCell
+	 * @param CellAggregatedEvent
 	 */
-	void onCellAggregated(Key childKey, Cell childCell, Key parentKey, Cell parentCell);
+	void onCellAggregated(CellAggregatedEvent event);
 
 }

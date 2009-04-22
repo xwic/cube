@@ -17,6 +17,7 @@ public class Key implements Serializable {
 
 	private static final long serialVersionUID = -3558184977558178383L;
 	private IDimensionElement[] elementKeys;
+	protected transient int hashCode = 0; 
 	
 	/**
 	 * @param elementKeys
@@ -31,9 +32,13 @@ public class Key implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
+		if (hashCode != 0) {
+			return hashCode;
+		}
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + Arrays.hashCode(elementKeys);
+		hashCode = result;
 		return result;
 	}
 
@@ -106,6 +111,7 @@ public class Key implements Serializable {
 	 */
 	public void setDimensionElement(int idx, IDimensionElement element) {
 		elementKeys[idx] = element;
+		hashCode = 0;
 	}
 
 	/**
