@@ -31,6 +31,7 @@ import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
+import de.xwic.cube.event.CellAggregatedEvent;
 
 /**
  * This cube implementation stores only the leaf cells. Aggregated values are stored
@@ -182,6 +183,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		
 		Set<Key> keys = rootIndex.get(searchKey.getDimensionElement(0));
 		if (keys != null) {
+			CellAggregatedEvent event = new CellAggregatedEvent(this, null, null, searchKey, null);
 			for (Key key : keys) {
 				if (searchKey.isSubKey(key)) {
 					cc.leafCount++;
@@ -193,7 +195,10 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 						}
 						aggregateCells(cc.cell, rawCell);
 						// invoke ICubeListener
-						onCellAggregated(key, rawCell, searchKey, cc.cell);
+						event.setChildKey(key);
+						event.setChildCell(rawCell);
+						event.setParentCell(cc.cell);
+						onCellAggregated(event);
 					}
 				}
 			}
@@ -230,7 +235,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		for (int i = 0; i < keys.length; i++) {
 			cachedCells[i] = new CachedCell(null);
 		}
-		
+		CellAggregatedEvent event = new CellAggregatedEvent();
 		for(Entry<Key, Cell> entry: data.entrySet()) {
 		
 			Cell rawCell = entry.getValue();
@@ -242,7 +247,11 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 					}
 					aggregateCells(cachedCells[i].cell, rawCell);
 					// invoke ICubeListener
-					onCellAggregated(entry.getKey(), rawCell, keys[i], cachedCells[i].cell);
+					event.setChildKey(entry.getKey());
+					event.setChildCell(rawCell);
+					event.setParentKey(keys[i]);
+					event.setParentCell(cachedCells[i].cell);
+					onCellAggregated(event);
 				}
 			}
 			
