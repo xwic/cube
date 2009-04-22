@@ -32,6 +32,7 @@ import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
 import de.xwic.cube.event.CellAggregatedEvent;
+import de.xwic.cube.event.CellValueChangedEvent;
 
 /**
  * This cube implementation stores only the leaf cells. Aggregated values are stored
@@ -119,7 +120,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		cell.setValue(measureIndex, oldValue != null ? oldValue.doubleValue() + diff : diff);
 		
 		// invoke CellValueChangedListener
-		onCellValueChanged(key, cell, measureIndex, diff);
+		onCellValueChanged(new CellValueChangedEvent(this, key, cell, measureIndex, diff));
 		return 1;
 		
 	}
