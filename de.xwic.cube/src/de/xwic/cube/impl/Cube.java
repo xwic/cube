@@ -267,7 +267,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			cell.setValue(measureIndex, oldValue != null ? oldValue.doubleValue() + diff : diff);
 			cellsModified = 1;
 			// invoke CellValueChangedListener
-			onCellValueChanged(key, cell, measureIndex, diff);
+			onCellValueChanged(new CellValueChangedEvent(this, key, cell, measureIndex, diff));
 			//System.out.println("Changed Cell " + key + " from " + oldValue + " to " + cell.getValue(measure));
 		} else {
 			Key myCursor = key.clone();
@@ -634,16 +634,12 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	
 	/**
 	 * Invoke all cell value changed listeners
-	 * @param key
-	 * @param cell
-	 * @param measureIndex
-	 * @param diff
+	 * @param event
 	 */
-	protected void onCellValueChanged(Key key, Cell cell, int measureIndex, double diff) {
+	protected void onCellValueChanged(CellValueChangedEvent event) {
 		if (cubeListeners.size() == 0) {
 			return;
 		}
-		CellValueChangedEvent event = new CellValueChangedEvent(this, key, cell, measureIndex, diff);
 		for (ICubeListener listener : cubeListeners) {
 			listener.onCellValueChanged(event);
 		}
@@ -651,7 +647,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 
 	/**
 	 * Invoke all cell aggregated listeners
-	 * @param CellAggregatedEvent
+	 * @param event
 	 */
 	protected void onCellAggregated(CellAggregatedEvent event) {
 		if (cubeListeners.size() == 0) {
