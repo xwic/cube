@@ -12,7 +12,9 @@
 package de.xwic.cube.util;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICube;
@@ -36,6 +38,10 @@ public class DimensionLeafLoader implements IMeasureLoader, ICubeListener, Seria
 	protected int measureIndex;
 
 	protected transient boolean cellValueChangedEnabled;
+	protected transient Map<IDimensionElement, IDimensionElement> leafMap;
+	{
+		leafMap = new HashMap<IDimensionElement, IDimensionElement>();
+	}
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -65,12 +71,66 @@ public class DimensionLeafLoader implements IMeasureLoader, ICubeListener, Seria
 	 */
 	public void onCellAggregated(CellAggregatedEvent event) {
 		Key key = event.getParentKey();
-		ICell cell = event.getParentCell();
 		IDimensionElement element = key.getDimensionElement(dimensionIndex);
-		Double value = findBottomLeafValue(event.getCube(), key.clone(), element);
-		if (value != null) {
-			cell.setValue(measureIndex, value);
+		if (element.isLeaf()) {
+			// setting correct aggregated value not required
+			return;
 		}
+		ICell cell = event.getParentCell();
+		IDimensionElement leaf = findLeaf(event.getCube(), key, element);
+		if (leaf != null) {
+			// leaf found, use its value
+			Key clone = key.clone();
+			clone.setDimensionElement(dimensionIndex, leaf);
+			ICell leafCell = event.getCube().getCell(clone);
+			cell.setValue(measureIndex, leafCell != null ? leafCell.getValue(measureIndex) : null);
+		} else {
+			// no leaf found set null
+			cell.setValue(measureIndex, null);
+		}
+	}
+
+	/**
+	 * @param cube
+	 * @param key
+	 * @return
+	 */
+	protected IDimensionElement findLeaf(ICube cube, Key key, IDimensionElement parent) {
+		if (leafMap == null) {
+			leafMap = new HashMap<IDimensionElement, IDimensionElement>();			
+		}
+		IDimensionElement leaf = leafMap.get(parent);
+		if (leaf != null) {
+			return leaf;
+		}
+		// find leaf with data on configured measure
+		key = cube.createKey();
+		
+		try {
+			List<IDimensionElement> children = parent.getDimensionElements(); 
+			for (int i = children.size() - 1; i != -1 ; i--) {
+				IDimensionElement child = children.get(i);
+				if (!child.isLeaf()) {
+					// recursive call
+					leaf = findLeaf(cube, key, child);
+					if (leaf != null) {
+						return leaf;
+					}
+				} else {
+					// child is leaf, if value exists return
+					key.setDimensionElement(dimensionIndex, child);
+					ICell cell = cube.getCell(key);
+					if (cell != null) {
+						leaf = child;
+						return leaf;
+					}
+				}
+			}
+		} finally {
+			leafMap.put(parent, leaf);
+		}
+		// no leaf found
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -83,56 +143,7 @@ public class DimensionLeafLoader implements IMeasureLoader, ICubeListener, Seria
 			// nothing to do
 			return;
 		}
-		Key key = event.getKey();
-		ICell cell = event.getCell();
-		int measureIndex = event.getMeasureIndex();
-		if (this.measureIndex != measureIndex) {
-			// setting correct aggregated value not required
-			return;
-		}
-
-		IDimensionElement element = key.getDimensionElement(dimensionIndex);
-		if (element.isLeaf()) {
-			// setting correct aggregated value not required
-			return;
-		}
-
-		// key is a parent, find correct bottom leaf containing a value
-		Double value = findBottomLeafValue(event.getCube(), key.clone(), element);
-		if (value != null) {
-			cell.setValue(measureIndex, value);
-		}
-	}
-
-	/**
-	 * @param cube
-	 * @param key
-	 * @param element
-	 * @return
-	 */
-	protected Double findBottomLeafValue(ICube cube, Key key, IDimensionElement element) {
-		List<IDimensionElement> children = element.getDimensionElements(); 
-		for (int i = children.size() - 1; i != -1 ; i--) {
-			IDimensionElement child = children.get(i);
-			if (!child.isLeaf()) {
-				// recursive call
-				Double value = findBottomLeafValue(cube, key, child);
-				if (value != null) {
-					return value;
-				}
-			} else {
-				key.setDimensionElement(dimensionIndex, child);
-				ICell cell = cube.getCell(key);
-				if (cell == null) {
-					return null;
-				}
-				Double value = cell.getValue(measureIndex);
-				if (value != null) {
-					return value;
-				}
-			}
-		}
-		return null;
+		throw new RuntimeException("Method not yet supported");
 	}
 
 	/**
