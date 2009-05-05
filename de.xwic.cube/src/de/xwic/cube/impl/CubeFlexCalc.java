@@ -237,6 +237,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			cachedCells[i] = new CachedCell(null);
 		}
 		CellAggregatedEvent event = new CellAggregatedEvent();
+		event.setCube(this);
 		for(Entry<Key, Cell> entry: data.entrySet()) {
 		
 			Cell rawCell = entry.getValue();
