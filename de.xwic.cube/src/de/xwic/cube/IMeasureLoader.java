@@ -12,6 +12,7 @@
 package de.xwic.cube;
 
 
+
 /**
  * Created on Apr 22, 2009
  * @author JBORNEMA
@@ -49,5 +50,15 @@ public interface IMeasureLoader extends ICubeListener {
 	 * @return
 	 */
 	boolean isExtension();
+
+	/**
+	 * Returns true if measure and value is accepted for loading.
+	 * @param cube
+	 * @param key
+	 * @param measure
+	 * @param value
+	 * @return
+	 */
+	boolean accept(ICube cube, Key key, IMeasure measure, Double value);
 
 }
