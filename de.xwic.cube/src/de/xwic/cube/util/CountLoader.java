@@ -18,7 +18,9 @@ import java.util.Map;
 import java.util.Set;
 
 import de.xwic.cube.ICell;
+import de.xwic.cube.ICube;
 import de.xwic.cube.ICubeListener;
+import de.xwic.cube.IMeasure;
 import de.xwic.cube.IMeasureLoader;
 import de.xwic.cube.Key;
 import de.xwic.cube.event.CellAggregatedEvent;
@@ -45,7 +47,8 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	protected Map<Key, Set<Object>> keyCounts;
 	
 	protected int measureIndex;
-	protected Integer countOnMeasureIndex; 
+	protected int countOnMeasureIndex;
+	protected transient String countOnMeasureKey;
 
 	protected transient Object countOn;
 	
@@ -84,8 +87,8 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 		Key key = event.getKey();
 		ICell cell = event.getCell();
 		int measureIndex = event.getMeasureIndex();
-		if (countOnMeasureIndex != null && measureIndex != countOnMeasureIndex) {
-			// don't count on with this measure
+		if (measureIndex != countOnMeasureIndex) {
+			// don't count on this measure
 			return;
 		}
 		Set<Object> objects = keyCounts.get(key);
@@ -169,14 +172,14 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	/**
 	 * @return the countOnMeasureIndex
 	 */
-	public Integer getCountOnMeasureIndex() {
+	public int getCountOnMeasureIndex() {
 		return countOnMeasureIndex;
 	}
 
 	/**
 	 * @param countOnMeasureIndex the countOnMeasureIndex to set
 	 */
-	public void setCountOnMeasureIndex(Integer countOnMeasureIndex) {
+	public void setCountOnMeasureIndex(int countOnMeasureIndex) {
 		this.countOnMeasureIndex = countOnMeasureIndex;
 	}
 
@@ -209,5 +212,18 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	public boolean isExtension() {
 		// count logic is completely different to existing sum aggregation
 		return false;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IMeasureLoader#accept(de.xwic.cube.ICube, de.xwic.cube.Key, de.xwic.cube.IMeasure, java.lang.Double)
+	 */
+	public boolean accept(ICube cube, Key key, IMeasure measure, Double value) {
+		if (countOnMeasureKey == null) {
+			int idx = cube.getMeasureIndex(measure);
+			if (idx == countOnMeasureIndex) {
+				countOnMeasureKey = measure.getKey();
+			}
+		}
+		return countOnMeasureKey != null && countOnMeasureKey.equals(measure.getKey());
 	}
 }
