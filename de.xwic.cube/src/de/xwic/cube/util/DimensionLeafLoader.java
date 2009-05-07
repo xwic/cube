@@ -20,6 +20,7 @@ import de.xwic.cube.ICell;
 import de.xwic.cube.ICube;
 import de.xwic.cube.ICubeListener;
 import de.xwic.cube.IDimensionElement;
+import de.xwic.cube.IMeasure;
 import de.xwic.cube.IMeasureLoader;
 import de.xwic.cube.Key;
 import de.xwic.cube.event.CellAggregatedEvent;
@@ -36,6 +37,7 @@ public class DimensionLeafLoader implements IMeasureLoader, ICubeListener, Seria
 	
 	protected int dimensionIndex;
 	protected int measureIndex;
+	protected String measureKey;
 
 	protected transient boolean cellValueChangedEnabled;
 	protected transient Map<IDimensionElement, IDimensionElement> leafMap;
@@ -194,8 +196,7 @@ public class DimensionLeafLoader implements IMeasureLoader, ICubeListener, Seria
 	 * @see de.xwic.cube.IMeasureLoader#setObjectFocus(java.lang.Object)
 	 */
 	public void setObjectFocus(Object objectFocus) {
-		// TODO Auto-generated method stub
-		
+		// no used
 	}
 
 	/* (non-Javadoc)
@@ -220,4 +221,16 @@ public class DimensionLeafLoader implements IMeasureLoader, ICubeListener, Seria
 		this.cellValueChangedEnabled = cellValueChangedEnabled;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IMeasureLoader#accept(de.xwic.cube.ICube, de.xwic.cube.Key, de.xwic.cube.IMeasure, java.lang.Double)
+	 */
+	public boolean accept(ICube cube, Key key, IMeasure measure, Double value) {
+		if (measureKey == null) {
+			int idx = cube.getMeasureIndex(measure);
+			if (idx == measureIndex) {
+				measureKey = measure.getKey();
+			}
+		}
+		return measureKey != null && measureKey.equals(measure.getKey());
+	}
 }
