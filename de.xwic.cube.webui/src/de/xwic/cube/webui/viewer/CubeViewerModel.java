@@ -16,6 +16,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.IQuery;
 import de.xwic.cube.IValueFormat;
 import de.xwic.cube.Key;
 
@@ -39,6 +40,7 @@ public class CubeViewerModel implements Serializable {
 	
 	protected IValueFormat valueFormat;
 	protected Key baseKey = null;
+	protected IQuery baseQuery = null;
 	
 	protected List<ICubeViewerModelListener> listeners = new ArrayList<ICubeViewerModelListener>();
 
@@ -273,6 +275,20 @@ public class CubeViewerModel implements Serializable {
 			expandAll(child);
 		}
 		
+	}
+
+	/**
+	 * @return the baseQuery
+	 */
+	public IQuery getBaseQuery() {
+		return baseQuery;
+	}
+
+	/**
+	 * @param baseQuery the baseQuery to set
+	 */
+	public void setBaseQuery(IQuery baseQuery) {
+		this.baseQuery = baseQuery;
 	}
 	
 }
