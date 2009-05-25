@@ -4,6 +4,7 @@
 package de.xwic.cube;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Used to query one or more values from the cube. While the Key object is
@@ -35,5 +36,17 @@ public interface IQuery {
 	 * @return
 	 */
 	public List<Key> createKeys();
+
+	/**
+	 * Returns set of selected IDimensionElement objects.
+	 * @param dimension
+	 * @return
+	 */
+	public Set<IDimensionElement> getSelectedDimensionElements(IDimension dimension);
 	
+	/**
+	 * Returns a new clone of this query. 
+	 * @return
+	 */
+	public IQuery clone();
 }
