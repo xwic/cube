@@ -127,5 +127,20 @@ public class Query implements IQuery {
 		}
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IQuery#getSelectedDimensionElements(de.xwic.cube.IDimension)
+	 */
+	public Set<IDimensionElement> getSelectedDimensionElements(IDimension dimension) {
+		return selection.get(dimension);
+	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	public IQuery clone() {
+		Query clone = new Query(cube);
+		clone.selection = new HashMap<IDimension, Set<IDimensionElement>>(selection);
+		return clone;
+	}
 }

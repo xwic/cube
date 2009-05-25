@@ -6,6 +6,7 @@ package de.xwic.cube.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -323,5 +324,25 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	@Override
 	public String toString() {
 		return getPath();
+	}
+	
+	/**
+	 * Sort elements using given comparator.
+	 * @param comparator 
+	 */
+	public void sortDimensionElements(Comparator<IDimensionElement> comparator) {
+		Collections.sort(elements, comparator);
+	}
+	
+	/**
+	 * Sort elements by key. 
+	 */
+	public void sortDimensionElements() {
+		Comparator<IDimensionElement> comparator = new Comparator<IDimensionElement>() {
+			public int compare(IDimensionElement o1, IDimensionElement o2) {
+				return o1.getKey().compareTo(o2.getKey());
+			}
+		};
+		Collections.sort(elements, comparator);
 	}
 }
