@@ -36,6 +36,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private Comparator<INavigationElement> sortComparator = null;
 	
 	private String rootTitle = null;
+	private Object contentUserData = null;
 	
 	private int indention = 0;
 	private Map<IDimension, Integer> dimensionsDepth = null;
@@ -217,6 +218,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 			
 			ContentInfo contentInfo = new ContentInfo(dataProvider, elements);
 			contentInfo.setClickable(clickable);
+			contentInfo.setUserData(contentUserData);
 			return contentInfo;
 		}
 
@@ -291,6 +293,10 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		ICube cube = model.getCube();
 		//Key cursor = model.createCursor();
 		Key cursor = dataProvider.createCursor(model, null, null);
+		if (cursor == null) {
+			// the dataProvider is a special implementation that does not use cube data as it seems.
+			return false;
+		}
 
 		// add content filter as well
 		for (IDimensionElement de : getContentFilter()) {
@@ -576,5 +582,19 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public void setSortComparator(Comparator<INavigationElement> sortComparator) {
 		this.sortComparator = sortComparator;
+	}
+
+	/**
+	 * @return the contentUserData
+	 */
+	public Object getContentUserData() {
+		return contentUserData;
+	}
+
+	/**
+	 * @param contentUserData the contentUserData to set
+	 */
+	public void setContentUserData(Object contentUserData) {
+		this.contentUserData = contentUserData;
 	}
 }
