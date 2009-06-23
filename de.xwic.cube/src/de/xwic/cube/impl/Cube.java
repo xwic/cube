@@ -666,4 +666,19 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	public String toString() {
 		return getKey() + " (Size:" + data.size() + ")";
 	}
+
+	public void replace(ICube oldCube) {
+		if (this.dataPool != oldCube.getDataPool()) {
+			throw new IllegalArgumentException("Cubes do not share the same DataPool");
+		}
+		// remove new cube
+		dataPool.removeCube(this);
+		// set target cubeKey
+		this.setKey(oldCube.getKey());
+		// replace cube in dataPool
+		dataPool.replaceCube(oldCube, this);
+		//clear oldCube, TODO make old cube invalid and throw exception when it is used
+		oldCube.clear();
+	}	
+	
 }
