@@ -224,4 +224,10 @@ public interface ICube extends IIdentifyable {
 	 * @return
 	 */
 	public List<ICubeListener> getCubeListeners();
+	
+	/**
+	 * Sets this cube in place for the old cube (used for fast cube update without downtime)
+	 * @param oldCube
+	 */
+	public void replace(ICube oldCube);
 }

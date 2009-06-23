@@ -304,4 +304,18 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 		return element;
 	}
 	
+	/**
+	 * replaces the old cube with the new cube
+	 * @param oldCubeKey
+	 * @param newCubeKey
+	 * @param newCube
+	 */
+	void replaceCube(ICube oldCube, ICube newCube) {
+		if (this != oldCube.getDataPool()) {
+			throw new IllegalArgumentException("Cubes do not share the same DataPool");
+		}
+		if(cubeMap.containsKey(oldCube.getKey())) {
+			cubeMap.put(oldCube.getKey(), newCube);
+		}
+	}
 }
