@@ -147,4 +147,21 @@ public class Key implements Serializable {
 		}
 		return true;
 	}
+
+	/**
+	 * Checks if the key exists in the cube. A key might not exist after some
+	 * dimension elements have been removed.
+	 * 
+	 * @return
+	 */
+	public boolean exists() {
+		for(IDimensionElement el: elementKeys) {
+			if(el.getParent() != null) {
+				if(!el.getParent().containsDimensionElement(el.getKey())) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }
