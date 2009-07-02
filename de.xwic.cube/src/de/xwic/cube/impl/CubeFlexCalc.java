@@ -25,6 +25,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.xwic.cube.ICube;
 import de.xwic.cube.ICubeCacheControl;
 import de.xwic.cube.ICubeListener;
@@ -58,7 +61,12 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	transient int buildCacheForPathsTime = 0;
 	transient int buildCacheForPathsTimeout = 0;
 	transient int calcCellTime = 0;
-	//transient Map<IDimension, DimensionInfo> dimensionsInfo;
+
+	// Commons log
+	private transient Log log;
+	{
+		log = LogFactory.getLog(getClass());
+	}
 
 	/**
 	 * @author lippisch
@@ -328,9 +336,9 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 					
 				} else {
 					// check if it is cached, if autoCachePaths is on unknownCachePaths is filled
-					if (isCachedPath(key)) {
-						// it is a cache path but not in the cache: no data there so return empty CachedCell
-						cc = new CachedCell(null);
+					if (autoCachePaths && isCachedPath(key)) {
+						// it is a cached path but not in the cache, so not available
+						// don't cache empty CachedCell
 					} else {
 
 						if (autoCachePaths) {
@@ -820,7 +828,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			return;
 		}
 		
-		log().info("Build cache for " + newCachePaths.size() + " new paths: " + newCachePaths);
+		log.info("Build cache for " + newCachePaths.size() + " new paths: " + newCachePaths);
 
 		long start = System.currentTimeMillis();
 		
@@ -833,6 +841,8 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		
 		// set new calculation time
 		calcCellTime = (int)(System.currentTimeMillis() - start);
+		
+		log.info("Build cache in " + calcCellTime + " msec. (total cache size: " + cache.size() + ")");
 		
 		// move paths and clear newCachePaths
 		if (cachePaths == null) {
@@ -849,10 +859,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @return
 	 */
 	protected boolean isCachedPath(Key key) {
-		if (!autoCachePaths) {
-			return false;
-		}
-
 		CachePath newPath = new CachePath(key);
 		if (newCachePaths == null) {
 			newCachePaths = new HashSet<CachePath>();

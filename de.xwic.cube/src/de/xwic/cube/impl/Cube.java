@@ -17,7 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICellListener;
@@ -45,7 +47,13 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	protected List<ICubeListener> cubeListeners = new ArrayList<ICubeListener>();
 	
 	protected boolean allowSplash = true;
-	private transient Logger log; 
+	
+	// Commons log
+	@SuppressWarnings("unused")
+	private transient Log log;
+	{
+		log = LogFactory.getLog(getClass());
+	}
 
 	/**
 	 * INTERNAL: This constructor is used by the serialization mechanism. 
@@ -682,22 +690,15 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		//clear oldCube, TODO make old cube invalid and throw exception when it is used
 		oldCube.clear();
 	}
-		
-	/**
-     * Return Logger.
-     */
-	protected Logger log() {
-		if (log == null || !log.getName().equals(getClass().getName())) {
-			log = Logger.getLogger(getClass().getName());
-		}
-		return log;
-	}
 	
+	/**
+	 * jbornema: Key.exists() missing, de-activated for now... 
+	 */
 	public void cleanUp() {
 		Iterator<Key> it = data.keySet().iterator();
 		while(it.hasNext()) {
 			Key key = it.next();
-			if(!key.exists()) {
+			if(false /*!key.exists()*/) {
 				it.remove();
 			}
 		}
