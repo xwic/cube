@@ -1,6 +1,15 @@
 Change Notes
 ============
 
+2009-07-02 jbornema
+	- FindUtil class for Cube browsing.
+	- Added log() method to Cube class.
+	- CubeFlexCalc support new autoCachePaths mode, using new class CachePath and CachePathDimensionDepth,
+	  to pre-cache new Key paths usage. The trigger to calculate the cache (method buildCacheForPaths) is invoked
+	  when total aggregation time of calcCellFromIndex and serialCalc calls exceeds last build cache time (1000 msec for first call).
+	  Property buildCacheForPathsTimeout can be assigned instead of last build cache time.
+	  Useful when cache statistics are not used or not applicable. 
+
 2009-06-18 kstein
 	- Added ICube.replace(ICube oldCube)
 	- Added DataPool.replaceCube(ICube oldCube, ICube newCube)
