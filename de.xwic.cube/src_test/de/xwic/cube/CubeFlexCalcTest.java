@@ -9,6 +9,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
+import de.xwic.cube.impl.CubeFlexCalc;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.cube.util.DataDump;
 
@@ -76,6 +77,9 @@ public class CubeFlexCalcTest extends TestCase {
 		
 		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.FLEX_CALC);
 		
+		CubeFlexCalc flexCube = (CubeFlexCalc)cube;
+		flexCube.setAutoCachePaths(true);
+		
 	}
 	
 	public void testCreateKey() {
@@ -136,7 +140,7 @@ public class CubeFlexCalcTest extends TestCase {
 		assertEquals(250.0, cube.getCellValue("[LOB:PS]", meBookings));
 		assertEquals(470.0, cube.getCellValue("", meBookings));
 
-		
+		buildCacheForPaths();
 	}
 	
 	public void testMeasureFunction() {
@@ -326,5 +330,15 @@ public class CubeFlexCalcTest extends TestCase {
 		assertEquals(4, keys.size());
 		
 		
-	}	
+	}
+	
+	protected void buildCacheForPaths() {
+		//String paths = "[Time:1][LOB:0]";
+		CubeFlexCalc flexCube = (CubeFlexCalc)cube;
+		flexCube.cache.clear();
+		flexCube.buildCacheForPaths();
+		assertEquals(220.0, cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
+		//Key key = flexCube.createKey("[*][*][2008]");
+		//CachedCell cc = flexCube.cache.get(key);
+	}
 }

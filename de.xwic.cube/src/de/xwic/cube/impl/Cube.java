@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICellListener;
@@ -44,6 +45,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	protected List<ICubeListener> cubeListeners = new ArrayList<ICubeListener>();
 	
 	protected boolean allowSplash = true;
+	private transient Logger log; 
 
 	/**
 	 * INTERNAL: This constructor is used by the serialization mechanism. 
@@ -666,7 +668,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	public String toString() {
 		return getKey() + " (Size:" + data.size() + ")";
 	}
-
+	
 	public void replace(ICube oldCube) {
 		if (this.dataPool != oldCube.getDataPool()) {
 			throw new IllegalArgumentException("Cubes do not share the same DataPool");
@@ -679,6 +681,15 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		dataPool.replaceCube(oldCube, this);
 		//clear oldCube, TODO make old cube invalid and throw exception when it is used
 		oldCube.clear();
-	}	
-	
+	}
+		
+	/**
+     * Return Logger.
+     */
+	protected Logger log() {
+		if (log == null || !log.getName().equals(getClass().getName())) {
+			log = Logger.getLogger(getClass().getName());
+		}
+		return log;
+	}
 }
