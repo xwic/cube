@@ -692,4 +692,14 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		}
 		return log;
 	}
+	
+	public void cleanUp() {
+		Iterator<Key> it = data.keySet().iterator();
+		while(it.hasNext()) {
+			Key key = it.next();
+			if(!key.exists()) {
+				it.remove();
+			}
+		}
+	}
 }

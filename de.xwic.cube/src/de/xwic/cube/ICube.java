@@ -230,4 +230,10 @@ public interface ICube extends IIdentifyable {
 	 * @param oldCube
 	 */
 	public void replace(ICube oldCube);
+	
+	/**
+	 * Removes dead elements. 
+	 */
+	public void cleanUp();
+	
 }
