@@ -820,12 +820,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		
 	}
 	
-	class DimensionInfo {
-		IDimension dimension;
-		Set<Integer> depths = new HashSet<Integer>();
-		int index;
-	}
-	
 	/**
 	 * Updates cache with newCachePaths identified in autoCachePaths mode.
 	 * When complete, CachePaths are moved to cachePaths set.
