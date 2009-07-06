@@ -1,7 +1,7 @@
 Change Notes
 ============
 
-2009-07-02 jbornema
+2009-07-06 jbornema
 	- Fixed bug in autoCachePaths mode where the first aggregated cells had been not removed form the cache and aggregated again
 
 2009-07-02 jbornema
