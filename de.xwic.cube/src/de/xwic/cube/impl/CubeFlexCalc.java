@@ -57,6 +57,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	private boolean autoCachePaths = false;
 	transient Set<CachePath> cachePaths;
 	transient Set<CachePath> newCachePaths;
+	transient Set<Key> newCacheKeys;
 	
 	transient int buildCacheForPathsTime = 0;
 	transient int buildCacheForPathsTimeout = 0;
@@ -360,12 +361,26 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 							}
 						}
 						
+						// measure time to calculate, used for autoCachePaths mode
+						long start = System.currentTimeMillis();
+						
 						if (key.getDimensionElement(0).getDepth() > 0 && rootIndex.size() > 0) {
 							// use indexed calculation
 							cc = calcCellFromIndex(key);
 						} else {
 							CachedCell[] cells = serialCalc(new Key[] { key.clone() });
 							cc = cells[0];
+						}
+						
+						// calculation finished
+						calcCellTime += (System.currentTimeMillis() - start);
+						
+						// remove the key for new buildCacheForPaths run
+						if (autoCachePaths) {
+							if (newCacheKeys == null) {
+								newCacheKeys = new HashSet<Key>();
+							}
+							newCacheKeys.add(key);
 						}
 					}
 				}
@@ -387,7 +402,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @return
 	 */
 	private CachedCell calcCellFromIndex(Key searchKey) {
-		long start = System.currentTimeMillis();
 		CachedCell cc = new CachedCell(null);
 		
 		Set<Key> keys = rootIndex.get(searchKey.getDimensionElement(0));
@@ -412,7 +426,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 				}
 			}
 		}
-		calcCellTime += (System.currentTimeMillis() - start);
 		return cc;
 	}
 
@@ -439,8 +452,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @return
 	 */
 	private CachedCell[] serialCalc(Key[] keys) {
-		
-		long start = System.currentTimeMillis();
 		
 		CachedCell[] cachedCells = new CachedCell[keys.length];
 		for (int i = 0; i < keys.length; i++) {
@@ -469,8 +480,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			
 		}
 		
-		calcCellTime += (System.currentTimeMillis() - start);
-
 		return cachedCells;
 		
 	}
@@ -828,9 +837,19 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			return;
 		}
 		
-		log.info("Build cache for " + newCachePaths.size() + " new paths: " + newCachePaths);
+		String cubeInfo = "Cube '" + getKey() + "': ";
+		
+		log.info(cubeInfo + "building cache for " + newCachePaths.size() + " new paths: " + newCachePaths);
 
 		long start = System.currentTimeMillis();
+		
+		// remove newCacheKeys from cache, so cells are not double aggregated
+		if (newCacheKeys != null) {
+			for (Key key : newCacheKeys) {
+				cache.remove(key);
+			}
+			newCacheKeys.clear();
+		}
 		
 		// iterate all raw (leaf) cells and calculate the paths
 		for(Entry<Key, Cell> entry: data.entrySet()) {
@@ -842,7 +861,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		// set new calculation time
 		calcCellTime = (int)(System.currentTimeMillis() - start);
 		
-		log.info("Build cache in " + calcCellTime + " msec. (total cache size: " + cache.size() + ")");
+		log.info(cubeInfo + "build cache finished in " + calcCellTime + " msec. (total cache size: " + cache.size() + ")");
 		
 		// move paths and clear newCachePaths
 		if (cachePaths == null) {
@@ -884,6 +903,10 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @param rawCell
 	 */
 	protected void cachePathCell(Key key, Cell rawCell) {
+		
+		CellAggregatedEvent event = new CellAggregatedEvent();
+		event.setCube(this);
+		
 		for (CachePath path : newCachePaths) {
 			Key k = path.makePathKey(key);
 			CachedCell cc = cache.get(k);
@@ -894,7 +917,12 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			// aggregate rawCell
 			aggregateCells(cc.cell, rawCell);
 			
-			// TODO throw event
+			// invoke ICubeListener
+			event.setChildKey(key);
+			event.setChildCell(rawCell);
+			event.setParentKey(k);
+			event.setParentCell(cc.cell);
+			onCellAggregated(event);
 		}		
 	}
 	
