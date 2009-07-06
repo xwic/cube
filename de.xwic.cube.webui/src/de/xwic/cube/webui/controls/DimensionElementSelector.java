@@ -37,8 +37,14 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	private IDimensionElement dimensionElement = null;
 	private List<IDimensionElement> flatList = new ArrayList<IDimensionElement>();
 	private boolean selectLeafsOnly = false;
+	private boolean showDimensionTitle = false;
 	
-	private List<ElementSelectedListener> listeners = new ArrayList<ElementSelectedListener>();
+	private List<ElementSelectedListener> listeners;
+	{
+		if (listeners == null) {
+			listeners = new ArrayList<ElementSelectedListener>();
+		}
+	}
 	private final IDimensionFilter filter;
 	
 	/**
@@ -101,6 +107,9 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 * @param listener
 	 */
 	public void addElementSelectedListener(ElementSelectedListener listener) {
+		if (listeners == null) {
+			listeners = new ArrayList<ElementSelectedListener>();
+		}
 		listeners.add(listener);
 	}
 	
@@ -292,6 +301,18 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 			dimensionElement = flatList.get(0);
 		}
 		
+	}
+	/**
+	 * @return the showDimensionTitle
+	 */
+	public boolean isShowDimensionTitle() {
+		return showDimensionTitle;
+	}
+	/**
+	 * @param showDimensionTitle the showDimensionTitle to set
+	 */
+	public void setShowDimensionTitle(boolean showDimensionTitle) {
+		this.showDimensionTitle = showDimensionTitle;
 	}
 
 }
