@@ -4,6 +4,7 @@
 #set($next = $control.next)
 <table cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl_${control.controlID}">
  <tr>
+  #if($control.showDimensionTitle)<td>#if($control.dimension.title)$control.dimension.title#else$control.dimension.key#end</td>#end
   <td width="22" valign="middle">
 #if($prev)
   	<a href="$control.createActionURL("prev", "")"><img title="$prev.key" src="$jwic.contextPath/xwiccube/images/resultset_previous.gif" border="0"></a>
