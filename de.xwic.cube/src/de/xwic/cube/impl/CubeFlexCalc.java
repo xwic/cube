@@ -54,7 +54,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	private boolean massUpdateMode = false;
 	private int maxCacheSize = 100000;
 	
-	private boolean autoCachePaths = false;
+	transient private boolean autoCachePaths = false;
 	transient Set<CachePath> cachePaths;
 	transient Set<CachePath> newCachePaths;
 	transient Set<Key> newCacheKeys;
