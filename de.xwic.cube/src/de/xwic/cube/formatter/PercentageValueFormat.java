@@ -22,7 +22,7 @@ public class PercentageValueFormat implements IValueFormat {
 	public PercentageValueFormat(Locale locale) {
 		nf = NumberFormat.getNumberInstance(locale);
 		nf.setMaximumFractionDigits(2);
-		nf.setMinimumFractionDigits(0);
+		nf.setMinimumFractionDigits(2);
 	}
 	
 	/* (non-Javadoc)
