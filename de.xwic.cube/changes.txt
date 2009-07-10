@@ -1,6 +1,11 @@
 Change Notes
 ============
 
+2009-07-10 jbornema
+	- CubeFlexCalc.externalizeCache property added, to externalize cache data
+	- CubeFlexCalc serialize version 4 added
+	- Fixes in autoCachePaths mode
+
 2009-07-06 jbornema
 	- Fixed bug in autoCachePaths mode where the first aggregated cells had been not removed form the cache and aggregated again
 
