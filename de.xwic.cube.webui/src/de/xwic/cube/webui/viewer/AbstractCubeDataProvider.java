@@ -32,15 +32,19 @@ public abstract class AbstractCubeDataProvider implements ICubeDataProvider {
 		
 		if (row != null) {
 			for (IDimensionElement elm : row.getElements()) {
-				int idx = cube.getDimensionIndex(elm.getDimension());
-				cursor.setDimensionElement(idx, elm);
+				if (cube.getDimensions().contains(elm.getDimension())) {
+					int idx = cube.getDimensionIndex(elm.getDimension());
+					cursor.setDimensionElement(idx, elm);
+				}
 			}
 		}
 		
 		if (col != null) {
 			for (IDimensionElement elm : col.getElements()) {
-				int idx = cube.getDimensionIndex(elm.getDimension());
-				cursor.setDimensionElement(idx, elm);
+				if (cube.getDimensions().contains(elm.getDimension())) {
+					int idx = cube.getDimensionIndex(elm.getDimension());
+					cursor.setDimensionElement(idx, elm);
+				}
 			}
 		}
 		

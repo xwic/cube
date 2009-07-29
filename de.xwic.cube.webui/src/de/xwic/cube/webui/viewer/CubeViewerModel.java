@@ -290,5 +290,12 @@ public class CubeViewerModel implements Serializable {
 	public void setBaseQuery(IQuery baseQuery) {
 		this.baseQuery = baseQuery;
 	}
+
+	/**
+	 * @return the locale
+	 */
+	public Locale getLocale() {
+		return locale;
+	}
 	
 }
