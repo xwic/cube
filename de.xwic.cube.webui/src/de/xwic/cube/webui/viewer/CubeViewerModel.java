@@ -5,6 +5,7 @@ package de.xwic.cube.webui.viewer;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -251,6 +252,14 @@ public class CubeViewerModel implements Serializable {
 		return element == null ? dimension : element;
 	}
 
+	/**
+	 * Returns all filters set.
+	 * @return
+	 */
+	public Collection<IDimensionElement> getFilterElements() {
+		return filter.values();
+	}
+	
 	/**
 	 * 
 	 */

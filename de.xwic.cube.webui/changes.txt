@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2009-08-03 FLI
+	- Added getFilterElements() to CubeModel.
+	
 2009-07-06 jbornema
 	- Added DimensionElementSelector.showDimensionTitle property that adds dimension
 	  titel when rendering
