@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2009-08-03 FLI
+	- Added TempMeasure helper class.
+
 2009-07-10 jbornema
 	- CubeFlexCalc.externalizeCache property added, to externalize cache data
 	- CubeFlexCalc serialize version 4 added
