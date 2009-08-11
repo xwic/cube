@@ -402,6 +402,24 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	}
 	
 	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#createKey(de.xwic.cube.Key)
+	 */
+	public Key createKey(Key foreignKey) {
+		Key newKey = createKey();
+		
+		for (IDimensionElement elm : foreignKey.getDimensionElements()) {
+			try {
+				int idx = getDimensionIndex(elm.getDimension());
+				newKey.setDimensionElement(idx, elm);
+			} catch (IllegalArgumentException iae) {
+				// do nothing -> the dimension does not exist and is skipped.
+			}
+		}
+		
+		return newKey;
+	}
+	
+	/* (non-Javadoc)
 	 * @see de.xwic.cube.ICube#createKey(java.lang.String)
 	 */
 	public Key createKey(String key) {
@@ -689,18 +707,5 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		dataPool.replaceCube(oldCube, this);
 		//clear oldCube, TODO make old cube invalid and throw exception when it is used
 		oldCube.clear();
-	}
-	
-	/**
-	 * jbornema: Key.exists() missing, de-activated for now... 
-	 */
-	public void cleanUp() {
-		Iterator<Key> it = data.keySet().iterator();
-		while(it.hasNext()) {
-			Key key = it.next();
-			if(false /*!key.exists()*/) {
-				it.remove();
-			}
-		}
 	}
 }
