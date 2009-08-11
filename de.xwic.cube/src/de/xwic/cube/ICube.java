@@ -49,6 +49,15 @@ public interface ICube extends IIdentifyable {
 	public abstract Key createKey(String key);
 	
 	/**
+	 * Create a Key from another Key object that has been created for another
+	 * Cube. The new Key will be pre-filled by all dimension elements that 
+	 * exist in the current cube. Non-existing dimensions are ignored.
+	 * @param foreignKey
+	 * @return
+	 */
+	public abstract Key createKey(Key foreignKey);
+	
+	/**
 	 * Create a new Key. 
 	 * @return
 	 */
@@ -230,10 +239,5 @@ public interface ICube extends IIdentifyable {
 	 * @param oldCube
 	 */
 	public void replace(ICube oldCube);
-	
-	/**
-	 * Removes dead elements. 
-	 */
-	public void cleanUp();
 	
 }

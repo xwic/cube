@@ -1,6 +1,10 @@
 Change Notes
 ============
 
+2009-08-11 FLI
+	- Removed cube.cleanUp() as it was not implemented.
+	- Added cube.createKey() method.
+
 2009-08-07 FLI
 	- Added LastLeafFunction
 	
