@@ -57,7 +57,7 @@ public class LastLeafFunction implements IMeasureFunction {
 		
 		IDimensionElement elm = key.getDimensionElement(dimIdx);
 		if (elm.isLeaf()) {
-			return cell.getValue(measureIdx);
+			return cell != null ? cell.getValue(measureIdx) : 0.0;
 		}
 		
 		// search the last leaf that has a value
@@ -91,8 +91,11 @@ public class LastLeafFunction implements IMeasureFunction {
 			IDimensionElement child = childs.get(i);
 			if (child.isLeaf()) {
 				searchKey.setDimensionElement(dimIdx, child);
-				Double value = cube.getCell(searchKey).getValue(measureIdx);
-				if (value != null) {
+				ICell cell = cube.getCell(searchKey);
+				Double value = cell != null ? cell.getValue(measureIdx) : null;
+				
+				//RPF: added second null check -> caused nullpointer on different views!
+				if (value != null && cube.getCell(key) != null) {
 					key.setDimensionElement(dimIdx, child);
 					result.value = cube.getCell(key).getValue(measureIdx);
 					result.found = true;

@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2009-08-13 RPF
+	- added another "null" check on class LastLeafFunction -> findLastLeaf(), caused Nullpointer in dashboard application
+
 2009-08-11 FLI
 	- Removed cube.cleanUp() as it was not implemented.
 	- Added cube.createKey() method.
