@@ -6,6 +6,8 @@ package de.xwic.cube.webui.controls;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +40,9 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	private List<IDimensionElement> flatList = new ArrayList<IDimensionElement>();
 	private boolean selectLeafsOnly = false;
 	private boolean showDimensionTitle = false;
+
+	private Comparator<IDimensionElement> sortComparator = null;
+
 	
 	private List<ElementSelectedListener> listeners;
 	{
@@ -269,6 +274,14 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 */
 	private void addData(JSONWriter jw, List<IDimensionElement> list) throws JSONException {
 		
+		if (sortComparator != null) {
+			// need to copy the list in order to modify it.
+			List<IDimensionElement> tempList = new ArrayList<IDimensionElement>();
+			tempList.addAll(list);
+			Collections.sort(tempList, sortComparator);
+			list = tempList;
+		}
+		
 		for (IDimensionElement child : list) {
 			if (filter == null || filter.accept(child)) {
 				jw.object();
@@ -313,6 +326,18 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 */
 	public void setShowDimensionTitle(boolean showDimensionTitle) {
 		this.showDimensionTitle = showDimensionTitle;
+	}
+	/**
+	 * @return the sortComparator
+	 */
+	public Comparator<IDimensionElement> getSortComparator() {
+		return sortComparator;
+	}
+	/**
+	 * @param sortComparator the sortComparator to set
+	 */
+	public void setSortComparator(Comparator<IDimensionElement> sortComparator) {
+		this.sortComparator = sortComparator;
 	}
 
 }
