@@ -3,16 +3,11 @@
  */
 package de.xwic.cube.xlsbridge;
 
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import de.xwic.cube.ICube;
-import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
@@ -28,16 +23,6 @@ import de.xwic.cube.Key;
 public class XCValueFunction extends AbstractFunction {
 
 	public final static String FUNCTION_NAME = "xcValue";
-
-	/**
-	 * @param config
-	 * @param workbook
-	 * @param log
-	 * @param dataPool 
-	 */
-	public XCValueFunction(Properties config, HSSFWorkbook workbook, ISimpleLog log, IDataPool dataPool, List<IDimensionElement> filters) {
-		super(config, workbook, log, dataPool, filters);
-	}
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.xlsbridge.AbstractFunction#executeFunction(java.util.List, org.apache.poi.hssf.usermodel.HSSFSheet, org.apache.poi.hssf.usermodel.HSSFRow, org.apache.poi.hssf.usermodel.HSSFCell)

@@ -12,10 +12,10 @@ import java.util.List;
  */
 public class Match {
 
-	String functionName = null;
-	List<String> args = new ArrayList<String>();
+	public String functionName = null;
+	public List<String> args = new ArrayList<String>();
 	
-	String prefix = null;
-	String suffix = "";
+	public String prefix = null;
+	public String suffix = "";
 	
 }

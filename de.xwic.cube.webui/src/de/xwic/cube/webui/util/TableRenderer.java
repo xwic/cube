@@ -27,6 +27,9 @@ public class TableRenderer {
 	private String cssClass = "";
 	
 	private boolean enableJSHoverMode = false;
+
+	private int rowCount;
+	private int colCount;
 	
 	public TableRenderer() {
 		super();
@@ -95,6 +98,9 @@ public class TableRenderer {
 	 * @param j
 	 */
 	public void initSize(int rowCount, int colCount) {
+		
+		this.rowCount = rowCount;
+		this.colCount = colCount;
 		
 		rows.clear();
 		rowData.clear();
@@ -209,6 +215,20 @@ public class TableRenderer {
 	 */
 	public void setEnableJSHoverMode(boolean enableJSHoverMode) {
 		this.enableJSHoverMode = enableJSHoverMode;
+	}
+
+	/**
+	 * @return the rowCount
+	 */
+	public int getRowCount() {
+		return rowCount;
+	}
+
+	/**
+	 * @return the colCount
+	 */
+	public int getColCount() {
+		return colCount;
 	}
 	
 }
