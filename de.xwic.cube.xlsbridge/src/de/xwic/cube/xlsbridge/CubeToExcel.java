@@ -6,9 +6,9 @@ package de.xwic.cube.xlsbridge;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -35,7 +35,7 @@ public class CubeToExcel implements ISimpleLog {
 	private Properties config = new Properties();
 
 	private Map<String, AbstractFunction> functions = new HashMap<String, AbstractFunction>();
-	private List<IDimensionElement> filters = new ArrayList<IDimensionElement>();
+	private Collection<IDimensionElement> filters = new ArrayList<IDimensionElement>();
 	
 	/**
 	 * Construct a new instance.
@@ -43,6 +43,21 @@ public class CubeToExcel implements ISimpleLog {
 	 */
 	public CubeToExcel(IDataPool dataPool) {
 		this.dataPool = dataPool;
+		
+		functions.put(XCValueFunction.FUNCTION_NAME, new XCValueFunction());
+		functions.put(FilterInfoFunction.FUNCTION_NAME, new FilterInfoFunction());
+		functions.put(SetConfigFunction.FUNCTION_NAME, new SetConfigFunction());
+		
+	}
+	
+	/**
+	 * Add a custom function.
+	 * @param name
+	 * @param function
+	 */
+	public void addFunction(String name, AbstractFunction function) {
+		
+		functions.put(name, function);
 		
 	}
 
@@ -61,10 +76,10 @@ public class CubeToExcel implements ISimpleLog {
 		readConfig();
 		
 		// initialize functions.
-		functions.clear();
-		functions.put(XCValueFunction.FUNCTION_NAME, new XCValueFunction(config, wb, this, dataPool, filters));
-		functions.put(FilterInfoFunction.FUNCTION_NAME, new FilterInfoFunction(config, wb, this, dataPool, filters));
-		functions.put(SetConfigFunction.FUNCTION_NAME, new SetConfigFunction(config, wb, this, dataPool, filters));
+		
+		for (AbstractFunction function : functions.values()) {
+			function.initialize(this, dataPool, config, wb, filters);
+		}
 		
 		// process all sheets
 		int num = wb.getNumberOfSheets();
@@ -85,9 +100,7 @@ public class CubeToExcel implements ISimpleLog {
 	 */
 	private void fillSheet(HSSFSheet sheet) {
 
-		int lastRow = sheet.getLastRowNum();
-
-		for (int i = 0; i <= lastRow; i++) {
+		for (int i = 0; i <= sheet.getLastRowNum(); i++) {
 			
 			HSSFRow row = sheet.getRow(i);
 			if (row != null) {
@@ -99,9 +112,10 @@ public class CubeToExcel implements ISimpleLog {
 							
 							String formula = cell.getCellFormula();
 							
-							log(formula);
 							if (formula != null) {
 								
+								log(formula);
+								String oldFormula = formula;
 								Match match = getFunctionArgs(formula);
 								while (match != null) {
 									//log("Identified function: " + args.get(0));
@@ -113,6 +127,10 @@ public class CubeToExcel implements ISimpleLog {
 									}
 									formula = cell.getCellFormula();
 									match = getFunctionArgs(formula);
+									if (oldFormula.equals(formula)) { // nothing was changed -> exit
+										break;
+									}
+									oldFormula = formula;
 								}
 								
 							}
@@ -272,14 +290,14 @@ public class CubeToExcel implements ISimpleLog {
 	/**
 	 * @return the filters
 	 */
-	public List<IDimensionElement> getFilters() {
+	public Collection<IDimensionElement> getFilters() {
 		return filters;
 	}
 
 	/**
 	 * @param filters the filters to set
 	 */
-	public void setFilters(List<IDimensionElement> filters) {
+	public void setFilters(Collection<IDimensionElement> filters) {
 		this.filters = filters;
 	}
 	

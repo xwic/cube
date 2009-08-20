@@ -127,7 +127,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	/**
 	 * @return
 	 */
-	private TableRenderer renderTable() {
+	public TableRenderer renderTable() {
 		TableRenderer tbl = new TableRenderer(this);
 		tbl.setCssClass("xcube-tbl");
 		
