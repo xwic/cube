@@ -28,7 +28,7 @@ import de.xwic.cube.Key;
  */
 public class CubeViewerModel implements Serializable {
 
-	private enum EventType { FILTER_UPDATE, CUBE_UPDATED, CELL_SELECTION }; 
+	private enum EventType { FILTER_UPDATE, CUBE_UPDATED, CELL_SELECTION, NODE_EXPAND, NODE_COLLAPSE }; 
 	private ICube cube = null;
 
 	protected IMeasure measure = null;
@@ -89,6 +89,12 @@ public class CubeViewerModel implements Serializable {
 				break;
 			case CELL_SELECTION:
 				listener.cellSelected(event);
+				break;
+			case NODE_COLLAPSE:
+				listener.nodeCollapse(event);
+				break;
+			case NODE_EXPAND:
+				listener.nodeExpand(event);
 				break;
 			}
 		}
@@ -221,6 +227,7 @@ public class CubeViewerModel implements Serializable {
 	 */
 	public void expand(String elementId) {
 		expandedElements.add(elementId);
+		fireEvent(EventType.NODE_EXPAND, new CubeViewerModelEvent(this, elementId));
 	}
 
 	/**
@@ -229,6 +236,7 @@ public class CubeViewerModel implements Serializable {
 	 */
 	public void collapse(String elementId) {
 		expandedElements.remove(elementId);
+		fireEvent(EventType.NODE_COLLAPSE, new CubeViewerModelEvent(this, elementId));
 	}
 
 
