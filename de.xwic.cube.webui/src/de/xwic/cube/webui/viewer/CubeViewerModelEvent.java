@@ -13,14 +13,26 @@ public class CubeViewerModelEvent {
 	private Object source;
 	private Key selectionKey = null;
 	private String[] selectionArguments = null;
+	private String elementId;
+
+	
+	
+	/**
+	 * @param source
+	 * @param elementId
+	 */
+	public CubeViewerModelEvent(Object source, String elementId) {
+		super();
+		this.source = source;
+		this.elementId = elementId;
+	}
 
 	/**
 	 * @param source
 	 * @param selectionKey
 	 * @param selectionArguments
 	 */
-	public CubeViewerModelEvent(Object source, Key selectionKey,
-			String[] selectionArguments) {
+	public CubeViewerModelEvent(Object source, Key selectionKey, String[] selectionArguments) {
 		super();
 		this.source = source;
 		this.selectionKey = selectionKey;
@@ -54,6 +66,13 @@ public class CubeViewerModelEvent {
 	 */
 	public String[] getSelectionArguments() {
 		return selectionArguments;
+	}
+
+	/**
+	 * @return the elementId
+	 */
+	public String getElementId() {
+		return elementId;
 	}
 
 }

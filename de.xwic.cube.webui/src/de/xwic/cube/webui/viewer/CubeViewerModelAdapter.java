@@ -29,4 +29,19 @@ public abstract class CubeViewerModelAdapter implements ICubeViewerModelListener
 	public void cellSelected(CubeViewerModelEvent event) {
 				
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.webui.viewer.ICubeViewerModelListener#nodeCollapse(de.xwic.cube.webui.viewer.CubeViewerModelEvent)
+	 */
+	public void nodeCollapse(CubeViewerModelEvent event) {
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.webui.viewer.ICubeViewerModelListener#nodeExpand(de.xwic.cube.webui.viewer.CubeViewerModelEvent)
+	 */
+	public void nodeExpand(CubeViewerModelEvent event) {
+		
+	}
+	
 }
