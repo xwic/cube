@@ -76,17 +76,30 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 			throw new NullPointerException("Dimension must not be null");
 		}
 		
+		loadData();
+		
+	}
+	
+	public void loadData() {
+		flatList.clear();
+		
 		if (dimension.isLeaf()) {
 			dimensionElement = dimension;
 			flatList.add(dimension);
  		} else {
  			addLeafs(dimension, filter);
- 			if (flatList.size() > 0) {
- 				dimensionElement = flatList.get(0);
+ 			
+ 			if (dimensionElement == null || !flatList.contains(dimensionElement)) {
+	 			if (flatList.size() > 0) {
+	 				dimensionElement = flatList.get(0);
+	 				fireEvent(new ElementSelectedEvent(this, dimensionElement));
+	 			} else {
+	 				dimensionElement = dimension;
+	 			}
  			}
  		}
-		
 	}
+	
 	/**
 	 * @param filter 
 	 * @param dimension
