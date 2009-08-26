@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2009-08-26 RPF
+	- Added "ValueFormat from Measure first" priority in DefaultDimensionDataProvider.
+	  If there is none, the ValueFormat from the model is taken instead
+
 2009-08-03 FLI
 	- Added getFilterElements() to CubeModel.
 	

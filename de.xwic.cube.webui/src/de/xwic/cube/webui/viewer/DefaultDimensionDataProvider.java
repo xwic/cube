@@ -7,6 +7,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.IQuery;
+import de.xwic.cube.IValueFormat;
 import de.xwic.cube.Key;
 
 /**
@@ -25,6 +26,7 @@ public class DefaultDimensionDataProvider extends AbstractCubeDataProvider imple
 		ICube cube = model.getCube();
 		Key cursor = createCursor(model, row, col);
 		IMeasure measure = fixedMeasure != null ? fixedMeasure : model.getMeasure();
+		
 		Double value = null;
 		if (model.getBaseQuery() == null) {
 			// default value retrieval
@@ -37,7 +39,11 @@ public class DefaultDimensionDataProvider extends AbstractCubeDataProvider imple
 			}
 			value = cube.getCellValue(query, measure);
 		}
-		return value != null ? model.getValueFormat().format(value) : "";
+		
+		//check measure format provider first!
+		IValueFormat format = measure.getValueFormatProvider() != null ? measure.getValueFormatProvider().createValueFormat(model.getLocale()) : model.getValueFormat();
+		
+		return value != null ? format.format(value) : "";
 	}
 
 	/**
