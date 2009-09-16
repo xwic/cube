@@ -27,6 +27,8 @@ import de.xwic.cube.event.CellAggregatedEvent;
 import de.xwic.cube.event.CellValueChangedEvent;
 
 /**
+ * IMeasureLoader that ensures for given measure the data set/retrieved from its bottom leaf and no sum aggregation takes place.
+ * This is required when values contains the current situation for a time, e.g. a companies wallet for May, June and July should not be aggregated to Q1.
  * Created on Apr 22, 2009
  * @author JBORNEMA
  */
