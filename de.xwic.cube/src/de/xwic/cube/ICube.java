@@ -33,6 +33,18 @@ public interface ICube extends IIdentifyable {
 	public abstract void remove();
 
 	/**
+	 * Create a Key from a list of dimension elements. Each specified element is placed into the key
+	 * at its designated position. If a element is specified that is not used in the cube, an exception 
+	 * is thrown.
+	 * The elements do not have to be in a special order nor do you need to specify all elements used 
+	 * in that cube.
+	 *  
+	 * @param elements
+	 * @return
+	 */
+	public abstract Key createKey(IDimensionElement... elements);
+	
+	/**
 	 * Create a Key from a string notation. The key string must contain a [] pair for
 	 * each dimension in the cube. If the dimension key is not present in the key pair, 
 	 * the dimension at the index position is assumed.
