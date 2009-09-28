@@ -57,7 +57,7 @@ public class LastLeafFunction implements IMeasureFunction {
 		
 		IDimensionElement elm = key.getDimensionElement(dimIdx);
 		if (elm.isLeaf()) {
-			return cell != null ? cell.getValue(measureIdx) : 0.0;
+			return cell != null ? cell.getValue(measureIdx) : null;
 		}
 		
 		// search the last leaf that has a value

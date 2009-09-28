@@ -1,6 +1,10 @@
 Change Notes
 ============
 
+2009-09-28 FLI
+	- LastLeafFunction no longer returns 0.0 if no element is available at all.
+	- Added ICube.createKey(IDimensionElement...)
+
 2009-08-13 RPF
 	- added another "null" check on class LastLeafFunction -> findLastLeaf(), caused Nullpointer in dashboard application
 

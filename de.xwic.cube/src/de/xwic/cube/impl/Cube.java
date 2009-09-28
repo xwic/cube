@@ -402,6 +402,18 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	}
 	
 	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#createKey(de.xwic.cube.IDimensionElement[])
+	 */
+	public Key createKey(IDimensionElement... elements) {
+		Key key = createKey();
+		for (IDimensionElement elm : elements) {
+			int idx = getDimensionIndex(elm.getDimension());
+			key.setDimensionElement(idx, elm);
+		}
+		return key;
+	}
+	
+	/* (non-Javadoc)
 	 * @see de.xwic.cube.ICube#createKey(de.xwic.cube.Key)
 	 */
 	public Key createKey(Key foreignKey) {
