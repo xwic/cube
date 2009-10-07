@@ -3,6 +3,9 @@
  */
 package de.xwic.cube;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +19,7 @@ import java.util.List;
 public class Key implements Serializable {
 
 	private static final long serialVersionUID = -3558184977558178383L;
-	private IDimensionElement[] elementKeys;
+	protected IDimensionElement[] elementKeys;
 	protected transient int hashCode = 0; 
 	
 	/**
@@ -25,6 +28,14 @@ public class Key implements Serializable {
 	public Key(IDimensionElement[] elementKeys) {
 		super();
 		this.elementKeys = elementKeys;
+	}
+	
+	/**
+	 * @param key
+	 */
+	public Key(Key key) {
+		elementKeys = new IDimensionElement[key.elementKeys.length];
+		System.arraycopy(key.elementKeys, 0, elementKeys, 0, key.elementKeys.length);
 	}
 	
 	/* (non-Javadoc)
@@ -141,7 +152,7 @@ public class Key implements Serializable {
 	 */
 	public boolean isSubKey(Key key) {
 		for (int i = 0; i < elementKeys.length; i++) {
-			if (!(elementKeys[i].equals(key.elementKeys[i]) || elementKeys[i].isChild(key.elementKeys[i]))) {
+			if (!isSubKeyElement(key, i)) {
 				return false;
 			}
 		}
@@ -163,5 +174,40 @@ public class Key implements Serializable {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Returns true if the element at idx matches, invoked by @see isSubeKey(Key)
+	 * @param key
+	 * @param idx
+	 * @return
+	 */
+	public boolean isSubKeyElement(Key key, int idx) {
+		return elementKeys[idx].equals(key.elementKeys[idx]) || elementKeys[idx].isChild(key.elementKeys[idx]);
+	}
+
+	/**
+	 * Writes the object to the ObjectOutput
+	 * @param out
+	 * @throws IOException 
+	 */
+	public void writeObject(ObjectOutput out) throws IOException {
+		for (IDimensionElement elm : elementKeys) {
+			out.writeObject(elm);
+		}
+	}
+
+	/**
+	 * Reads the object data from the ObjectInput
+	 * @param in
+	 * @param dimSize
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 */
+	public void readObject(ObjectInput in, int dimSize) throws ClassNotFoundException, IOException {
+		elementKeys = new IDimensionElement[dimSize];
+		for (int dIdx = 0; dIdx < dimSize; dIdx++) {
+			elementKeys[dIdx] = (IDimensionElement)in.readObject();
+		}
 	}
 }

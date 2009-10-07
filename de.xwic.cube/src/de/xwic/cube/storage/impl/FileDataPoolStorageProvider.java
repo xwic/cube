@@ -11,9 +11,16 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDataPoolStorageProvider;
@@ -27,6 +34,7 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 
 	private static Logger log = Logger.getLogger(FileDataPoolStorageProvider.class.getName());
 	private File dataDir;
+	private boolean zipDataPool = false;
 	
 	/**
 	 * @param dataDir
@@ -42,7 +50,8 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 	public boolean containsDataPool(String key) throws StorageException {
 		String filename = key + ".datapool";
 		File file = new File(dataDir, filename);
-		return file.exists();
+		File zipFile = new File(dataDir, filename + ".zip");
+		return file.exists() || zipFile.exists();
 	}
 
 	/* (non-Javadoc)
@@ -51,16 +60,21 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 	public List<String> listDataPools() throws StorageException {
 		File[] files = dataDir.listFiles(new FilenameFilter() {
 			public boolean accept(File dir, String filename) {
-				return filename.toLowerCase().endsWith(".datapool");
+				return filename.toLowerCase().endsWith(".datapool") || filename.toLowerCase().endsWith(".datapool.zip");
 			}
 		});
-		List<String> keys = new ArrayList<String>();
+		Set<String> keys = new LinkedHashSet<String>();
 		for (File f : files) {
 			String name = f.getName();
-			name = name.substring(0, name.length() - ".datapool".length());
+			boolean zipped = name.toLowerCase().endsWith(".zip");
+			if (zipped) {
+				name = name.substring(0, name.length() - ".datapool.zip".length());
+			} else {
+				name = name.substring(0, name.length() - ".datapool".length());
+			}
 			keys.add(name);
 		}
-		return keys;
+		return new ArrayList<String>(keys);
 	}
 
 	/* (non-Javadoc)
@@ -71,17 +85,38 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 		try {
 			String filename = key + ".datapool";
 			File file = new File(dataDir, filename);
-			if (!file.exists()) {
+			File zipFile = new File(dataDir, filename + ".zip");
+			
+			if (!file.exists() && !zipFile.exists()) {
 				throw new IllegalArgumentException("A datapool with the key " + key + " does not exist.");
 			}
-			FileInputStream fis = new FileInputStream(file);
-			BufferedInputStream bip = new BufferedInputStream(fis);
-			ObjectInputStream ois = new ObjectInputStream(bip);
-	
+			
+			ObjectInputStream ois = null;
+			if (file.exists()) {
+				// open default data pool
+				FileInputStream fis = new FileInputStream(file);
+				BufferedInputStream bip = new BufferedInputStream(fis);
+				ois = new ObjectInputStream(bip);
+			} else {
+				// open zipped data pool
+				ZipFile zip = new ZipFile(zipFile);
+				for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
+					ZipEntry entry = entries.nextElement();
+					if (entry.getName().toLowerCase().endsWith(".datapool")) {
+						// use first data pool found
+						ois = new ObjectInputStream(new BufferedInputStream(zip.getInputStream(entry)));
+						break;
+					}
+				}
+				// ensure zip flag is set
+				zipDataPool = true;
+				if (ois == null) {
+					throw new IllegalArgumentException("A datapool with the key " + key + " not found in " + zipFile);
+				}
+			}
+				
 			IDataPool pool = (IDataPool) ois.readObject();
 			ois.close();
-			bip.close();
-			fis.close();
 			return pool;
 		} catch (Exception e) {
 			throw new StorageException("Error loading DataPool " + key + ": " + e, e);
@@ -95,10 +130,25 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 		
 		try {
 			String filename = dataPool.getKey() + ".datapool";
+			String originalFilename = filename;
+			if (zipDataPool) {
+				filename += ".zip";
+			}
 			log.info("Saving DataPool " + filename + " with cubes " + dataPool.getCubes() + "...");
 			FileOutputStream fos = new FileOutputStream(new File(dataDir, filename));
 			BufferedOutputStream bufOut = new BufferedOutputStream(fos);
-			ObjectOutputStream oos = new ObjectOutputStream(bufOut);
+			OutputStream os = bufOut;
+			
+			if (zipDataPool) {
+				// zip data pool
+				ZipEntry zipEntry = new ZipEntry(originalFilename);
+				//zipEntry.setTime(System.currentTimeMillis());
+				ZipOutputStream zos = new ZipOutputStream(bufOut);
+				zos.putNextEntry(zipEntry);
+				os = zos;
+			}
+			
+			ObjectOutputStream oos = new ObjectOutputStream(os);
 	
 			oos.writeObject(dataPool);
 			

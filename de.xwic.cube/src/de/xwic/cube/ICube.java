@@ -7,6 +7,8 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 
+import de.xwic.cube.IDataPool.CubeType;
+
 /**
  * The cube contains a data structure based on a fixed number of dimensions. Data can 
  * be added into the cube, where they are automatically aggregated.
@@ -251,5 +253,20 @@ public interface ICube extends IIdentifyable {
 	 * @param oldCube
 	 */
 	public void replace(ICube oldCube);
+
+	/**
+	 * @return the allowSplash
+	 */
+	public boolean isAllowSplash();
+
+	/**
+	 * @param allowSplash the allowSplash to set
+	 */
+	public void setAllowSplash(boolean allowSplash);
 	
+	/**
+	 * Returns the CubeType defined in IDataPool.
+	 * @return
+	 */
+	public CubeType getCubeType();
 }
