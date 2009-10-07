@@ -95,10 +95,13 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 		if (cubeMap.containsKey(key)) {
 			throw new IllegalArgumentException("A cube with that key already exists: " + key);
 		}
-		Cube newCube;
+		ICube newCube;
 		switch (type) {
 		case FLEX_CALC:
 			newCube = new CubeFlexCalc(this, key, dimensions, measures);
+			break;
+		case PRE_CACHE:
+			newCube = new CubePreCache(this, key, dimensions, measures);
 			break;
 		default:
 			newCube = new Cube(this, key, dimensions, measures);

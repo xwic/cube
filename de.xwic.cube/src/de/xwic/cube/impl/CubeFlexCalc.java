@@ -33,8 +33,10 @@ import de.xwic.cube.ICubeCacheControl;
 import de.xwic.cube.ICubeListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
+import de.xwic.cube.IDimensionResolver;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
+import de.xwic.cube.IDataPool.CubeType;
 import de.xwic.cube.event.CellAggregatedEvent;
 import de.xwic.cube.event.CellValueChangedEvent;
 
@@ -48,29 +50,21 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 
 	private static final long serialVersionUID = 1L;
 	
-	public Map<Key, CachedCell> cache = new HashMap<Key, CachedCell>();
-	private Map<IDimensionElement, Set<Key>> rootIndex = new HashMap<IDimensionElement, Set<Key>>();
+	protected Map<Key, CachedCell> cache = new HashMap<Key, CachedCell>();
+	protected Map<IDimensionElement, Set<Key>> rootIndex = new HashMap<IDimensionElement, Set<Key>>();
 
-	private boolean massUpdateMode = false;
-	private int maxCacheSize = 100000;
+	protected boolean massUpdateMode = false;
+	protected int maxCacheSize = 100000;
 	
-	private boolean autoCachePaths = false;
-	private boolean externalizeCache = true;
-	private Set<CachePath> cachePaths = new HashSet<CachePath>();
-	private Set<CachePath> newCachePaths = new HashSet<CachePath>();
-	private Set<Key> newCacheKeys = new HashSet<Key>();
-	private Set<CachePathCellAggregatedEvent> newCachePathCellAggregatedEvents = new HashSet<CachePathCellAggregatedEvent>();
+	protected boolean externalizeCache = true;
 
-	transient boolean buildCacheForPaths = false;
-	transient boolean buildCacheForPathsAgain = false;
-	transient int buildCacheForPathsTime = 0;
-	transient int buildCacheForPathsTimeout = 0;
-	transient int calcCellTime = 0;
-
+	protected transient int calcCellTime = 0;
+	
 	// Commons log
+	@SuppressWarnings("unused")
 	private transient Log log;
 	{
-		log = LogFactory.getLog(getClass());
+		log = LogFactory.getLog(CubeFlexCalc.class);
 	}
 
 	/**
@@ -200,6 +194,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 				}
 				key.setDimensionElement(dimensionDepth.dimensionIndex, element);
 			}
+			dimensionResolver.adjustKey(key, rawKey);
 			return key;
 		}
 	}
@@ -266,7 +261,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append('[').append(new ArrayList<IDimension>(dimensionMap.values()).get(dimensionIndex));
-			sb.append(":{").append(depth).append(']');
+			sb.append("/").append(depth).append(']');
 			return sb.toString();
 		}
 
@@ -349,35 +344,23 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		} else {
 			// create cell
 			synchronized (this) { // must sync, otherwise the cache might get damaged
-				if (false) {
+				boolean f = false;
+				if (f) {
+					// TODO Can this be removed?
 					Cell cell = new Cell(measureMap.size());
 					boolean hasData = calcCell(0, key.clone(), cell);
 					result = hasData ? cell : null;
 					
 				} else {
 					// check if it is cached, if autoCachePaths is on unknownCachePaths is filled
-					if (autoCachePaths && isCachedPath(key)) {
+					if (isCachedKey(key)) {
 						// it is a cached path but not in the cache, so not available
 						// don't cache empty CachedCell
 					} else {
 
-						if (autoCachePaths) {
-							int timeout = buildCacheForPathsTimeout;
-							if (timeout == 0 || timeout < buildCacheForPathsTime) {
-								// use last buildCache time
-								timeout = buildCacheForPathsTime;
-							}
-							if (timeout == 0) {
-								// initial default timeout set to 1000 msec
-								timeout = 1000;
-							}
-							if (calcCellTime >= timeout) {
-								calcCellTime = 0;
-								// build new cache from scratch
-								buildCacheForPaths();
-								// recursive call to getCell() should NOT end in an infinite loop!
-								return getCell(key, createNew);
-							}
+						Cell cachedCell = probeCachedCell(key, createNew);
+						if (cachedCell != null) {
+							return cachedCell;
 						}
 						
 						// measure time to calculate, used for autoCachePaths mode
@@ -395,12 +378,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 						calcCellTime += (System.currentTimeMillis() - start);
 						
 						// remove the key for new buildCacheForPaths run
-						if (autoCachePaths) {
-							if (newCacheKeys == null) {
-								newCacheKeys = new HashSet<Key>();
-							}
-							newCacheKeys.add(key.clone());
-						}
+						addNewCachedKey(key);
 					}
 				}
 				if (cc != null) {
@@ -416,6 +394,17 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		return result;
 	}
 	
+	protected void addNewCachedKey(Key key) {
+	}
+
+	protected Cell probeCachedCell(Key key, boolean createNew) {
+		return null;
+	}
+
+	protected boolean isCachedKey(Key key) {
+		return false;
+	}
+
 	/**
 	 * @param key
 	 * @return
@@ -427,7 +416,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		if (keys != null) {
 			CellAggregatedEvent event = new CellAggregatedEvent(this, null, null, searchKey, null);
 			for (Key key : keys) {
-				if (searchKey.isSubKey(key)) {
+				if (dimensionResolver.isSubKey(searchKey, key)) {
 					cc.leafCount++;
 					Cell rawCell = data.get(key);
 					if (rawCell != null) {
@@ -453,7 +442,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @param cell
 	 * @param valueCell
 	 */
-	private void aggregateCells(Cell cell, Cell valueCell) {
+	protected void aggregateCells(Cell cell, Cell valueCell) {
 		for (int m = 0; m < valueCell.values.length; m++) {
 			if (valueCell.values[m] != null) {
 				if (cell.values[m] == null) {
@@ -481,15 +470,16 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		for(Entry<Key, Cell> entry: data.entrySet()) {
 		
 			Cell rawCell = entry.getValue();
+			Key rawKey = entry.getKey();
 			for (int i = 0; i < keys.length; i++) {
-				if (keys[i].isSubKey(entry.getKey())) {
+				if (dimensionResolver.isSubKey(keys[i], rawKey)) {
 					cachedCells[i].leafCount++;
 					if (cachedCells[i].cell == null) {
 						cachedCells[i].cell = new Cell(measureMap.size());
 					}
 					aggregateCells(cachedCells[i].cell, rawCell);
 					// invoke ICubeListener
-					event.setChildKey(entry.getKey());
+					event.setChildKey(rawKey);
 					event.setChildCell(rawCell);
 					event.setParentKey(keys[i]);
 					event.setParentCell(cachedCells[i].cell);
@@ -561,8 +551,8 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			ClassNotFoundException {
 
 		int version = in.readInt();
-		if (version < 1 || version > 4) {
-			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected 1..4");
+		if (version < 1 || version > 5) {
+			throw new IOException("Cannot deserialize cube -> data file version is " + version + ", but expected 1..5");
 		}
 		key = (String) in.readObject();
 		title = (String) in.readObject();
@@ -575,41 +565,52 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			cubeListeners = (List<ICubeListener>)in.readObject();
 		}
 		
-		// read data
-		int size = in.readInt();
-		int dimSize = dimensionMap.size();
+		if (version > 4) {
+			dimensionResolver = (IDimensionResolver)in.readObject();
+			serializeData = in.readBoolean();
+		}
 		
-		data = new HashMap<Key, Cell>(size);
-		for (int i = 0; i < size; i++) {
-			IDimensionElement[] keyElements = new IDimensionElement[dimSize];
-			for (int dIdx = 0; dIdx < dimSize; dIdx++) {
-				keyElements[dIdx] = (IDimensionElement)in.readObject();
+		// read data
+		if (!serializeData) {
+			// optimized data read
+			int size = in.readInt();
+			int dimSize = dimensionMap.size();
+			
+			data = newHashMap(size);
+			for (int i = 0; i < size; i++) {
+				Key key = createNewKey(null);
+				key.readObject(in, dimSize);
+				Cell cell = (Cell)in.readObject();
+				data.put(key, cell);
 			}
-			Key key = new Key(keyElements);
-			Cell cell = (Cell)in.readObject();
-			data.put(key, cell);
+		} else {
+			// customer Key implementation
+			data = (Map<Key, Cell>)in.readObject();
 		}
 		
 		if (version > 3) {
 			externalizeCache = in.readBoolean();
-			// read cache paths settings
-			autoCachePaths = in.readBoolean();
-			if (autoCachePaths && externalizeCache) {
-				cachePaths = (HashSet<CachePath>)in.readObject();
-				newCachePaths = (HashSet<CachePath>)in.readObject();
-				newCacheKeys = (HashSet<Key>)in.readObject();
+			
+			// moved to CubePreCache implementation
+			if (version < 5) {
+				// read cache paths settings
+				boolean autoCachePaths = in.readBoolean();
+				if (autoCachePaths && externalizeCache) {
+					in.readObject(); // cachePaths = (HashSet<CachePath>) 
+					in.readObject(); // newCachePaths = (HashSet<CachePath>) 
+					in.readObject(); // newCacheKeys = (HashSet<Key>)
+				}
 			}
 		}
 
-		if (version > 1 && externalizeCache) {
-			size = in.readInt();
+		// read cache
+		if (externalizeCache) {
+			int size = in.readInt();
+			int dimSize = dimensionMap.size();
 			cache = new HashMap<Key, CachedCell>(size);
 			for (int i = 0; i < size; i++) {
-				IDimensionElement[] keyElements = new IDimensionElement[dimSize];
-				for (int dIdx = 0; dIdx < dimSize; dIdx++) {
-					keyElements[dIdx] = (IDimensionElement)in.readObject();
-				}
-				Key key = new Key(keyElements);
+				Key key = createNewKey(null);
+				key.readObject(in, dimSize);
 				CachedCell cell = (CachedCell)in.readObject();
 				cache.put(key, cell);
 			}
@@ -645,7 +646,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * Build an index for all elements of the first defined dimension.
 	 * 
 	 */
-	private void buildIndex() {
+	protected void buildIndex() {
 		
 		rootIndex.clear();
 		for(Entry<Key, Cell> entry: data.entrySet()) {
@@ -671,7 +672,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	public void writeExternal(ObjectOutput out) throws IOException {
 
 		// serialize -> write the cube data.
-		int version = 4;
+		int version = 5;
 		out.writeInt(version); // version number
 		out.writeObject(key);
 		out.writeObject(title);
@@ -680,29 +681,30 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		out.writeObject(dimensionMap);
 		out.writeObject(measureMap);
 		out.writeObject(cubeListeners);
+		out.writeObject(dimensionResolver);
+		
+		// data serialization mode
+		out.writeBoolean(serializeData);
 		
 		// write data...
-		out.writeInt(data.size());
-		for(Entry<Key, Cell> entry: data.entrySet()) {
-			
-			for (IDimensionElement elm : entry.getKey().getDimensionElements()) {
-				out.writeObject(elm);
+		if (!serializeData) {
+			// default, optimized data serialization
+			out.writeInt(data.size());
+			for(Entry<Key, Cell> entry: data.entrySet()) {
+				
+				for (IDimensionElement elm : entry.getKey().getDimensionElements()) {
+					out.writeObject(elm);
+				}
+				out.writeObject(entry.getValue());
 			}
-			out.writeObject(entry.getValue());
-			
+		} else {
+			// customer Key implementation used, serialize data
+			out.writeObject(data);
 		}
 	
 		// save cache
 		out.writeBoolean(externalizeCache);
 
-		// write cache paths settings
-		out.writeBoolean(autoCachePaths);
-		if (autoCachePaths && externalizeCache) {
-			out.writeObject(cachePaths);
-			out.writeObject(newCachePaths);
-			out.writeObject(newCacheKeys);
-		}
-		
 		if (externalizeCache) {
 			out.writeInt(cache.size());
 			for(Entry<Key, CachedCell> entry: cache.entrySet()) {
@@ -734,11 +736,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	protected void clearCache() {
 		cache.clear();
 		rootIndex.clear();
-
-		// clear cache paths
-		cachePaths.clear();
-		newCachePaths.clear();
-		newCacheKeys.clear();
 	}
 	
 	/* (non-Javadoc)
@@ -859,144 +856,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		
 	}
 	
-	/**
-	 * Updates cache with newCachePaths identified in autoCachePaths mode.
-	 * When complete, CachePaths are moved to cachePaths set.
-	 */
-	public synchronized void buildCacheForPaths() {
-
-		if (newCachePaths.size() == 0) {
-			// nothing to calculate
-			return;
-		}
-		
-		if (buildCacheForPaths) {
-			// signal to build cache again
-			buildCacheForPathsAgain = true;
-			return;
-		}
-		
-		buildCacheForPaths = true;
-		try {
-			
-			String cubeInfo = "Cube '" + getKey() + "': ";
-			
-			log.info(cubeInfo + "building cache for " + newCachePaths.size() + " new paths: " + newCachePaths);
-
-			long start = System.currentTimeMillis();
-			
-			do {
-			
-				// remove newCacheKeys from cache, so cells are not double aggregated
-				for (Key key : newCacheKeys) {
-					cache.remove(key);
-				}
-				newCacheKeys.clear();
-				
-				if (buildCacheForPathsAgain) {
-					// clear previous build cache
-					for(Iterator<Key> it = cache.keySet().iterator(); it.hasNext();) {
-						Key key = it.next();
-						CachePath cachePath = new CachePath(key);
-						if (newCachePaths.contains(cachePath)) {
-							// remove element
-							it.remove();
-						}
-					}
-					buildCacheForPathsAgain = false;
-				}
-				
-				// iterate all raw (leaf) cells and calculate the paths
-				for(Entry<Key, Cell> entry: data.entrySet()) {
-					Key rawKey = entry.getKey();
-					Cell rawCell = entry.getValue();
-					cachePathCell(rawKey, rawCell);
-				}
-				
-				// throw collected event, might end in recursive call due to getCell
-				if (newCachePathCellAggregatedEvents.size() > 0) {
-					CellAggregatedEvent cae = new CellAggregatedEvent();
-					cae.setCube(this);
-					for (CachePathCellAggregatedEvent event : newCachePathCellAggregatedEvents) {
-						// might call getCell again that would end up in recursive call here again, identified with buildCacheForPathsAgain
-						onCellAggregated(event.use(cae));
-						if (buildCacheForPathsAgain) {
-							// stop build
-							break;
-						}
-					}
-					newCachePathCellAggregatedEvents.clear();
-				}
-			} while (buildCacheForPathsAgain); 
-			
-			// move paths and clear newCachePaths
-			cachePaths.addAll(newCachePaths);
-			newCachePaths.clear();
-
-			// set new calculation time
-			calcCellTime = (int)(System.currentTimeMillis() - start);
-			
-			log.info(cubeInfo + "build cache finished in " + calcCellTime + " msec. (total cache size: " + cache.size() + ")");
-			
-		} finally {
-			buildCacheForPaths = false;
-		}
-		
-	}
-
-	/**
-	 * Checks if key's path is cache already or not. It fills newCachePaths for new paths.
-	 * @param key
-	 * @return
-	 */
-	protected boolean isCachedPath(Key key) {
-		CachePath newPath = new CachePath(key);
-		
-		if (newCachePaths.contains(newPath)) {
-			return false;
-		}
-		
-		if (cachePaths.contains(newPath)) {
-			return true;
-		}
-		
-		// new cache path, use for next build run
-		newCachePaths.add(newPath);
-		
-		return false;
-	}
-	
-	/**
-	 * Caches and aggregate rawCell data to cachePaths.
-	 * @param key
-	 * @param rawCell
-	 */
-	protected void cachePathCell(Key key, Cell rawCell) {
-		
-		for (CachePath path : newCachePaths) {
-			Key k = path.makePathKey(key);
-			CachedCell cc = cache.get(k);
-			if (cc == null) {
-				cc = new CachedCell(new Cell(measureMap.size()));
-				cache.put(k, cc);
-			}
-			// aggregate rawCell
-			aggregateCells(cc.cell, rawCell);
-
-			if (cubeListeners.size() > 0) {
-				// invoke ICubeListener
-				CachePathCellAggregatedEvent event = new CachePathCellAggregatedEvent();
-				event.childKey = key;
-				event.childCell = rawCell;
-				event.parentKey = k;
-				event.parentCell = cc.cell;
-
-				// moved to buildCachePaths due to infinite loops might occur
-				newCachePathCellAggregatedEvents.add(event);
-			}
-		}		
-	}
-	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.impl.ICubeCacheControl#refreshCache()
 	 */
@@ -1042,34 +901,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	}
 
 	/**
-	 * @return the autoCachePaths
-	 */
-	public boolean isAutoCachePaths() {
-		return autoCachePaths;
-	}
-
-	/**
-	 * @param autoCachePaths the autoCachePaths to set
-	 */
-	public void setAutoCachePaths(boolean autoCachePaths) {
-		this.autoCachePaths = autoCachePaths;
-	}
-
-	/**
-	 * @return the buildCacheForPathsTimeout
-	 */
-	public int getBuildCacheForPathsTimeout() {
-		return buildCacheForPathsTimeout;
-	}
-
-	/**
-	 * @param buildCacheForPathsTimeout the buildCacheForPathsTimeout to set
-	 */
-	public void setBuildCacheForPathsTimeout(int buildCacheForPathsTimeout) {
-		this.buildCacheForPathsTimeout = buildCacheForPathsTimeout;
-	}
-
-	/**
 	 * @return the externalizeCache
 	 */
 	public boolean isExternalizeCache() {
@@ -1081,5 +912,12 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 */
 	public void setExternalizeCache(boolean externalizeCache) {
 		this.externalizeCache = externalizeCache;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#getCubeType()
+	 */
+	public CubeType getCubeType() {
+		return CubeType.FLEX_CALC;
 	}
 }

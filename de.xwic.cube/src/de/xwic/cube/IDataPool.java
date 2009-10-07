@@ -21,7 +21,13 @@ public interface IDataPool extends IIdentifyable {
 		/**
 		 * This variation stores only the leaf values permanently. Aggregated values are cached.
 		 */
-		FLEX_CALC
+		FLEX_CALC,
+		
+		/**
+		 * This cube extends FLEX_CALC with pre-caching (key patch caching) when aggregated cell
+		 * calculation exceeds a given threshold - buildCacheForPathsTimeout (by default 1000 msec) 
+		 */
+		PRE_CACHE
 	}
 	
 	/**

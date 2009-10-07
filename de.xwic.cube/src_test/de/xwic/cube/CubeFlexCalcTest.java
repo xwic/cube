@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
 import de.xwic.cube.impl.CubeFlexCalc;
+import de.xwic.cube.impl.CubePreCache;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.cube.util.DataDump;
 
@@ -75,9 +76,9 @@ public class CubeFlexCalcTest extends TestCase {
 		meDiff.setFunction(function);
 		meDiff.setValueFormatProvider(new PercentageValueFormatProvider());
 		
-		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.FLEX_CALC);
+		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.PRE_CACHE);
 		
-		CubeFlexCalc flexCube = (CubeFlexCalc)cube;
+		CubePreCache flexCube = (CubePreCache)cube;
 		flexCube.setAutoCachePaths(true);
 		
 	}
@@ -334,8 +335,8 @@ public class CubeFlexCalcTest extends TestCase {
 	
 	protected void buildCacheForPaths() {
 		//String paths = "[Time:1][LOB:0]";
-		CubeFlexCalc flexCube = (CubeFlexCalc)cube;
-		flexCube.cache.clear();
+		CubePreCache flexCube = (CubePreCache)cube;
+		flexCube.clearCachePaths();
 		flexCube.buildCacheForPaths();
 		assertEquals(220.0, cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
 		//Key key = flexCube.createKey("[*][*][2008]");

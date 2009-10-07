@@ -1,6 +1,18 @@
 Change Notes
 ============
 
+2009-10-07 jbornema
+	- ICube: added allowSplash methods, added getCubeType
+	- IDataPool.CubeType.PRE_CACHE added (implemented in CubePreCache)
+	- IDimensionResolver added to implement changing IDimensionElements during aggregation
+	- Key(Key) constuctor added - minor changes
+	- KeyExt added that extends Key and provides a UserObject
+	- Cube.createNewKey(IDimensionElement[]) added (for customer extension to a cube implementation)
+	- Cube.serializeData added to switch between data and optimized data serialization
+	- CubeFlexCalc pre-cache (path caching) function moved to new CubePreCache implementation extending CubeFlexCalc
+	- FileDataPoolStorageProvider supports now serialization to zip files,
+	  setting zipDataPool flag or just zipping mydatapool.datapool to mydatapool.datapool.zip enables it
+	  	
 2009-09-28 FLI
 	- LastLeafFunction no longer returns 0.0 if no element is available at all.
 	- Added ICube.createKey(IDimensionElement...)

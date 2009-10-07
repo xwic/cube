@@ -11,6 +11,7 @@
  */
 package de.xwic.cube.util;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,9 @@ import de.xwic.cube.IDimensionElement;
  * @author JBORNEMA
  */
 
-public class CubeUtil {
+public class CubeUtil implements Serializable {
+
+	private static final long serialVersionUID = 7136878159382807077L;
 
 	protected IDataPool dataPool;
 	protected boolean autoCreateDimensionElement;
