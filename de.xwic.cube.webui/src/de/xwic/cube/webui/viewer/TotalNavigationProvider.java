@@ -21,6 +21,8 @@ public class TotalNavigationProvider implements INavigationProvider {
 	private Object contentUserObject = null;
 	private ICubeDataProvider dataProvider = new DefaultDimensionDataProvider();
 
+	private String extraClickInformation = null;
+	
 	private class TotalNavigationElement implements INavigationElement {
 
 		/* (non-Javadoc)
@@ -30,6 +32,7 @@ public class TotalNavigationProvider implements INavigationProvider {
 			ContentInfo ci = new ContentInfo (dataProvider);
 			ci.setClickable(clickable);
 			ci.setUserData(contentUserObject);
+			ci.setExtraClickInfo(extraClickInformation);
 			return ci;
 		}
 
@@ -184,6 +187,14 @@ public class TotalNavigationProvider implements INavigationProvider {
 	 */
 	public void setContentUserObject(Object contentUserObject) {
 		this.contentUserObject = contentUserObject;
+	}
+
+	public String getExtraClickInformation() {
+		return extraClickInformation;
+	}
+
+	public void setExtraClickInformation(String extraClickInformation) {
+		this.extraClickInformation = extraClickInformation;
 	}
 
 }

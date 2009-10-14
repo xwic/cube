@@ -24,6 +24,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 
 	private List<IDimensionElement> dimensions = new ArrayList<IDimensionElement>();
 	private final CubeViewerModel model;
+
 	private List<INavigationElement> rootNavElements = new ArrayList<INavigationElement>();
 	private ICubeDataProvider dataProvider = new DefaultDimensionDataProvider();
 
@@ -597,4 +598,12 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	public void setContentUserData(Object contentUserData) {
 		this.contentUserData = contentUserData;
 	}
+
+	/**
+	 * @return the cubeviewer model
+	 */
+	public CubeViewerModel getModel() {
+		return model;
+	}
+
 }
