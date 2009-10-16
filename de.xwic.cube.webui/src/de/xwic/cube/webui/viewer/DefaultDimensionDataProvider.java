@@ -41,7 +41,10 @@ public class DefaultDimensionDataProvider extends AbstractCubeDataProvider imple
 		}
 		
 		//check measure format provider first!
-		IValueFormat format = measure.getValueFormatProvider() != null ? measure.getValueFormatProvider().createValueFormat(model.getLocale()) : model.getValueFormat();
+		IValueFormat format = model.getValueFormat();
+		if (fixedMeasure != null && fixedMeasure.getValueFormatProvider() != null) {
+			format = measure.getValueFormatProvider().createValueFormat(model.getLocale());
+		}
 		
 		return value != null ? format.format(value) : "";
 	}
