@@ -116,8 +116,11 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 
 		PrintWriter out = renderContext.getWriter();
 
+//		long start = System.currentTimeMillis();
 		TableRenderer tbl = renderTable();
 		tbl.render(out);
+//		long time = System.currentTimeMillis() - start;
+//		log.debug("Rendering Time for " + getName() + ": " + time);
 		
 		//out.println("<span class=\"x-cube-info\">cube: " + model.getCube().getKey() + ", measure: " + model.getMeasure().getKey() + "</span>");
 		

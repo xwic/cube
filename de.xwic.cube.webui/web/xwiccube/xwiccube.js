@@ -208,6 +208,7 @@
 			var elm = document.getElementById("xcubeLeafselBox_" + currentOpenCtrlId);
 			if (elm) {
 				elm.style.display = "none";
+				elm.innerHTML = "...";
 			}
 			currentOpenCtrlId = null;
 		}
