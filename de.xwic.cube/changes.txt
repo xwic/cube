@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2009-11-06 FLI
+	- Added sortElements to IDimensionElement interface.
+
 2009-10-07 jbornema
 	- ICube: added allowSplash methods, added getCubeType
 	- IDataPool.CubeType.PRE_CACHE added (implemented in CubePreCache)

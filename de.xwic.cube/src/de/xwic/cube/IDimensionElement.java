@@ -3,6 +3,7 @@
  */
 package de.xwic.cube;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -139,5 +140,15 @@ public interface IDimensionElement extends IIdentifyable {
 	 * @return
 	 */
 	public boolean isChild(IDimensionElement dimensionElement);
+
+	/**
+	 * Sort elements using given comparator.
+	 * @param comparator 
+	 */
+	public void sortDimensionElements(Comparator<IDimensionElement> comparator);
 	
+	/**
+	 * Sort elements by key. 
+	 */
+	public void sortDimensionElements();
 }
