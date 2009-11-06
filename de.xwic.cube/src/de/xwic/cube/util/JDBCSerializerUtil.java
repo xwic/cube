@@ -220,6 +220,7 @@ public class JDBCSerializerUtil {
 		while (rs.next()) {
 			String key = rs.getString(1);
 			String title = rs.getString(2);
+			System.out.println("Validating Dimension " + key);
 			IDimension dim;
 			if (!pool.containsDimension(key)) {
 				dim = pool.createDimension(key);
