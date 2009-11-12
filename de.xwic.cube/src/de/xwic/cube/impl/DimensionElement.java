@@ -144,6 +144,21 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	}
 
 	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDimensionElement#getTitlePath()
+	 */
+	public String getTitlePath() {
+		StringBuilder sb = new StringBuilder();
+		IDimensionElement pr = parent;
+		while (pr != null && !(pr instanceof Dimension)) {
+			sb.insert(0, "/");
+			sb.insert(0, pr.getTitle() != null ? pr.getTitle() : pr.getKey());
+			pr = pr.getParent();
+		}
+		sb.append(getTitle() != null ? getTitle() : getKey());
+		return sb.toString();
+	}
+	
+	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override

@@ -11,6 +11,7 @@
  */
 package de.xwic.cube.event;
 
+import de.xwic.cube.ICell;
 import de.xwic.cube.ICube;
 import de.xwic.cube.Key;
 import de.xwic.cube.impl.Cell;
@@ -25,11 +26,11 @@ public class CellAggregatedEvent extends CubeEvent {
 
 	protected Key childKey;
 
-	protected Cell childCell;
+	protected ICell childCell;
 
 	protected Key parentKey;
 
-	protected Cell parentCell;
+	protected ICell parentCell;
 
 	
 	/**
@@ -71,7 +72,7 @@ public class CellAggregatedEvent extends CubeEvent {
 	/**
 	 * @return the childCell
 	 */
-	public Cell getChildCell() {
+	public ICell getChildCell() {
 		return childCell;
 	}
 
@@ -79,7 +80,7 @@ public class CellAggregatedEvent extends CubeEvent {
 	 * @param childCell
 	 *            the childCell to set
 	 */
-	public void setChildCell(Cell childCell) {
+	public void setChildCell(ICell childCell) {
 		this.childCell = childCell;
 	}
 
@@ -101,7 +102,7 @@ public class CellAggregatedEvent extends CubeEvent {
 	/**
 	 * @return the parentCell
 	 */
-	public Cell getParentCell() {
+	public ICell getParentCell() {
 		return parentCell;
 	}
 
@@ -109,7 +110,7 @@ public class CellAggregatedEvent extends CubeEvent {
 	 * @param parentCell
 	 *            the parentCell to set
 	 */
-	public void setParentCell(Cell parentCell) {
+	public void setParentCell(ICell parentCell) {
 		this.parentCell = parentCell;
 	}
 

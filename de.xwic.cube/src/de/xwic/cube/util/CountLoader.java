@@ -26,7 +26,6 @@ import de.xwic.cube.Key;
 import de.xwic.cube.event.CellAggregatedEvent;
 import de.xwic.cube.event.CellValueChangedEvent;
 import de.xwic.cube.impl.AbstractCubeListener;
-import de.xwic.cube.impl.Cell;
 
 /**
  * CountLoader counts distinct objects and stores the count number in the cell for specified measure.
@@ -80,35 +79,39 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 		return other.measureIndex == measureIndex;
 	}
 	
+	/**
+	 * Returns the Set where the countOn objects are place
+	 * @param key
+	 * @param createNew
+	 * @return
+	 */
+	protected Set<Object> getCounts(Key key, ICell cell, boolean createNew) {
+		Set<Object> objects = keyCounts.get(key);
+		if (createNew && objects == null) {
+			objects = new HashSet<Object>();
+			keyCounts.put(key.clone(), objects);
+		}
+		return objects;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.impl.AbstractCubeListener#onCellValueChanged(de.xwic.cube.event.CellValueChangedEvent)
 	 */
 	public void onCellValueChanged(CellValueChangedEvent event) {
 		Key key = event.getKey();
 		ICell cell = event.getCell();
-		int measureIndex = event.getMeasureIndex();
-		if (measureIndex != countOnMeasureIndex) {
+		int mIndex = event.getMeasureIndex();
+		if (mIndex != countOnMeasureIndex) {
 			// don't count on this measure
 			return;
 		}
-		Set<Object> objects = keyCounts.get(key);
-		if (objects == null) {
-			objects = new HashSet<Object>();
-			keyCounts.put(key.clone(), objects);
-			objects.add(countOn);
-			cell.setValue(this.measureIndex, 1d);
-			return;
-		}
-		if (objects.contains(countOn)) {
-			// nothing to do
-			return;
-		}
-		objects.add(countOn);
+		Set<Object> objects = getCounts(key, cell, true);
 		
-		// increase count
-		Double value = cell.getValue(this.measureIndex);
-		value = value != null ? value + 1d : 1d;
-		cell.setValue(this.measureIndex, value);
+		// add countOn object
+		objects.add(countOn);
+
+		// set count in cell
+		cell.setValue(measureIndex, (double)objects.size());
 	}
 	
 	/* (non-Javadoc)
@@ -118,21 +121,18 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	public void onCellAggregated(CellAggregatedEvent event) {
 		Key childKey = event.getChildKey();
 		Key parentKey = event.getParentKey();
-		Cell parentCell = event.getParentCell();
-		Set<Object> childObjects = keyCounts.get(childKey);
+		ICell parentCell = event.getParentCell();
+		ICell childCell = event.getChildCell();
+		Set<Object> childObjects = getCounts(childKey, childCell, false);
 		if (childObjects == null) {
 			// nothing to count
 			return;
 		}
 		
-		Set<Object> objects = keyCounts.get(parentKey);
-		if (objects == null) {
-			objects = new HashSet<Object>();
-			keyCounts.put(parentKey.clone(), objects);
-		}
+		Set<Object> objects = getCounts(parentKey, parentCell, true);
 		objects.addAll(childObjects);
 		// set count
-		parentCell.setValue(this.measureIndex, (double)objects.size());
+		parentCell.setValue(measureIndex, (double)objects.size());
 	}
 
 	/**
