@@ -1,6 +1,15 @@
 Change Notes
 ============
 
+2009-11-12 jbornema
+	- ICellProvider and IKeyProvider added to support customer Key and Cell extensions
+	- Refactored usage of Cell to ICell
+	- IDimensionElement.getTitlePath() added
+	- Cell holds now an array of double and not Double obejcts anymore. This optimizes
+	  overall memory allocation. Null values are stored as Double.NaN
+	- CellExt and CellExtProvider added that supports userObject
+	- Cube, CubeFlexCalc and CubePreCache increased version that supports new key and cell providers
+
 2009-11-06 FLI
 	- Added sortElements to IDimensionElement interface.
 

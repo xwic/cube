@@ -21,10 +21,13 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.cube.ICell;
+import de.xwic.cube.ICellProvider;
 import de.xwic.cube.ICubeListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IDimensionResolver;
+import de.xwic.cube.IKeyProvider;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
 import de.xwic.cube.IDataPool.CubeType;
@@ -41,6 +44,7 @@ public class CubePreCache extends CubeFlexCalc {
 	private static final long serialVersionUID = 2L;
 	
 	protected boolean autoCachePaths = false;
+	protected boolean enableBuildIndex = false;
 	protected Set<CachePath> cachePaths = new HashSet<CachePath>();
 	protected Set<CachePath> newCachePaths = new HashSet<CachePath>();
 	protected Set<Key> newCacheKeys = new HashSet<Key>();
@@ -137,7 +141,7 @@ public class CubePreCache extends CubeFlexCalc {
 		 * @return
 		 */
 		public Key makePathKey(Key rawKey) {
-			Key key = new Key(new IDimensionElement[dimensionMap.size()]);
+			Key key = createNewKey(new IDimensionElement[dimensionMap.size()]);
 			for (CachePathDimensionDepth dimensionDepth : dimensionsDepth) {
 				IDimensionElement element = rawKey.getDimensionElement(dimensionDepth.dimensionIndex);
 				for (int depth = element.getDepth(); depth > dimensionDepth.depth; depth--) {
@@ -223,9 +227,9 @@ public class CubePreCache extends CubeFlexCalc {
 	
 	public class CachePathCellAggregatedEvent {
 		protected Key childKey;
-		protected Cell childCell;
+		protected ICell childCell;
 		protected Key parentKey;
-		protected Cell parentCell;
+		protected ICell parentCell;
 
 		public CellAggregatedEvent use(CellAggregatedEvent event) {
 			event.setChildCell(childCell);
@@ -287,8 +291,8 @@ public class CubePreCache extends CubeFlexCalc {
 			ClassNotFoundException {
 
 		int version = in.readInt();
-		if (version < 1 || version > 1) {
-			throw new IOException("Cannot deserialize cube -> data file version is " + version + ", but expected 1");
+		if (version < 1 || version > 2) {
+			throw new IOException("Cannot deserialize cube -> data file version is " + version + ", but expected 1..2");
 		}
 		key = (String) in.readObject();
 		title = (String) in.readObject();
@@ -299,6 +303,11 @@ public class CubePreCache extends CubeFlexCalc {
 		
 		cubeListeners = (List<ICubeListener>)in.readObject();
 		dimensionResolver = (IDimensionResolver)in.readObject();
+		
+		if (version > 1) {
+			keyProvider = (IKeyProvider)in.readObject();
+			cellProvider = (ICellProvider)in.readObject();
+		}
 		
 		serializeData = in.readBoolean();
 		
@@ -319,7 +328,7 @@ public class CubePreCache extends CubeFlexCalc {
 			}
 		} else {
 			// customer Key implementation
-			data = (Map<Key, Cell>)in.readObject();
+			data = (Map<Key, ICell>)in.readObject();
 		}
 		
 		externalizeCache = in.readBoolean();
@@ -353,7 +362,7 @@ public class CubePreCache extends CubeFlexCalc {
 	public void writeExternal(ObjectOutput out) throws IOException {
 
 		// serialize -> write the cube data.
-		int version = 1;
+		int version = 2;
 		out.writeInt(version); // version number
 		out.writeObject(key);
 		out.writeObject(title);
@@ -363,12 +372,15 @@ public class CubePreCache extends CubeFlexCalc {
 		out.writeObject(measureMap);
 		out.writeObject(cubeListeners);
 		out.writeObject(dimensionResolver);
+		out.writeObject(keyProvider);
+		out.writeObject(cellProvider);
+		
 		out.writeBoolean(serializeData);
 		
 		// write data...
 		if (!serializeData) {
 			out.writeInt(data.size());
-			for(Entry<Key, Cell> entry: data.entrySet()) {
+			for(Entry<Key, ICell> entry: data.entrySet()) {
 				
 				for (IDimensionElement elm : entry.getKey().getDimensionElements()) {
 					out.writeObject(elm);
@@ -468,9 +480,9 @@ public class CubePreCache extends CubeFlexCalc {
 				}
 				
 				// iterate all raw (leaf) cells and calculate the paths
-				for(Entry<Key, Cell> entry: data.entrySet()) {
+				for(Entry<Key, ICell> entry: data.entrySet()) {
 					Key rawKey = entry.getKey();
-					Cell rawCell = entry.getValue();
+					ICell rawCell = entry.getValue();
 					cachePathCell(rawKey, rawCell);
 				}
 				
@@ -532,7 +544,7 @@ public class CubePreCache extends CubeFlexCalc {
 	}
 	
 	@Override
-	protected Cell probeCachedCell(Key key, boolean createNew) {
+	protected ICell probeCachedCell(Key key, boolean createNew) {
 		if (autoCachePaths) {
 			int timeout = buildCacheForPathsTimeout;
 			if (timeout == 0 || timeout < buildCacheForPathsTime) {
@@ -569,13 +581,13 @@ public class CubePreCache extends CubeFlexCalc {
 	 * @param key
 	 * @param rawCell
 	 */
-	protected void cachePathCell(Key key, Cell rawCell) {
+	protected void cachePathCell(Key key, ICell rawCell) {
 		
 		for (CachePath path : newCachePaths) {
 			Key k = path.makePathKey(key);
 			CachedCell cc = cache.get(k);
 			if (cc == null) {
-				cc = new CachedCell(new Cell(measureMap.size()));
+				cc = new CachedCell(createNewCell(k, measureMap.size()));
 				cache.put(k, cc);
 			}
 			// aggregate rawCell
@@ -657,4 +669,31 @@ public class CubePreCache extends CubeFlexCalc {
 	public CubeType getCubeType() {
 		return CubeType.PRE_CACHE;
 	}
+	
+	@Override
+	protected void buildIndex() {
+		if (enableBuildIndex) {
+			super.buildIndex();
+		}
+	}
+
+	/**
+	 * @return the enableBuildIndex
+	 */
+	public boolean isEnableBuildIndex() {
+		return enableBuildIndex;
+	}
+
+	/**
+	 * @param enableBuildIndex the enableBuildIndex to set
+	 */
+	public void setEnableBuildIndex(boolean enableBuildIndex) {
+		if (this.enableBuildIndex != enableBuildIndex && !enableBuildIndex) {
+			// disable build index by clearing the map
+			rootIndex.clear();
+		}
+		this.enableBuildIndex = enableBuildIndex;
+	}
+	
+	
 }

@@ -14,7 +14,6 @@ package de.xwic.cube.event;
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICube;
 import de.xwic.cube.Key;
-import de.xwic.cube.impl.Cell;
 
 /**
  * Created on Apr 22, 2009
@@ -45,7 +44,7 @@ public class CellValueChangedEvent extends CubeEvent {
 	 * @param measureIndex
 	 * @param diff
 	 */
-	public CellValueChangedEvent(ICube cube, Key key, Cell cell, int measureIndex, double diff) {
+	public CellValueChangedEvent(ICube cube, Key key, ICell cell, int measureIndex, double diff) {
 		this.cube = cube;
 		this.key = key;
 		this.cell = cell;

@@ -7,6 +7,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Arrays;
 
 import de.xwic.cube.ICell;
 
@@ -18,15 +19,16 @@ import de.xwic.cube.ICell;
 public class Cell implements ICell, Externalizable {
 
 	private static final long serialVersionUID = -4297789024853482650L;
-	
-	public Double[] values;
+
+	private double[] values;
 	
 	public Cell() {
 		
 	}
 	
 	Cell(int measureSize) {
-		values = new Double[measureSize];
+		values = new double[measureSize];
+		Arrays.fill(values, Double.NaN);
 	}
 	
 	/* (non-Javadoc)
@@ -35,14 +37,15 @@ public class Cell implements ICell, Externalizable {
 	public Double getValue(int measureIndex) {
 		// FIXME Functions always return null, why does values contains that index? Could be used for caching?
 		// Function measureIndex used by DummyFunction...
-		return values[measureIndex];
+		double value = values[measureIndex];
+		return Double.isNaN(value) ? null : value;
 	}
 	
 	/*
 	 * Change the value in this cell.
 	 */
 	public void setValue(int measureIndex, Double value) {
-		values[measureIndex] = value;
+		values[measureIndex] = value != null ? value : Double.NaN;
 	}
 	
 	/**
@@ -50,8 +53,8 @@ public class Cell implements ICell, Externalizable {
 	 * @return
 	 */
 	public boolean isEmpty() {
-		for (Double d : values) {
-			if (d != null) {
+		for (double d : values) {
+			if (!Double.isNaN(d)) {
 				return false;
 			}
 		}
@@ -64,12 +67,12 @@ public class Cell implements ICell, Externalizable {
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		
 		int size = in.readInt();
-		values = new Double[size];
+		values = new double[size];
 		for (int i = 0; i < size; i++) {
 			if (in.readBoolean()) {
-				values[i] = new Double(in.readDouble());
+				values[i] = in.readDouble();
 			} else {
-				values[i] = null;
+				values[i] = Double.NaN;
 			}
 		}
 		
@@ -80,8 +83,8 @@ public class Cell implements ICell, Externalizable {
 	 */
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeInt(values.length);
-		for (Double d : values) {
-			if (d != null) {
+		for (double d : values) {
+			if (!Double.isNaN(d)) {
 				out.writeBoolean(true);
 				out.writeDouble(d);
 			} else {

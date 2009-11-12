@@ -75,6 +75,13 @@ public interface IDimensionElement extends IIdentifyable {
 	 * @return
 	 */
 	public abstract String getPath();
+	
+	/**
+	 * Returns the titles (if not null) for the the path.
+	 * Similar to getPath() just with titles (or keys).
+	 * @return
+	 */
+	public abstract String getTitlePath();
 
 	/**
 	 * Returns the index position within the parent's dimension element collection.

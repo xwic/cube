@@ -18,7 +18,7 @@ public class KeyExt extends Key {
 
 	private static final long serialVersionUID = 796614174206092706L;
 	
-	private Serializable userObject;
+	protected Serializable userObject;
 
 	/**
 	 * @param elementKeys
