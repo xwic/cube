@@ -1,6 +1,10 @@
 Change Notes
 ============
 
+2009-11-17 jbornema
+	- IKeyProvider implements required Serialized interface
+	- FileDataPoolStorageProvider saved the data pool still in zip format even if the deserialization of zip failed (due to corrupt file or so) 
+
 2009-11-12 jbornema
 	- ICellProvider and IKeyProvider added to support customer Key and Cell extensions
 	- Refactored usage of Cell to ICell

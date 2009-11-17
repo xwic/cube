@@ -98,6 +98,8 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 				BufferedInputStream bip = new BufferedInputStream(fis);
 				ois = new ObjectInputStream(bip);
 			} else {
+				// ensure zip flag is set
+				zipDataPool = true;
 				// open zipped data pool
 				ZipFile zip = new ZipFile(zipFile);
 				for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
@@ -108,8 +110,6 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 						break;
 					}
 				}
-				// ensure zip flag is set
-				zipDataPool = true;
 				if (ois == null) {
 					throw new IllegalArgumentException("A datapool with the key " + key + " not found in " + zipFile);
 				}
