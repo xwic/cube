@@ -13,6 +13,8 @@ import de.xwic.cube.IKeyProvider;
  */
 public class DefaultKeyProvider implements IKeyProvider {
 
+	private static final long serialVersionUID = 1L;
+
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IKeyProvider#createNewKey(de.xwic.cube.IDimensionElement[])
 	 */
