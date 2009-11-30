@@ -1,5 +1,5 @@
 #set($currElm = $control.getDimensionElement())
-#if ($currElm.dimension == $currElm) #set($title = "- All -") #else #set($title = $currElm.path) #end
+#if ($currElm.dimension == $currElm) #set($title = "- All -") #else #set($title = $currElm.titlePath) #end
 #set($prev = $control.prev)
 #set($next = $control.next)
 <table cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl_${control.controlID}">
