@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2009-11-30 jbornema
+	- DimensionElementSelector.vtl uses IDimensionElement.titlePath as title
+
 2009-10-14 RPF
 	- Added "extraClickInformation" on TotalNavigationProvider
 
