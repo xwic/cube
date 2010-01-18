@@ -313,7 +313,9 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 					if (horizontal) {
 						tbl.setColumnData(stCol, contentInfo);
 						for (int r = row + 1; r <= stRow; r++) {
-							tbl.getCell(r, stCol).setCssClass("xcube-hl-" + level + " xcube-hor-end");
+							if (r < tbl.getRowCount()) {
+								tbl.getCell(r, stCol).setCssClass("xcube-hl-" + level + " xcube-hor-end");
+							}
 							
 						}
 						titleCol = stCol;
@@ -330,7 +332,9 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 				if (horizontal) {
 					tbl.setColumnData(col, contentInfo);
 					for (int r = row + 1; r <= totalSize.depth; r++) {
-						tbl.getCell(r, col).setCssClass("xcube-hl-" + level + " xcube-hor-end");
+						if (r < tbl.getRowCount()) {
+							tbl.getCell(r, col).setCssClass("xcube-hl-" + level + " xcube-hor-end");
+						}
 						
 					}
 				} else {

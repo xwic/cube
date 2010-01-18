@@ -162,10 +162,12 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 * @param dimensionElement the dimensionElement to set
 	 */
 	public void setDimensionElement(IDimensionElement dimensionElement) {
-		IDimensionElement previousDimensionElement = this.dimensionElement;
-		this.dimensionElement = dimensionElement;
-		requireRedraw();
-		fireEvent(new DimensionElementSelectedEvent(this, dimensionElement, previousDimensionElement));
+		if (this.dimensionElement != dimensionElement) {
+			IDimensionElement previousDimensionElement = this.dimensionElement;
+			this.dimensionElement = dimensionElement;
+			requireRedraw();
+			fireEvent(new DimensionElementSelectedEvent(this, dimensionElement, previousDimensionElement));
+		}
 	}
 
 	/**
