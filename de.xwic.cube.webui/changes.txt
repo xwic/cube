@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2010-01-18 FLI
+	- DimensionElementSelector now hides underlying SELECT elements
+	- DimensionElementSelector only triggers elementSelected event if new element is different to previous selection 
+	
 2009-11-30 jbornema
 	- DimensionElementSelector.vtl uses IDimensionElement.titlePath as title
 
