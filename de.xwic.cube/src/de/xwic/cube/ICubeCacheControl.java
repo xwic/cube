@@ -47,6 +47,16 @@ public interface ICubeCacheControl {
 	 * @throws IOException 
 	 */
 	public abstract void buildCacheFromStats(InputStream openStream) throws IOException;
+	
+	/**
+	 * Rebuild the cache based on another cube.
+	 * @param cube 
+	 */
+	public abstract void buildCacheFromCube(ICube cube);
+	
+	/**
+	 * Rebuild the cache based on cache statistics.
+	 */
 
 	/**
 	 * @return

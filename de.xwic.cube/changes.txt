@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2010-02-08 kstein (commited by FLI)
+	- Added ICubeCacheControl.buildCacheFromCube(ICube)
+
 2009-11-17 jbornema
 	- IKeyProvider implements required Serialized interface
 	- FileDataPoolStorageProvider saved the data pool still in zip format even if the deserialization of zip failed (due to corrupt file or so) 
