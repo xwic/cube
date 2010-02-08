@@ -844,6 +844,11 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			}
 		}
 		
+		batchRefreshCache(cellMap);
+		
+	}
+
+	private void batchRefreshCache(Map<Key, CachedCell> cellMap) {
 		// now batch-refresh cache
 		Key[] keys = new Key[cellMap.size()];
 		int idx = 0;
@@ -857,6 +862,20 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			cells[i].hits = oldCell.hits;
 			cells[i].unusedCount = oldCell.unusedCount + 1;
 			cache.put(keys[i], cells[i]);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICubeCacheControl#buildCacheFromCube(ICube cube)
+	 */
+	public synchronized void buildCacheFromCube(ICube cube) {
+		
+		if(cube.getClass().isAssignableFrom(CubeFlexCalc.class)) {
+			
+			cache.clear();
+									
+			batchRefreshCache(((CubeFlexCalc)cube).cache);	
+			
 		}
 		
 	}
