@@ -8,6 +8,8 @@ import java.util.Comparator;
 import de.xwic.cube.IDimensionElement;
 
 /**
+ * Simple String compare of Dimension KEY!
+ * 
  * @author ronny
  *
  */

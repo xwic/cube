@@ -20,7 +20,7 @@ public class TimeUtil {
 	public static final int Q2 = 1;
 	public static final int Q3 = 2;
 	public static final int Q4 = 3;
-	
+	private static int MONTH_SHIFT = 4;
 	private static final String[] MONTH_NAMES = {
 		"Jan",
 		"Feb",
@@ -46,36 +46,18 @@ public class TimeUtil {
 	private int quarter = -1;
 	private int month = -1;
 
-	private int startMonth = 0;
+//	private int startMonth = 0;
 	
 	public TimeUtil() {
 		
 	}
 
 	/**
-	 * Constructs a new TimeUtil with the given start month.
-	 * @param startMonth
-	 */
-	public TimeUtil(int startMonth) {
-		this.startMonth = startMonth;
-	}
-
-	/**
 	 * 
 	 * @param elmTime
+	 * @param startMonth
 	 */
 	public TimeUtil(IDimensionElement elmTime) {
-		this(elmTime, 0);
-	}
-	
-	/**
-	 * 
-	 * @param elmTime
-	 * @param startMonth
-	 */
-	public TimeUtil(IDimensionElement elmTime, int startMonth) {
-		
-		this.startMonth = startMonth;
 		IDimensionElement elm = elmTime;
 		switch (elmTime.getDepth()) {
 		case 0: // the dimension itself -> ALL
@@ -89,7 +71,7 @@ public class TimeUtil {
 			if (mIdx == null) {
 				throw new IllegalArgumentException("Can not identify month: " + elm.getKey());
 			}
-			month = mIdx.intValue() - getStartMonth();
+			month = mIdx.intValue();
 			if (month < 0) {
 				month += 12;
 			}
@@ -106,28 +88,41 @@ public class TimeUtil {
 	}
 
 	/**
-	 * Construct a new TimeUtil from a Date.
+	 * Construct a new TimeUtil from a Calendar Date.
 	 * @param date
 	 */
 	public TimeUtil(Date date) {
-		this(date, 0);
+		this(date, false);
 	}
+	
 	/**
-	 * Construct a new TimeUtil from a Date.
+	 * Construct a new TimeUtil from a Calendar Date or Fiscal Date.
+	 * 
 	 * @param date
+	 * @param isFiscalDate
 	 */
-	public TimeUtil(Date date, int startMonth) {
-		this.startMonth = startMonth;
+	public TimeUtil(Date date, boolean isFiscalDate) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
-		year = cal.get(Calendar.YEAR);
-		month = cal.get(Calendar.MONTH) - startMonth;
+		
+		year = cal.get(Calendar.YEAR); 
+		month = cal.get(Calendar.MONTH);
+		
+		//year increase only necessary, if Calendar Date is given
+		if (!isFiscalDate) {
+			if (month >= MONTH_SHIFT) {
+				year++;
+			}
+		}
+
+		month = month - MONTH_SHIFT;
 		if (month < 0) {
 			month += 12;
-			year--;
 		}
+
 		quarter = month / 3;
 	}
+	
 	
 	/**
 	 * @param last
@@ -136,7 +131,6 @@ public class TimeUtil {
 		this.year = last.year;
 		this.quarter = last.quarter;
 		this.month = last.month;
-		this.startMonth = last.startMonth;
 	}
 
 	/**
@@ -314,7 +308,7 @@ public class TimeUtil {
 				if (month != -1) {
 					sb.append("/");
 					// re-shift month names
-					int m = month + getStartMonth();
+					int m = month + MONTH_SHIFT;
 					if (m > 11) {
 						m -= 12;
 					}
@@ -333,8 +327,8 @@ public class TimeUtil {
 		String s = toPath();
 		if (s.length() == 0) {
 			return "all-time";
-		} 
-		s = s + " (y=" + year + ", q=" + quarter + ", m=" + month + ")";
+		}
+		s = s + " (y=" + year + ", q=" + quarter + ", m=" + month + ")"; 
 		return s;
 	}
 
@@ -376,11 +370,19 @@ public class TimeUtil {
 	 * @return
 	 */
 	public String getMonthName() {
-		int m = month + getStartMonth();
+		int m = month + MONTH_SHIFT;
 		if (m > 11) {
 			m -= 12;
 		}
 		return MONTH_NAMES[m];
+	}
+	
+	/**
+	 * Calendar month integer, starting with 0.
+	 * @return
+	 */
+	public int getCalendarMonth() {
+		return MONTH_INDEX.get(getMonthName().toLowerCase());
 	}
 
 	/**
@@ -389,31 +391,94 @@ public class TimeUtil {
 	 */
 	public void addMonth(int i) {
 		
+		// if no quarter is set, select first quarter
+		if (!hasQuarter()) {
+			quarter = 0;
+		}
+		if (!hasMonth()) {
+			month = quarter * 3;	// select first month in the quarter.
+		}
+		
 		year += (i / 12);
 		month += i % 12;
 		
-		if (month >= 12) {
+		while (month >= 12) {
 			month = month - 12;
 			year++;
+		}
+		
+		while (month < 0) {
+			month = month + 12;
+			year--;
 		}
 		
 		
 		quarter = month / 3;
 		
 	}
-
+	
 	/**
-	 * @param startMonth the startMonth to set
+	 * Goes to last month, if is quarter or a year.
+	 * 2010/Q2 -> will be 2010/Q2/Oct
+	 * 2010    -> will be 2010/Q4/Apr
 	 */
-	public void setStartMonth(int startMonth) {
-		this.startMonth = startMonth;
-	}
-
-	/**
-	 * @return the startMonth
-	 */
-	public int getStartMonth() {
-		return startMonth;
+	public void goToLastMonth() {
+		//year -> add 12 and go back
+		if (!hasQuarter()) {
+			addMonth(11);
+		} 
+		else if (!hasMonth()) {
+			addMonth(2);
+		}
 	}
 	
+	
+	/**
+	 * Goes to first month, if is quarter or a year.
+	 * 2010/Q2 -> will be 2010/Q2/Aug
+	 * 2010    -> will be 2010/Q1/May
+	 */
+	public void goToFirstMonth() {
+		//year -> add 1, remove 1
+		if (!hasQuarter()) {
+			addMonth(1);
+			addMonth(-1);
+		} 
+		else if (!hasMonth()) {
+			addMonth(1);
+			addMonth(-1);
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * @return a date object
+	 */
+	public Date getDate() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		cal.set(Calendar.MONTH, getMonth());
+		cal.add(Calendar.MONTH, MONTH_SHIFT);
+		
+		if (cal.get(Calendar.MONTH) >= MONTH_SHIFT) {
+			cal.set(Calendar.YEAR, getYear() - 1);
+		} else { // Jan-Apr is FY=CalYear
+			cal.set(Calendar.YEAR, getYear());
+		}
+		
+		return cal.getTime();
+	}
+
+	
+	public Date getDateAsFiscal() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		cal.set(Calendar.MONTH, getMonth());
+		cal.add(Calendar.MONTH, MONTH_SHIFT);
+
+		cal.set(Calendar.YEAR, getYear());
+		return cal.getTime();
+	}
+
 }
