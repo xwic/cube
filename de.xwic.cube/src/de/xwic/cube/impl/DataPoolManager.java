@@ -84,7 +84,7 @@ public class DataPoolManager implements IDataPoolManager {
 	 * @param dataPool
 	 * @throws StorageException 
 	 */
-	public void saveDataPool(IDataPool dataPool) throws StorageException {
+	void saveDataPool(IDataPool dataPool) throws StorageException {
 		storageProvider.saveDataPool(dataPool);
 	}
 
@@ -124,7 +124,7 @@ public class DataPoolManager implements IDataPoolManager {
 	/**
 	 * @param dataPool
 	 */
-	public void deleteDataPool(IDataPool dataPool) {
+	void deleteDataPool(IDataPool dataPool) {
 		
 		releaseDataPool(dataPool);
 		storageProvider.deleteDataPool(dataPool.getKey());

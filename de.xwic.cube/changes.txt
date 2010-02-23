@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2010-02-23 kstein (commited by FLI)
+	- Added the possibility to create temporary (softReferenced) cubes.
+
 2010-02-08 kstein (commited by FLI)
 	- Added ICubeCacheControl.buildCacheFromCube(ICube)
 
