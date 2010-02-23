@@ -4,10 +4,15 @@
 package de.xwic.cube.impl;
 
 import java.io.Serializable;
+import java.lang.ref.SoftReference;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDataPool;
@@ -24,6 +29,7 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 
 	private static final long serialVersionUID = -8857844492316508015L;
 	private Map<String, ICube> cubeMap = new LinkedHashMap<String, ICube>();
+	private transient Map<String, SoftReference<ICube>> softRefCubeMap = new LinkedHashMap<String, SoftReference<ICube>>();
 	private Map<String, IDimension> dimensionMap = new LinkedHashMap<String, IDimension>();
 	private Map<String, IMeasure> measureMap = new LinkedHashMap<String, IMeasure>();
 	private transient DataPoolManager dataPoolManager;
@@ -79,22 +85,55 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	 * @see de.xwic.cube.IDataPool#getCubes()
 	 */
 	public Collection<ICube> getCubes() {
-		return Collections.unmodifiableCollection(cubeMap.values());
+		List<ICube> result = new ArrayList<ICube>();
+		for (Iterator<Entry<String, SoftReference<ICube>>> it = softRefCubeMap.entrySet().iterator(); it.hasNext();) {
+			Entry<String, SoftReference<ICube>> entry = it.next();
+			SoftReference<ICube> ref = entry.getValue();
+			ICube cube = ref.get();
+			if (cube != null) {
+				result.add(cube);
+			} else {
+				softRefCubeMap.remove(entry.getKey());
+			}
+		}
+		result.addAll(cubeMap.values());
+		return result;
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.cube.IDataPool#createCube(java.lang.String, de.xwic.cube.Dimension[], de.xwic.cube.Measure[])
+	 * @see de.xwic.cube.IDataPool#createCube(java.lang.String,
+	 * de.xwic.cube.Dimension[], de.xwic.cube.Measure[])
 	 */
 	public synchronized ICube createCube(String key, IDimension[] dimensions, IMeasure[] measures) {
 		return createCube(key, dimensions, measures, CubeType.DEFAULT);
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.cube.IDataPool#createCube(java.lang.String, de.xwic.cube.Dimension[], de.xwic.cube.Measure[], de.xwic.cube.IDataPool.CubeType)
+
+	/*(non-Javadoc)
+	 * @see de.xwic.cube.IDataPool#createCube(java.lang.String,
+	 * de.xwic.cube.Dimension[], de.xwic.cube.Measure[],
+	 * de.xwic.cube.IDataPool.CubeType)
 	 */
 	public synchronized ICube createCube(String key, IDimension[] dimensions, IMeasure[] measures, CubeType type) {
+		return createCube(key, dimensions, measures, type, false);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.cube.IDataPool#createCube(java.lang.String,
+	 * de.xwic.cube.Dimension[], de.xwic.cube.Measure[],
+	 * de.xwic.cube.IDataPool.CubeType)
+	 */
+	public synchronized ICube createCube(String key, IDimension[] dimensions, IMeasure[] measures, CubeType type, boolean softRerenced) {
+
 		if (cubeMap.containsKey(key)) {
-			throw new IllegalArgumentException("A cube with that key already exists: " + key);
-		}
+			throw new IllegalArgumentException("A cube with that key already exists: " + key + " (permanent)");
+		} else if (softRefCubeMap.containsKey(key)) {
+			SoftReference<ICube> ref = softRefCubeMap.get(key);
+			if (ref != null && ref.get() != null) {
+				throw new IllegalArgumentException("A cube with that key already exists: " + key +  "(softReferenced)");
+			}
+		} 
 		ICube newCube;
 		switch (type) {
 		case FLEX_CALC:
@@ -106,7 +145,11 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 		default:
 			newCube = new Cube(this, key, dimensions, measures);
 		}
-		cubeMap.put(key, newCube);
+		if (!softRerenced) {
+			cubeMap.put(key, newCube);
+		} else {
+			softRefCubeMap.put(key, new SoftReference<ICube>(newCube));
+		}
 		return newCube;
 	}
 	
@@ -116,16 +159,40 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	public ICube getCube(String key) {
 		ICube cube = cubeMap.get(key);
 		if (cube == null) {
+			SoftReference<ICube> ref = softRefCubeMap.get(key);
+			if (ref != null) {
+				ICube softRefCube = ref.get();
+				if (softRefCube != null) {
+					return softRefCube;
+				} else {
+					cubeMap.remove(key);
+				}
+			}
 			throw new IllegalArgumentException("A cube with that key does not exist: " + key);
+		} else {
+			return cube;
 		}
-		return cube;
 	}
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDataPool#containsCube(java.lang.String)
 	 */
 	public boolean containsCube(String key) {
-		return cubeMap.containsKey(key);
+
+		boolean result = cubeMap.containsKey(key);
+		if (!result) {
+			SoftReference<ICube> ref = softRefCubeMap.get(key);
+			if (ref != null) {
+				ICube cube = ref.get();
+				if (cube != null) {
+					return true;
+				} else {
+					softRefCubeMap.remove(key);
+				}
+			}
+			return false;
+		}
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -184,6 +251,8 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	void removeCube(ICube cube) {
 		if (cubeMap.containsKey(cube.getKey())) {
 			cubeMap.remove(cube.getKey());
+		} else if (softRefCubeMap.containsKey(cube.getKey())) {
+			softRefCubeMap.remove(cube.getKey());
 		}
 		
 	}
@@ -239,9 +308,12 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	}
 
 	/**
+	 * This method is invoked by the DataPoolManager after restoring/deserializing
+	 * the DataPool. It is used to restore/recreate transient objects.
 	 * @param dataPoolManager the dataPoolManager to set
 	 */
 	void setDataPoolManager(DataPoolManager dataPoolManager) {
+		softRefCubeMap = new LinkedHashMap<String, SoftReference<ICube>>();
 		this.dataPoolManager = dataPoolManager;
 	}
 	
@@ -319,6 +391,8 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 		}
 		if(cubeMap.containsKey(oldCube.getKey())) {
 			cubeMap.put(oldCube.getKey(), newCube);
+		} else if (softRefCubeMap.containsKey(oldCube.getKey())) {
+			softRefCubeMap.put(oldCube.getKey(), new SoftReference<ICube>(newCube));
 		}
 	}
 }

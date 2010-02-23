@@ -78,7 +78,19 @@ public interface IDataPool extends IIdentifyable {
 	 */
 	public abstract ICube createCube(String key, IDimension[] dimensions, IMeasure[] measures, CubeType type);
 
-	
+	/**
+	 * Create a new cube with the specified dimensions and measures. The type indicates how the cube is storing and
+	 * calculating the data. The softReferenced flag allows to create temporary cubes that can be removed from the GC
+	 * if needed. 
+	 *  
+	 * @param key
+	 * @param dimensions
+	 * @param measures
+	 * @param type
+	 * @param softRerenced
+	 * @return
+	 */
+	public abstract ICube createCube(String key, IDimension[] dimensions, IMeasure[] measures, CubeType type, boolean softRerenced);
 	/**
 	 * Returns the cube with the specified key. If the cube does not exist, 
 	 * an IllegalArgumentException is thrown. 
