@@ -172,10 +172,16 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 		
 	}
 
+	/**
+	 * @return the zipDataPool
+	 */
 	public boolean isZipDataPool() {
 		return zipDataPool;
 	}
 
+	/**
+	 * @param zipDataPool the zipDataPool to set
+	 */
 	public void setZipDataPool(boolean zipDataPool) {
 		this.zipDataPool = zipDataPool;
 	}
