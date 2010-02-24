@@ -222,8 +222,10 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 			int idx = cube.getMeasureIndex(measure);
 			if (idx == countOnMeasureIndex) {
 				countOnMeasureKey = measure.getKey();
+			} else {
+				return false;
 			}
 		}
-		return countOnMeasureKey != null && countOnMeasureKey.equals(measure.getKey());
+		return countOnMeasureKey.equals(measure.getKey());
 	}
 }
