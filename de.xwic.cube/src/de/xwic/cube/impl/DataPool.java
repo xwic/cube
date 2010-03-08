@@ -54,7 +54,7 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDataPool#createDimension(java.lang.String)
 	 */
-	public synchronized Dimension createDimension(String key) {
+	public synchronized IDimension createDimension(String key) {
 		if (dimensionMap.containsKey(key)) {
 			throw new IllegalArgumentException("A dimension with that key already exists: " + key);
 		}
@@ -205,7 +205,7 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDataPool#createMeasure(java.lang.String)
 	 */
-	public synchronized Measure createMeasure(String key) {
+	public synchronized IMeasure createMeasure(String key) {
 		if (measureMap.containsKey(key)) {
 			throw new IllegalArgumentException("A measure with that key already exists: " + key);
 		}
