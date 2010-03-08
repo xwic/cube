@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2010-03-08 jbornema
+	- DataPool: createDimension(String key) and createMeasure(String key) return types changed to interface. 
+
 2010-02-23 kstein (commited by FLI)
 	- Added the possibility to create temporary (softReferenced) cubes.
 
