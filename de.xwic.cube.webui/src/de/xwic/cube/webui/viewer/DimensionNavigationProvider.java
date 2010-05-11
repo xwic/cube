@@ -43,6 +43,8 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	private Map<IDimension, Integer> dimensionsDepth = null;
 
 	private Set<IDimensionElement> contentFilter = new HashSet<IDimensionElement>();
+	
+	protected boolean navInitialized = false;
 
 	/**
 	 * Used to chain multiple dimensions in one navigation.
@@ -323,7 +325,9 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 * 
 	 */
 	private void initialize() {
-		createNavigationElements();
+		// FLI: Do not initialize the navigation elements immediately - wait for other parameters to be set...
+		//createNavigationElements();
+		navInitialized = false;
 		model.addCubeViewerModelListener(new CubeViewerModelAdapter() { 
 			@Override
 			public void cubeUpdated(CubeViewerModelEvent event) {
@@ -362,6 +366,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		if (sortComparator != null) {
 			Collections.sort(rootNavElements, sortComparator);
 		}
+		navInitialized = true;
 	}
 
 	/**
@@ -376,7 +381,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	public void setHideEmptyElements(boolean hideEmptyElements) {
 		this.hideEmptyElements = hideEmptyElements;
 		// force re-initialization
-		createNavigationElements();
+		navInitialized = false;
 	}
 	
 	/**
@@ -390,7 +395,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public void setShowRoot(boolean showDimension) {
 		this.showRoot = showDimension;
-		createNavigationElements();
+		navInitialized = false;
 	}
 
 
@@ -398,6 +403,10 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 * @see de.xwic.cube.webui.viewer.INavigationProvider#getNavigationSize()
 	 */
 	public NavigationSize getNavigationSize() {
+	
+		if (!navInitialized) {
+			createNavigationElements();
+		}
 		
 		NavigationSize size = new NavigationSize();
 		size.cells = evaluateSize(size, this, 1);
@@ -434,6 +443,9 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 * @see de.xwic.cube.webui.viewer.INavigationProvider#getNavigationElements()
 	 */
 	public List<INavigationElement> getNavigationElements() {
+		if (!navInitialized) {
+			createNavigationElements();
+		}
 		return rootNavElements;
 	}
 
@@ -486,7 +498,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public void setFilter(IDimensionFilter filter) {
 		this.filter = filter;
-		createNavigationElements();
+		navInitialized = false;
 	}
 
 	/**
@@ -502,7 +514,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	public void setHideEmptyRoot(boolean hideEmptyRoot) {
 		this.hideEmptyRoot = hideEmptyRoot;
 		// force re-initialization
-		createNavigationElements();
+		navInitialized = false;
 	}
 	
 	/**
@@ -525,7 +537,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	public void setRootTitle(String rootTitle) {
 		this.rootTitle = rootTitle;
 		if (showRoot) {
-			createNavigationElements();
+			navInitialized = false;
 		}
 	}
 
@@ -568,7 +580,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 			dimensionsDepth = new HashMap<IDimension, Integer>(dimensions.size());
 		}
 		dimensionsDepth.put(dimension.getDimension(), depth);
-		createNavigationElements();
+		navInitialized = false;
 	}
 
 	/**
