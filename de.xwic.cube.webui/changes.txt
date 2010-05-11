@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2010-05-11 FLI
+	- DimensionNavigationProvider does now initialize the navigationElements on first "use" only. Increases
+	  performance and possible OutOfMemory issues when concatenating very large dimensions.
+	  
 2010-01-18 FLI
 	- DimensionElementSelector now hides underlying SELECT elements
 	- DimensionElementSelector only triggers elementSelected event if new element is different to previous selection 
