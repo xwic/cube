@@ -386,7 +386,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 				}
 				if (cc != null) {
 					cc.hits++;
-					cache.put(key, cc);
+					cache.put(key.clone(), cc);
 					result = cc.cell;
 				}
 			}
