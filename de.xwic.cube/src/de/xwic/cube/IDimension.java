@@ -32,5 +32,19 @@ public interface IDimension extends IDimensionElement {
 	 * @see de.xwic.cube.DimensionElement#getID()
 	 */
 	public abstract String getID();
+	
+	/**
+	 * Returns true if the dimension is sealed. A sealed dimension can not be changed, so
+	 * that creation, deletion or moving of elements will raise an IllegalStateException.
+	 * @return
+	 */
+	public boolean isSealed();
 
+	/**
+	 * Set the sealed flag. A sealed dimension can not be changed, so
+	 * that creation, deletion or moving of elements will raise an IllegalStateException.
+	 * @param sealed
+	 */
+	public void setSealed(boolean sealed);
+	
 }

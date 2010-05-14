@@ -15,9 +15,11 @@ import de.xwic.cube.IDimension;
  */
 public class Dimension extends DimensionElement implements IDimension, Serializable {
 
-	private static final long serialVersionUID = 7146991699834998971L;
+	private static final long serialVersionUID = 7146991699834998972L;
 	private final DataPool dataPool;
 	
+	private boolean sealed = false;
+
 	/**
 	 * @param dataPool 
 	 * @param key
@@ -111,6 +113,20 @@ public class Dimension extends DimensionElement implements IDimension, Serializa
 	public void removeDimensionElements() {
 		elements.clear();
 		elementMap.clear();
+	}
+	
+	/**
+	 * @return the sealed
+	 */
+	public boolean isSealed() {
+		return sealed;
+	}
+
+	/**
+	 * @param sealed the sealed to set
+	 */
+	public void setSealed(boolean sealed) {
+		this.sealed = sealed;
 	}
 	
 	/* (non-Javadoc)

@@ -1,6 +1,10 @@
 Change Notes
 ============
 
+2010-05-14 FLI
+	- Added possibility to seal a dimension to prevent changes. This will unfortunately cause an incompatibility
+	  to older serialized datapools. 
+	  
 2010-05-11 FLI
 	- Fixed a problem in the Flex cube cache in combination with mutable keys
 	

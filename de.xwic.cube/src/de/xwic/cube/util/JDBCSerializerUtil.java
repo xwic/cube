@@ -247,6 +247,7 @@ public class JDBCSerializerUtil {
 		psSelectDimElm.clearParameters();
 		psSelectDimElm.setString(1, elm.getDimension().getKey());
 		psSelectDimElm.setString(2, elm.getID());
+		psSelectDimElm.setFetchSize(1000);
 		
 		ResultSet rs = psSelectDimElm.executeQuery();
 		while (rs.next()) {
