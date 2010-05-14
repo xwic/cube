@@ -53,6 +53,9 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 		if (key.indexOf('/') != -1) {
 			throw new IllegalArgumentException("A key can not contain a '/' character.");
 		}
+		if (dimension.isSealed()) {
+			throw new IllegalStateException("Can not create a new element because the dimension " + dimension.getKey() + " is sealed.");
+		}
 		DimensionElement element = new DimensionElement(dimension, this, key);
 		elementMap.put(key, element);
 		elements.add(element);
@@ -88,6 +91,9 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 * @see de.xwic.cube.IDimensionElement#remove()
 	 */
 	public void remove() {
+		if (dimension.isSealed()) {
+			throw new IllegalStateException("Can not remove element because the dimension " + dimension.getKey() + " is sealed.");
+		}
 		parent.removeDimensionElement(this);
 	}
 
@@ -303,6 +309,9 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 		if (!elements.contains(childElement)) {
 			throw new IllegalArgumentException("The specified element is not a child member");
 		}
+		if (dimension.isSealed()) {
+			throw new IllegalStateException("Can not move the element because the dimension " + dimension.getKey() + " is sealed.");
+		}
 		if (newIndex > (elements.size() - 1)) {
 			// simply put at the end of the list.
 			elements.remove(childElement);
@@ -346,6 +355,9 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 * @param comparator 
 	 */
 	public void sortDimensionElements(Comparator<IDimensionElement> comparator) {
+		if (dimension.isSealed()) {
+			throw new IllegalStateException("Can not sort elements because the dimension " + dimension.getKey() + " is sealed.");
+		}
 		Collections.sort(elements, comparator);
 	}
 	
@@ -353,6 +365,9 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 * Sort elements by key. 
 	 */
 	public void sortDimensionElements() {
+		if (dimension.isSealed()) {
+			throw new IllegalStateException("Can not sort elements because the dimension " + dimension.getKey() + " is sealed.");
+		}
 		Comparator<IDimensionElement> comparator = new Comparator<IDimensionElement>() {
 			public int compare(IDimensionElement o1, IDimensionElement o2) {
 				return o1.getKey().compareTo(o2.getKey());
