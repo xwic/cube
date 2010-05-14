@@ -54,7 +54,7 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 			throw new IllegalArgumentException("A key can not contain a '/' character.");
 		}
 		if (dimension.isSealed()) {
-			throw new IllegalStateException("Can not create a new element because the dimension " + dimension.getKey() + " is sealed.");
+			throw new IllegalStateException("Can not create a new element '" + key + "' in " + getID() + "' because the dimension " + dimension.getKey() + " is sealed.");
 		}
 		DimensionElement element = new DimensionElement(dimension, this, key);
 		elementMap.put(key, element);
