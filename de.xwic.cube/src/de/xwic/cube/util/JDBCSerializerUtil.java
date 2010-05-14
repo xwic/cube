@@ -4,13 +4,18 @@
 package de.xwic.cube.util;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimension;
@@ -23,6 +28,8 @@ import de.xwic.cube.IMeasure;
  */
 public class JDBCSerializerUtil {
 
+	private static Log log = LogFactory.getLog(JDBCSerializerUtil.class);
+	
 	/**
 	 * Update the specified table with the measures in the DataPool.
 	 * @param connection
@@ -95,8 +102,10 @@ public class JDBCSerializerUtil {
 	 */
 	public static void storeDimensions(Connection connection, IDataPool pool, String dimTableName, String dimElmTableName) throws SQLException {
 		
-		PreparedStatement psUpdateDim = connection.prepareStatement("UPDATE [" + dimTableName + "] SET [Title] = ? WHERE [Key] = ?");
-		PreparedStatement psInsertDim = connection.prepareStatement("INSERT INTO [" + dimTableName + "] ([Key], [Title]) VALUES (?, ?)");
+		checkDimensionTable(connection, dimTableName, dimElmTableName);
+		
+		PreparedStatement psUpdateDim = connection.prepareStatement("UPDATE [" + dimTableName + "] SET [Title] = ?, [Sealed] = ? WHERE [Key] = ?");
+		PreparedStatement psInsertDim = connection.prepareStatement("INSERT INTO [" + dimTableName + "] ([Key], [Title], [Sealed]) VALUES (?, ?)");
 		PreparedStatement psDeleteDim = connection.prepareStatement("DELETE FROM [" + dimTableName + "] WHERE [Key] = ?");
 
 		PreparedStatement psSelectDimElm = connection.prepareStatement("SELECT [ID] FROM [" + dimElmTableName + "] WHERE [DimensionKey] = ? AND [ParentID] = ?");
@@ -117,7 +126,8 @@ public class JDBCSerializerUtil {
 			if (keys.contains(dimension.getKey())) {
 				psUpdateDim.clearParameters();
 				psUpdateDim.setString(1, dimension.getTitle());
-				psUpdateDim.setString(2, dimension.getKey());
+				psUpdateDim.setBoolean(2, dimension.isSealed());
+				psUpdateDim.setString(3, dimension.getKey());
 				int updates = psUpdateDim.executeUpdate();
 				if (updates != 1) {
 					System.out.println("Dimension update failed for " + dimension.getKey()); 
@@ -127,6 +137,7 @@ public class JDBCSerializerUtil {
 				psInsertDim.clearParameters();
 				psInsertDim.setString(1, dimension.getKey());
 				psInsertDim.setString(2, dimension.getTitle());
+				psUpdateDim.setBoolean(3, dimension.isSealed());
 				psInsertDim.executeUpdate();
 			}
 			updateDimensionElements(dimension, psSelectDimElm, psInsertDimElm, psUpdateDimElm, psDeleteDimElm);
@@ -146,6 +157,51 @@ public class JDBCSerializerUtil {
 		psUpdateDimElm.close();
 		psDeleteDimElm.close();
 		psInsertDimElm.close();
+	}
+
+	/**
+	 * @param connection
+	 * @param dimElmTableName 
+	 * @param dimTableName 
+	 * @throws SQLException 
+	 */
+	private static void checkDimensionTable(Connection connection, String dimTableName, String dimElmTableName) throws SQLException {
+		
+		if (!columnExists(connection, dimTableName, "Sealed")) {
+			// create column
+			log.warn("Column 'Sealed' does not exist - will be created now..");
+			Statement stmt = connection.createStatement();
+			stmt.execute("ALTER TABLE [" + dimTableName + "] ADD [Sealed] Bit NOT NULL Default 0");
+			SQLWarning sw = stmt.getWarnings();
+			if (sw != null) {
+				log.warn("SQL Result: " + sw);
+			}
+		}
+
+		
+	}
+	
+	/**
+	 * Check if a column exists already.
+	 * @param con
+	 * @param tableName
+	 * @param columnName
+	 * @return
+	 * @throws SQLException
+	 */
+	private static boolean columnExists(Connection con, String tableName, String columnName) throws SQLException {
+		
+		DatabaseMetaData metaData = con.getMetaData();
+		ResultSet columns = metaData.getColumns(con.getCatalog(), null, tableName, columnName);
+		try {
+			if (columns.next()) {
+				return true;
+			}
+			return false;
+		} finally {
+			columns.close();
+		}
+		
 	}
 
 	/**
@@ -212,14 +268,17 @@ public class JDBCSerializerUtil {
 	 */
 	public static void restoreDimensions(Connection connection, IDataPool pool, String dimTableName, String dimElmTableName) throws SQLException {
 		
+		checkDimensionTable(connection, dimTableName, dimElmTableName);
+		
 		// restores dimensions.
 		PreparedStatement psSelectDimElm = connection.prepareStatement("SELECT [Key], [Title], [weight] FROM [" + dimElmTableName + "] WHERE [DimensionKey] = ? AND [ParentID] = ? ORDER BY order_index ASC");
 		
 		Statement stmt = connection.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT [Key], [Title] FROM [" + dimTableName + "]");
+		ResultSet rs = stmt.executeQuery("SELECT [Key], [Title], [Sealed] FROM [" + dimTableName + "]");
 		while (rs.next()) {
 			String key = rs.getString(1);
 			String title = rs.getString(2);
+			boolean sealed = rs.getBoolean(3);
 			System.out.println("Validating Dimension " + key);
 			IDimension dim;
 			if (!pool.containsDimension(key)) {
@@ -228,6 +287,7 @@ public class JDBCSerializerUtil {
 				dim = pool.getDimension(key);
 			}
 			dim.setTitle(title);
+			dim.setSealed(sealed);
 			
 			// load child elements
 			restoreChilds(dim, psSelectDimElm);
