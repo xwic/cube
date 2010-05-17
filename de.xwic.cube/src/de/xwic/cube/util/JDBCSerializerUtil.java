@@ -11,7 +11,9 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -271,7 +273,7 @@ public class JDBCSerializerUtil {
 		checkDimensionTable(connection, dimTableName, dimElmTableName);
 		
 		// restores dimensions.
-		PreparedStatement psSelectDimElm = connection.prepareStatement("SELECT [Key], [Title], [weight] FROM [" + dimElmTableName + "] WHERE [DimensionKey] = ? AND [ParentID] = ? ORDER BY order_index ASC");
+		PreparedStatement psSelectDimElm = connection.prepareStatement("SELECT [Key], [Title], [weight], [order_index], [ParentID] FROM [" + dimElmTableName + "] WHERE [DimensionKey] = ? ORDER BY order_index asc");
 		
 		Statement stmt = connection.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT [Key], [Title], [Sealed] FROM [" + dimTableName + "]");
@@ -290,7 +292,25 @@ public class JDBCSerializerUtil {
 			dim.setSealed(false);
 			
 			// load child elements
-			restoreChilds(dim, psSelectDimElm);
+			psSelectDimElm.clearParameters();
+			psSelectDimElm.setString(1, dim.getKey());
+			psSelectDimElm.setFetchSize(1000);
+			
+			ResultSet rsE = psSelectDimElm.executeQuery();
+			// load them first
+			List<DimElmDef> elmList = new ArrayList<DimElmDef>();
+			while (rsE.next()) {
+				DimElmDef de = new DimElmDef();
+				de.key = rsE.getString("Key");
+				de.title = rsE.getString("Title");
+				de.weight = rsE.getDouble("weight");
+				de.parentId = rsE.getString("ParentID");
+				de.order_index = rsE.getInt("order_index");
+				elmList.add(de);
+			}
+			rsE.close();
+
+			restoreChilds(dim, elmList);
 			dim.setSealed(sealed);
 		}
 		rs.close();
@@ -300,34 +320,27 @@ public class JDBCSerializerUtil {
 
 	/**
 	 * @param dim
-	 * @param psSelectDimElm
+	 * @param elmList
 	 * @throws SQLException 
 	 */
-	private static void restoreChilds(IDimensionElement elm, PreparedStatement psSelectDimElm) throws SQLException {
+	private static void restoreChilds(IDimensionElement elm, List<DimElmDef> elmList) throws SQLException {
 		
-		psSelectDimElm.clearParameters();
-		psSelectDimElm.setString(1, elm.getDimension().getKey());
-		psSelectDimElm.setString(2, elm.getID());
-		psSelectDimElm.setFetchSize(1000);
-		
-		ResultSet rs = psSelectDimElm.executeQuery();
-		while (rs.next()) {
-			String key = rs.getString("Key");
-			String title = rs.getString("Title");
-			double weight = rs.getDouble("weight");
-			IDimensionElement child;
-			if (elm.containsDimensionElement(key)) {
-				child = elm.getDimensionElement(key);
-			} else {
-				child = elm.createDimensionElement(key);
+		String parentId = elm.getID();
+		for (DimElmDef ded : elmList) {
+			if (parentId.equals(ded.parentId)) {
+				IDimensionElement child;
+				if (elm.containsDimensionElement(ded.key)) {
+					child = elm.getDimensionElement(ded.key);
+				} else {
+					child = elm.createDimensionElement(ded.key);
+				}
+				child.setTitle(ded.title);
+				child.setWeight(ded.weight);
 			}
-			child.setTitle(title);
-			child.setWeight(weight);
 		}
-		rs.close();
-		
+
 		for (IDimensionElement child : elm.getDimensionElements()) {
-			restoreChilds(child, psSelectDimElm);
+			restoreChilds(child, elmList);
 		}
 		
 	}
