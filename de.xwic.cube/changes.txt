@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2010-05-17 FLI
+	- Improved JDBCSerializerUtil performance of restoring dimension elements from the database
+	
 2010-05-14 FLI
 	- Added possibility to seal a dimension to prevent changes. This will unfortunately cause an incompatibility
 	  to older serialized datapools. 
