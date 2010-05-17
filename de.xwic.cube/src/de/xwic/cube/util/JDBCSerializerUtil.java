@@ -287,10 +287,11 @@ public class JDBCSerializerUtil {
 				dim = pool.getDimension(key);
 			}
 			dim.setTitle(title);
-			dim.setSealed(sealed);
+			dim.setSealed(false);
 			
 			// load child elements
 			restoreChilds(dim, psSelectDimElm);
+			dim.setSealed(sealed);
 		}
 		rs.close();
 		stmt.close();
