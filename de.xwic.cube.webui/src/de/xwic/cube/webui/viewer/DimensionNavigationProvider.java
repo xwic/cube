@@ -635,4 +635,16 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		this.extraClickInformation = extraClickInformation;
 	}
 
+	/**
+	 * Replace existing dimensions.
+	 * @param dimensions
+	 */
+	public void setDimensions(IDimensionElement... dimensions) {
+		this.dimensions.clear();
+		for (IDimensionElement elm : dimensions) {
+			this.dimensions.add(elm);
+		}
+		navInitialized = false;
+	}
+	
 }

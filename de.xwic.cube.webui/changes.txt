@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2010-05-19 FLI
+	- Added DimensionNavigationProvider.setDimensions(..)
+	
 2010-05-19 RPF
 	- Added "extraClickInformation" on DimensionNavigationProvider
 
