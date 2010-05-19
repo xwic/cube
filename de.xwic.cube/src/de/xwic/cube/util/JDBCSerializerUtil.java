@@ -107,7 +107,7 @@ public class JDBCSerializerUtil {
 		checkDimensionTable(connection, dimTableName, dimElmTableName);
 		
 		PreparedStatement psUpdateDim = connection.prepareStatement("UPDATE [" + dimTableName + "] SET [Title] = ?, [Sealed] = ? WHERE [Key] = ?");
-		PreparedStatement psInsertDim = connection.prepareStatement("INSERT INTO [" + dimTableName + "] ([Key], [Title], [Sealed]) VALUES (?, ?)");
+		PreparedStatement psInsertDim = connection.prepareStatement("INSERT INTO [" + dimTableName + "] ([Key], [Title], [Sealed]) VALUES (?, ?, ?)");
 		PreparedStatement psDeleteDim = connection.prepareStatement("DELETE FROM [" + dimTableName + "] WHERE [Key] = ?");
 
 		PreparedStatement psSelectDimElm = connection.prepareStatement("SELECT [ID] FROM [" + dimElmTableName + "] WHERE [DimensionKey] = ? AND [ParentID] = ?");
@@ -139,7 +139,7 @@ public class JDBCSerializerUtil {
 				psInsertDim.clearParameters();
 				psInsertDim.setString(1, dimension.getKey());
 				psInsertDim.setString(2, dimension.getTitle());
-				psUpdateDim.setBoolean(3, dimension.isSealed());
+				psInsertDim.setBoolean(3, dimension.isSealed());
 				psInsertDim.executeUpdate();
 			}
 			updateDimensionElements(dimension, psSelectDimElm, psInsertDimElm, psUpdateDimElm, psDeleteDimElm);
