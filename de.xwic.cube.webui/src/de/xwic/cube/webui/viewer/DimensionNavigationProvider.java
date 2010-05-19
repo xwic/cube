@@ -46,6 +46,8 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	
 	protected boolean navInitialized = false;
 
+	private String extraClickInformation = null;
+	
 	/**
 	 * Used to chain multiple dimensions in one navigation.
 	 * @author Lippisch
@@ -222,6 +224,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 			ContentInfo contentInfo = new ContentInfo(dataProvider, elements);
 			contentInfo.setClickable(clickable);
 			contentInfo.setUserData(contentUserData);
+			contentInfo.setExtraClickInfo(getExtraClickInformation());
 			return contentInfo;
 		}
 
@@ -616,6 +619,20 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	 */
 	public CubeViewerModel getModel() {
 		return model;
+	}
+
+	/**
+	 * @return the extraClickInformation
+	 */
+	public String getExtraClickInformation() {
+		return extraClickInformation;
+	}
+
+	/**
+	 * @param extraClickInformation the extraClickInformation to set
+	 */
+	public void setExtraClickInformation(String extraClickInformation) {
+		this.extraClickInformation = extraClickInformation;
 	}
 
 }
