@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2010-05-19 RPF
+	- Added "extraClickInformation" on DimensionNavigationProvider
+
 2010-05-11 FLI
 	- DimensionNavigationProvider does now initialize the navigationElements on first "use" only. Increases
 	  performance and possible OutOfMemory issues when concatenating very large dimensions.
