@@ -9,13 +9,14 @@ import java.util.List;
 import junit.framework.TestCase;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
+import de.xwic.cube.impl.CubePreCache;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.cube.util.DataDump;
 
 /**
  * @author Florian Lippisch
  */
-public class CubeTest extends TestCase {
+public class CubePreCacheTest extends TestCase {
 
 	ICube cube = null;
 	private IMeasure meBookings;
@@ -74,7 +75,10 @@ public class CubeTest extends TestCase {
 		meDiff.setFunction(function);
 		meDiff.setValueFormatProvider(new PercentageValueFormatProvider());
 		
-		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings, mePlan, meDiff });
+		cube = pool.createCube("test", new IDimension[] { dimOT, dimLOB, dimTime }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.PRE_CACHE);
+		
+		CubePreCache flexCube = (CubePreCache)cube;
+		flexCube.setAutoCachePaths(true);
 		
 	}
 	
@@ -127,6 +131,8 @@ public class CubeTest extends TestCase {
 		long duration = System.currentTimeMillis() - start;
 		System.out.println("Duration: " + duration);
 		
+		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
+		
 		assertEquals(220.0, cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
 		assertEquals(220.0, cube.getCellValue("[*][Hardware]", meBookings));
 		assertEquals(270.0, cube.getCellValue("[AOO][*]", meBookings));
@@ -134,8 +140,7 @@ public class CubeTest extends TestCase {
 		assertEquals(250.0, cube.getCellValue("[LOB:PS]", meBookings));
 		assertEquals(470.0, cube.getCellValue("", meBookings));
 
-		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
-		
+		buildCacheForPaths();
 	}
 	
 	public void testMeasureFunction() {
@@ -323,8 +328,20 @@ public class CubeTest extends TestCase {
 		System.out.println("Keys: " + keys.toString());
 		System.out.println("Value: " + cube.getCellValue(query, meBookings));
 		assertEquals(4, keys.size());
+		
+		
 	}
 	
+	protected void buildCacheForPaths() {
+		//String paths = "[Time:1][LOB:0]";
+		CubePreCache flexCube = (CubePreCache)cube;
+		flexCube.clearCachePaths();
+		flexCube.buildCacheForPaths();
+		assertEquals(220.0, cube.getCellValue("[AOO][Hardware][2008/Q1]", meBookings));
+		//Key key = flexCube.createKey("[*][*][2008]");
+		//CachedCell cc = flexCube.cache.get(key);
+	}
+
 	public void testBehaiviorNoSplash() {
 		
 		cube.setDimensionBehavior(dimLOB, DimensionBehavior.NO_SPLASH);
@@ -342,6 +359,9 @@ public class CubeTest extends TestCase {
 		assertNull(value);
 		
 		
+		assertEquals(1500d, cube.getCellValue("[AOO][*][2008]", meBookings));
+		
+		
 	}
 	
 	public void testBehaiviorNoAggregate() {
@@ -353,7 +373,6 @@ public class CubeTest extends TestCase {
 		cube.setCellValue(key, meBookings, 1000d);
 		
 		cube.setCellValue(cube.createKey("[AOO][Hardware]"), meBookings, 500d);
-		
 		
 		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
 		
@@ -373,14 +392,15 @@ public class CubeTest extends TestCase {
 		cube.setCellValue(cube.createKey("[AOO][Hardware]"), meBookings, 500d);
 		
 		
-		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
-		
 		Double value = cube.getCellValue("[AOO][*][2008]", meBookings);	// as it was not splashed, PS must be NULL
 		assertNull(value);
+
+		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
+		
 
 		value = cube.getCellValue("[AOO][PS/Service][2008]", meBookings);	// as it was not splashed, PS must be NULL
 		assertNull(value);
 	}
 
-	
+
 }

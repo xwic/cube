@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.cube.DimensionBehavior;
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICellProvider;
 import de.xwic.cube.ICube;
@@ -331,7 +332,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	protected ICell getCell(Key key, boolean createNew) {
 		//buildCacheForPaths("[Customer:1][Time:0][Time:1][Time:3][GEO:0][GEO:2][GEO:4][OnOrder:0][OnOrder:1][Product:0][Product:1]");
 		
-		if (key.isLeaf()) {
+		if (isLeafLikeKey(key)) {
 			// is leaf key
 			return super.getCell(key, createNew);
 		}
@@ -415,11 +416,33 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	private CachedCell calcCellFromIndex(Key searchKey) {
 		CachedCell cc = new CachedCell(null);
 		
+		int max = dimensionMap.size();
+		boolean checkBehavior = false;
+		for (DimensionBehavior db : dimensionBehavior) {
+			if (db.isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION) || db.isFlagged(DimensionBehavior.FLAG_NO_SPLASH)) {
+				checkBehavior = true;
+				break;
+			}
+		}
+		
 		Set<Key> keys = rootIndex.get(searchKey.getDimensionElement(0));
 		if (keys != null) {
 			CellAggregatedEvent event = new CellAggregatedEvent(this, null, null, searchKey, null);
 			for (Key key : keys) {
-				if (dimensionResolver.isSubKey(searchKey, key)) {
+				// if the behavior for a key is set to NO_AGGREGATION and NO_SPLASH, only elements must be
+				// taken into account that EQUAL the search key.
+				boolean accept = dimensionResolver.isSubKey(searchKey, key);
+				if (checkBehavior && accept) {
+					for (int i = 0; i < max; i++) {
+						if (dimensionBehavior[i].isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION)) {
+							if (!searchKey.getDimensionElement(i).equals(key.getDimensionElement(i))) {
+								accept = false;
+								break;
+							}
+						}
+					}
+				}
+				if (accept) {
 					cc.leafCount++;
 					ICell rawCell = data.get(key);
 					if (rawCell != null) {
@@ -466,6 +489,15 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 */
 	private CachedCell[] serialCalc(Key[] keys) {
 		
+		int max = dimensionMap.size();
+		boolean checkBehavior = false;
+		for (DimensionBehavior db : dimensionBehavior) {
+			if (db.isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION) || db.isFlagged(DimensionBehavior.FLAG_NO_SPLASH)) {
+				checkBehavior = true;
+				break;
+			}
+		}
+
 		CachedCell[] cachedCells = new CachedCell[keys.length];
 		for (int i = 0; i < keys.length; i++) {
 			cachedCells[i] = new CachedCell(null);
@@ -477,7 +509,18 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			ICell rawCell = entry.getValue();
 			Key rawKey = entry.getKey();
 			for (int i = 0; i < keys.length; i++) {
-				if (dimensionResolver.isSubKey(keys[i], rawKey)) {
+				boolean accept = dimensionResolver.isSubKey(keys[i], rawKey);
+				if (checkBehavior && accept) {
+					for (int k = 0; k < max; k++) {
+						if (dimensionBehavior[k].isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION)) {
+							if (!keys[i].getDimensionElement(k).equals(rawKey.getDimensionElement(k))) {
+								accept = false;
+								break;
+							}
+						}
+					}
+				}
+				if (accept) {
 					cachedCells[i].leafCount++;
 					if (cachedCells[i].cell == null) {
 						cachedCells[i].cell = createNewCell(keys[i], measureMap.size());
@@ -548,8 +591,8 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			ClassNotFoundException {
 
 		int version = in.readInt();
-		if (version < 1 || version > 6) {
-			throw new IOException("Cannot deserialize cube -> data file version is " + version + ", but expected 1..6");
+		if (version < 1 || version > 7) {
+			throw new IOException("Cannot deserialize cube -> data file version is " + version + ", but expected 1..7");
 		}
 		key = (String) in.readObject();
 		title = (String) in.readObject();
@@ -557,6 +600,11 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		dataPool = (DataPool) in.readObject();
 		dimensionMap = (Map<String, IDimension>) in.readObject();
 		measureMap = (Map<String, IMeasure>) in.readObject();
+		
+		dimensionBehavior = new DimensionBehavior[dimensionMap.size()];
+		for (int i = 0; i < dimensionBehavior.length; i++) {
+			dimensionBehavior[i] = DimensionBehavior.DEFAULT;
+		}
 		
 		if (version > 2) {
 			cubeListeners = (List<ICubeListener>)in.readObject();
@@ -568,6 +616,11 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			if (version > 5) {
 				keyProvider = (IKeyProvider)in.readObject();
 				cellProvider = (ICellProvider)in.readObject();
+			}
+			if (version > 6) {
+				for (int i = 0; i < dimensionBehavior.length; i++) {
+					dimensionBehavior[i] = (DimensionBehavior)in.readObject();
+				}
 			}
 			
 			serializeData = in.readBoolean();
@@ -675,7 +728,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	public void writeExternal(ObjectOutput out) throws IOException {
 
 		// serialize -> write the cube data.
-		int version = 6;
+		int version = 7;
 		out.writeInt(version); // version number
 		out.writeObject(key);
 		out.writeObject(title);
@@ -688,6 +741,10 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		out.writeObject(keyProvider);
 		out.writeObject(cellProvider);
 		
+		for (int i = 0; i < dimensionBehavior.length; i++) {
+			out.writeObject(dimensionBehavior);
+		}
+
 		// data serialization mode
 		out.writeBoolean(serializeData);
 		

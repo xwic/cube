@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.cube.DimensionBehavior;
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICellListener;
 import de.xwic.cube.ICellProvider;
@@ -49,6 +50,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	protected Map<Key, ICell> data;
 	
 	protected List<ICubeListener> cubeListeners = new ArrayList<ICubeListener>();
+	protected DimensionBehavior[] dimensionBehavior = null;
 	
 	protected boolean allowSplash = true;
 		
@@ -103,6 +105,11 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 				throw new IllegalArgumentException("The list of measures contains a duplicate entry: " + measure.getKey());
 			}
 			measureMap.put(measure.getKey(), measure);
+		}
+		
+		dimensionBehavior = new DimensionBehavior[dimensions.length];
+		for (int i = 0; i < dimensionBehavior.length; i++) {
+			dimensionBehavior[i] = DimensionBehavior.DEFAULT;
 		}
 		
 		data = newHashMap(500);
@@ -202,6 +209,24 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		
 	}
 
+
+	/**
+	 * Returns true if the key is either a leaf or if the non-leaf elements have
+	 * the NO_SPLASH behavior set.
+	 * @param key
+	 * @return
+	 */
+	protected boolean isLeafLikeKey(Key key) {
+		for (int i = 0, max = dimensionMap.size(); i < max; i++) {
+			IDimensionElement elm = key.getDimensionElement(i);
+			DimensionBehavior behavior = dimensionBehavior[i];
+			if (!elm.isLeaf() && !behavior.isFlagged(DimensionBehavior.FLAG_NO_SPLASH)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	/**
 	 * @param key
 	 * @param measure
@@ -210,7 +235,8 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	protected int splashAndWriteValue(int idx, Key key, int measureIndex, Double value) {
 		
 		int cellsModified = 0;
-		if (key.isLeaf()) {
+		
+		if (isLeafLikeKey(key)) {
 			ICell cell = getCell(key, value != null);
 			
 			if (cell == null) { // can only happens when the value is null too
@@ -227,7 +253,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			
 		} else {
 			IDimensionElement elmCurr = key.getDimensionElement(idx);
-			if (!elmCurr.isLeaf()) {
+			if (!elmCurr.isLeaf() && !dimensionBehavior[idx].isFlagged(DimensionBehavior.FLAG_NO_SPLASH)) {
 				Key subKey = key.clone();
 				// splash and iterate over children
 				if (value != null) {
@@ -298,9 +324,13 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			IDimensionElement element = key.getDimensionElement(idx);
 			do {
 				cellsModified += applyValueChange(idx + 1, myCursor, measureIndex, diff);
-				if (element != null) {
-					element = element.getParent();
-					myCursor.setDimensionElement(idx, element);
+				if (dimensionBehavior[idx].isFlagged((DimensionBehavior.FLAG_NO_AGGREGATION))) {
+					break; // do not "aggregate" this dimension..
+				} else {
+					if (element != null) {
+						element = element.getParent();
+						myCursor.setDimensionElement(idx, element);
+					}
 				}
 			} while (element != null);
 		}
@@ -620,8 +650,8 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			ClassNotFoundException {
 
 		int version = in.readInt();
-		if (version > 4) {
-			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected between 1..4");
+		if (version > 5) {
+			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected between 1..5");
 		}
 		key = (String) in.readObject();
 		title = (String) in.readObject();
@@ -629,6 +659,11 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		dataPool = (DataPool) in.readObject();
 		dimensionMap = (Map<String, IDimension>) in.readObject();
 		measureMap = (Map<String, IMeasure>) in.readObject();
+
+		dimensionBehavior = new DimensionBehavior[dimensionMap.size()];
+		for (int i = 0; i < dimensionBehavior.length; i++) {
+			dimensionBehavior[i] = DimensionBehavior.DEFAULT;
+		}
 		
 		if (version > 1) {
 			cubeListeners = (List<ICubeListener>)in.readObject();
@@ -640,6 +675,12 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			if (version > 3) {
 				keyProvider = (IKeyProvider)in.readObject();
 				cellProvider = (ICellProvider)in.readObject();
+			}
+
+			if (version > 4) {
+				for (int i = 0; i < dimensionBehavior.length; i++) {
+					dimensionBehavior[i] = (DimensionBehavior)in.readObject();
+				}
 			}
 			
 			serializeData = in.readBoolean();
@@ -671,7 +712,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	public void writeExternal(ObjectOutput out) throws IOException {
 
 		// serialize -> write the cube data.
-		int version = 4;
+		int version = 5;
 		out.writeInt(version); // version number
 		out.writeObject(key);
 		out.writeObject(title);
@@ -683,6 +724,10 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		out.writeObject(dimensionResolver);
 		out.writeObject(keyProvider);
 		out.writeObject(cellProvider);
+		
+		for (int i = 0; i < dimensionBehavior.length; i++) {
+			out.writeObject(dimensionBehavior);
+		}
 		
 		// data serialization mode
 		out.writeBoolean(serializeData);
@@ -849,6 +894,24 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	 */
 	public void setCellProvider(ICellProvider cellProvider) {
 		this.cellProvider = cellProvider;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#setDimensionBehavior(de.xwic.cube.IDimension, de.xwic.cube.DimensionBehavior)
+	 */
+	@Override
+	public void setDimensionBehavior(IDimension dimension, DimensionBehavior behavior) {
+		int idx = getDimensionIndex(dimension);
+		dimensionBehavior[idx] = behavior;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#getDimensionBehaivior(de.xwic.cube.IDimension)
+	 */
+	@Override
+	public DimensionBehavior getDimensionBehaivior(IDimension dimension) {
+		int idx = getDimensionIndex(dimension);
+		return dimensionBehavior[idx];
 	}
 	
 }
