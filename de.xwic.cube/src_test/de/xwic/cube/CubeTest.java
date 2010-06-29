@@ -323,7 +323,64 @@ public class CubeTest extends TestCase {
 		System.out.println("Keys: " + keys.toString());
 		System.out.println("Value: " + cube.getCellValue(query, meBookings));
 		assertEquals(4, keys.size());
+	}
+	
+	public void testBehaiviorNoSplash() {
+		
+		cube.setDimensionBehavior(dimLOB, DimensionBehavior.NO_SPLASH);
+		
+		Key key = cube.createKey("[AOO][PS][2008]");
+		
+		cube.setCellValue(key, meBookings, 1000d);
+		
+		cube.setCellValue(cube.createKey("[AOO][Hardware]"), meBookings, 500d);
 		
 		
-	}	
+		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
+		
+		Double value = cube.getCellValue("[AOO][PS/Service][2008]", meBookings);	// as it was not splashed, PS/Service must be NULL
+		assertNull(value);
+		
+		
+	}
+	
+	public void testBehaiviorNoAggregate() {
+		
+		cube.setDimensionBehavior(dimLOB, DimensionBehavior.NO_AGGREGATION);
+		
+		Key key = cube.createKey("[AOO][PS][2008]");
+		
+		cube.setCellValue(key, meBookings, 1000d);
+		
+		cube.setCellValue(cube.createKey("[AOO][Hardware]"), meBookings, 500d);
+		
+		
+		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
+		
+		Double value = cube.getCellValue("[AOO][*][2008]", meBookings);	// as it was not splashed, PS must be NULL
+		assertNull(value);
+		
+	}
+
+	public void testBehaiviorFlat() {
+		
+		cube.setDimensionBehavior(dimLOB, DimensionBehavior.FLAT);
+		
+		Key key = cube.createKey("[AOO][PS][2008]");
+		
+		cube.setCellValue(key, meBookings, 1000d);
+		
+		cube.setCellValue(cube.createKey("[AOO][Hardware]"), meBookings, 500d);
+		
+		
+		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
+		
+		Double value = cube.getCellValue("[AOO][*][2008]", meBookings);	// as it was not splashed, PS must be NULL
+		assertNull(value);
+
+		value = cube.getCellValue("[AOO][PS/Service][2008]", meBookings);	// as it was not splashed, PS must be NULL
+		assertNull(value);
+	}
+
+	
 }

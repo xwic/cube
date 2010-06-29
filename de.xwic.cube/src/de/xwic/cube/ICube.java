@@ -269,4 +269,19 @@ public interface ICube extends IIdentifyable {
 	 * @return
 	 */
 	public CubeType getCubeType();
+	
+	/**
+	 * Change the behavior of a dimension. This should be changed only when the cube is empty.
+	 * @param dimension
+	 * @param behavior
+	 */
+	public void setDimensionBehavior(IDimension dimension, DimensionBehavior behavior);
+	
+	/**
+	 * Returns the behavior associated with the specified dimension. 
+	 * @param dimension
+	 * @return
+	 */
+	public DimensionBehavior getDimensionBehaivior(IDimension dimension);
+	
 }
