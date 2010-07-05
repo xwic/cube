@@ -90,9 +90,27 @@ public class CubeUtil implements Serializable {
 	 * [GEO:EMEA/Germany]
 	 * 
 	 * @param id
+	 * @param autoCreate
 	 * @return
 	 */
 	public IDimensionElement parseDimensionElementId(String id) {
+		return parseDimensionElementId(id, autoCreateDimensionElement);
+	}
+
+	/**
+	 * Returns the DimensionElement specified in the id. If
+	 * autoCreate is true missing dimension elements are
+	 * created. This call caches parsed dimension elements in
+	 * parsedDimensionElements. The id is created from
+	 * IDimensionElement.getId(). Sample:
+	 * <p>
+	 * [GEO:EMEA/Germany]
+	 * 
+	 * @param id
+	 * @param autoCreate
+	 * @return
+	 */
+	public IDimensionElement parseDimensionElementId(String id, boolean autoCreate) {
 
 		IDimensionElement cached = parsedDimensionElements.get(id);
 		if (cached != null) {
@@ -134,7 +152,7 @@ public class CubeUtil implements Serializable {
 				} else {
 					elmKey = elmKeys.substring(idxPathStart, idxPathSep);
 				}
-				if (!autoCreateDimensionElement
+				if (!autoCreate
 						|| element.containsDimensionElement(elmKey)) {
 					element = element.getDimensionElement(elmKey);
 				} else {
@@ -156,12 +174,22 @@ public class CubeUtil implements Serializable {
 	}
 
 	/**
-	 * Parse a dimension path.
+	 * Parse a dimension path. Auto creates elements when autoCreateDimensionElement is true.
 	 * @param path
 	 * @param dimension
 	 * @return
 	 */
 	public IDimensionElement parseDimensionPath(String path, IDimension dimension) {
+		return parseDimensionPath(path, dimension, autoCreateDimensionElement);
+	}
+	/**
+	 * Parse a dimension path. Auto creates elements when autoCreate is true.
+	 * @param path
+	 * @param dimension
+	 * @param autoCreate
+	 * @return
+	 */
+	public IDimensionElement parseDimensionPath(String path, IDimension dimension, boolean autoCreate) {
 		if (path == null) {
 			return dimension;
 		}
@@ -177,7 +205,7 @@ public class CubeUtil implements Serializable {
 			} else {
 				elmKey = path.substring(idxPathStart, idxPathSep);
 			}
-			if (!autoCreateDimensionElement
+			if (!autoCreate
 					|| element.containsDimensionElement(elmKey)) {
 				element = element.getDimensionElement(elmKey);
 			} else {
