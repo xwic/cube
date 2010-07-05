@@ -1,6 +1,10 @@
 Change Notes
 ============
 
+2010-07-05 jbornema
+	- CubeUtil.parseDimensionElementId(String, boolean) and CubeUtil.parseDimensionElementId(String, IDimension, boolean) added
+	  to support auto create elements.
+
 2010-06-29 FLI
 	- Added possibility to set dimension behaviors, i.e. NO_SPLASH, NO_AGGREAGATION or FLAT
 
