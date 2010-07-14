@@ -9,18 +9,19 @@ import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.cube.DimensionBehavior;
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICellProvider;
 import de.xwic.cube.ICubeListener;
@@ -45,10 +46,10 @@ public class CubePreCache extends CubeFlexCalc {
 	
 	protected boolean autoCachePaths = false;
 	protected boolean enableBuildIndex = false;
-	protected Set<CachePath> cachePaths = new HashSet<CachePath>();
-	protected Set<CachePath> newCachePaths = new HashSet<CachePath>();
-	protected Set<Key> newCacheKeys = new HashSet<Key>();
-	protected Set<CachePathCellAggregatedEvent> newCachePathCellAggregatedEvents = new HashSet<CachePathCellAggregatedEvent>();
+	protected Collection<CachePath> cachePaths = new HashSet<CachePath>();
+	protected Collection<CachePath> newCachePaths = new HashSet<CachePath>();
+	protected Collection<Key> newCacheKeys = new HashSet<Key>();
+	protected Collection<CachePathCellAggregatedEvent> newCachePathCellAggregatedEvents = new ArrayList<CachePathCellAggregatedEvent>();
 
 	protected transient boolean buildCacheForPaths = false;
 	protected transient boolean buildCacheForPathsAgain = false;
@@ -72,10 +73,17 @@ public class CubePreCache extends CubeFlexCalc {
 			for (int i = 0; i < dimensionMap.size(); i++) {
 				IDimensionElement element = key.getDimensionElement(i);
 				dimensionsDepth[i] = new CachePathDimensionDepth(i);
-				dimensionsDepth[i].depth = element.getDepth();
+				int depth = element.getDepth();
+				if (dimensionBehavior[i].isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION)) {
+					// for disabled dimension aggregation use -1 as the depth
+					depth = -1;
+				}
+				// get depth, for disabled aggregation use depth = 0
+				// int depth = dimensionBehavior[i].isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION) ? 0 : element.getDepth();
+				dimensionsDepth[i].depth = depth;
 			}
 		}
-		
+		/*
 		public boolean matches(Key key) {
 			for (int i = 0; i < dimensionsDepth.length; i++) {
 				CachePathDimensionDepth path = dimensionsDepth[i];
@@ -88,7 +96,7 @@ public class CubePreCache extends CubeFlexCalc {
 			}
 			return true;
 		}
-
+		*/
 		/* (non-Javadoc)
 		 * @see java.lang.Object#hashCode()
 		 */
@@ -144,8 +152,14 @@ public class CubePreCache extends CubeFlexCalc {
 			Key key = createNewKey(new IDimensionElement[dimensionMap.size()]);
 			for (CachePathDimensionDepth dimensionDepth : dimensionsDepth) {
 				IDimensionElement element = rawKey.getDimensionElement(dimensionDepth.dimensionIndex);
-				for (int depth = element.getDepth(); depth > dimensionDepth.depth; depth--) {
-					element = element.getParent();
+				int depth = element.getDepth();
+				// check for DimensionBehavior
+				if (dimensionBehavior[dimensionDepth.dimensionIndex].isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION)) {
+					// dimension is not aggregated, so nothing to adjust here
+				} else {
+					for (; depth > dimensionDepth.depth; depth--) {
+						element = element.getParent();
+					}
 				}
 				key.setDimensionElement(dimensionDepth.dimensionIndex, element);
 			}
@@ -166,7 +180,7 @@ public class CubePreCache extends CubeFlexCalc {
 		public CachePathDimensionDepth(int dimensionIndex) {
 			this.dimensionIndex = dimensionIndex;
 		}
-		
+		/*
 		public boolean matches(Key key) {
 			IDimensionElement element = key.getDimensionElement(dimensionIndex);
 			if (element.getDepth() == depth) {
@@ -174,7 +188,7 @@ public class CubePreCache extends CubeFlexCalc {
 			}
 			return false;
 		}
-		
+		*/
 		/* (non-Javadoc)
 		 * @see java.lang.Object#hashCode()
 		 */
@@ -291,7 +305,7 @@ public class CubePreCache extends CubeFlexCalc {
 			ClassNotFoundException {
 
 		int version = in.readInt();
-		if (version < 1 || version > 2) {
+		if (version < 1 || version > 3) {
 			throw new IOException("Cannot deserialize cube -> data file version is " + version + ", but expected 1..2");
 		}
 		key = (String) in.readObject();
@@ -304,13 +318,23 @@ public class CubePreCache extends CubeFlexCalc {
 		cubeListeners = (List<ICubeListener>)in.readObject();
 		dimensionResolver = (IDimensionResolver)in.readObject();
 		
+		dimensionBehavior = new DimensionBehavior[dimensionMap.size()];
+		for (int i = 0; i < dimensionBehavior.length; i++) {
+			dimensionBehavior[i] = DimensionBehavior.DEFAULT;
+		}
+		
 		if (version > 1) {
 			keyProvider = (IKeyProvider)in.readObject();
 			cellProvider = (ICellProvider)in.readObject();
+			if (version > 2) {
+				for (int i = 0; i < dimensionBehavior.length; i++) {
+					dimensionBehavior[i] = (DimensionBehavior)in.readObject();
+				}
+			}
 		}
 		
 		serializeData = in.readBoolean();
-		
+
 		int size = 0;
 		int dimSize = dimensionMap.size();
 		
@@ -335,9 +359,9 @@ public class CubePreCache extends CubeFlexCalc {
 		// read cache paths settings
 		autoCachePaths = in.readBoolean();
 		if (autoCachePaths && externalizeCache) {
-			cachePaths = (HashSet<CachePath>)in.readObject();
-			newCachePaths = (HashSet<CachePath>)in.readObject();
-			newCacheKeys = (HashSet<Key>)in.readObject();
+			cachePaths = (Collection<CachePath>)in.readObject();
+			newCachePaths = (Collection<CachePath>)in.readObject();
+			newCacheKeys = (Collection<Key>)in.readObject();
 		}
 
 		if (externalizeCache) {
@@ -362,7 +386,7 @@ public class CubePreCache extends CubeFlexCalc {
 	public void writeExternal(ObjectOutput out) throws IOException {
 
 		// serialize -> write the cube data.
-		int version = 2;
+		int version = 3;
 		out.writeInt(version); // version number
 		out.writeObject(key);
 		out.writeObject(title);
@@ -375,6 +399,10 @@ public class CubePreCache extends CubeFlexCalc {
 		out.writeObject(keyProvider);
 		out.writeObject(cellProvider);
 		
+		for (int i = 0; i < dimensionBehavior.length; i++) {
+			out.writeObject(dimensionBehavior[i]);
+		}
+
 		out.writeBoolean(serializeData);
 		
 		// write data...
@@ -567,7 +595,7 @@ public class CubePreCache extends CubeFlexCalc {
 	}
 
 	@Override
-	protected void addNewCachedKey(Key key) {
+	protected synchronized void addNewCachedKey(Key key) {
 		if (autoCachePaths) {
 			if (newCacheKeys == null) {
 				newCacheKeys = new HashSet<Key>();
@@ -575,7 +603,7 @@ public class CubePreCache extends CubeFlexCalc {
 			newCacheKeys.add(key.clone());
 		}
 	}
-	
+
 	/**
 	 * Caches and aggregate rawCell data to cachePaths.
 	 * @param key
@@ -585,6 +613,10 @@ public class CubePreCache extends CubeFlexCalc {
 		
 		for (CachePath path : newCachePaths) {
 			Key k = path.makePathKey(key);
+			if (k == null) {
+				// don't use this cell on this CachePath
+				continue;
+			}
 			CachedCell cc = cache.get(k);
 			if (cc == null) {
 				cc = new CachedCell(createNewCell(k, measureMap.size()));

@@ -3,13 +3,20 @@
  */
 package de.xwic.cube;
 
+import java.io.Serializable;
+
 /**
  * Controls how a dimension is managed within a cube.  
  * 
  * @author lippisch
  */
-public class DimensionBehavior {
-
+public class DimensionBehavior implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2231495297452220437L;
+	
 	public final static int FLAG_DEFAULT = 0;
 	public final static int FLAG_NO_SPLASH = 1;
 	public final static int FLAG_NO_AGGREGATION = 2 * 1;

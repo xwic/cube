@@ -151,8 +151,18 @@ public class Key implements Serializable {
 	 * @return
 	 */
 	public boolean isSubKey(Key key) {
+		return isSubKey(key, null);
+	}
+
+	/**
+	 * Returns true if the key's elements match these
+	 * @param key
+	 * @param dimensionBehavior
+	 * @return
+	 */
+	public boolean isSubKey(Key key, DimensionBehavior[] dimensionBehavior) {
 		for (int i = 0; i < elementKeys.length; i++) {
-			if (!isSubKeyElement(key, i)) {
+			if (!isSubKeyElement(key, i, dimensionBehavior)) {
 				return false;
 			}
 		}
@@ -183,7 +193,20 @@ public class Key implements Serializable {
 	 * @return
 	 */
 	public boolean isSubKeyElement(Key key, int idx) {
-		return elementKeys[idx].equals(key.elementKeys[idx]) || elementKeys[idx].isChild(key.elementKeys[idx]);
+		return isSubKeyElement(key, idx, null);
+	}
+
+	/**
+	 * Returns true if the element at idx matches, invoked by @see isSubeKey(Key)
+	 * @param key
+	 * @param idx
+	 * @param dimensionBehavior
+	 * @return
+	 */
+	public boolean isSubKeyElement(Key key, int idx, DimensionBehavior[] dimensionBehavior) {
+		return elementKeys[idx].equals(key.elementKeys[idx]) 
+			|| ((dimensionBehavior == null || !dimensionBehavior[idx].isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION)) 
+					&& elementKeys[idx].isChild(key.elementKeys[idx]));
 	}
 
 	/**

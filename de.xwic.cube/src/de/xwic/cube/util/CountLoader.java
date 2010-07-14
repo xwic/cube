@@ -12,16 +12,16 @@
 package de.xwic.cube.util;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICube;
 import de.xwic.cube.ICubeListener;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.IMeasureLoader;
+import de.xwic.cube.IUserObject;
 import de.xwic.cube.Key;
 import de.xwic.cube.event.CellAggregatedEvent;
 import de.xwic.cube.event.CellValueChangedEvent;
@@ -42,19 +42,18 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 
 	private static final long serialVersionUID = 1L;
 	
-	protected transient Map<Object, Object> mapCounts;
-	protected Map<Key, Set<Object>> keyCounts;
+	//protected transient Map<Object, Object> mapCounts = new HashMap<Object, Object>();
+	protected Map<Key, Serializable> keyCounts = new HashMap<Key, Serializable>();
 	
-	protected int measureIndex;
-	protected int countOnMeasureIndex;
-	protected transient String countOnMeasureKey;
+	protected int measureIndex = -1;
+	/**
+	 * Index of measure index that is checked to apply count on logic:
+	 * -1: count on any
+	 */
+	protected int countOnMeasureIndex = -1;
+	protected String countOnMeasureKey;
 
 	protected transient Object countOn;
-	
-	{
-		mapCounts = new HashMap<Object, Object>();
-		keyCounts = new HashMap<Key, Set<Object>>();
-	}
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -78,20 +77,46 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 		CountLoader other = (CountLoader)obj;
 		return other.measureIndex == measureIndex;
 	}
-	
+
 	/**
 	 * Returns the Set where the countOn objects are place
 	 * @param key
 	 * @param createNew
 	 * @return
 	 */
-	protected Set<Object> getCounts(Key key, ICell cell, boolean createNew) {
-		Set<Object> objects = keyCounts.get(key);
-		if (createNew && objects == null) {
-			objects = new HashSet<Object>();
-			keyCounts.put(key.clone(), objects);
+	protected Serializable getCounts(Key key, ICell cell, boolean createNew) {
+		IUserObject object = null;
+		if (cell instanceof IUserObject) {
+			object = (IUserObject)cell;
+		} else if (key instanceof IUserObject) {
+			object = (IUserObject)key; 
+		}
+		Serializable objects = null;
+		if (object != null) {
+			objects = object.getUserObject();
+		} else {
+			objects = keyCounts.get(key);
 		}
 		return objects;
+	}
+	
+	protected int setCounts(Key key, ICell cell, Serializable objects) {
+		IUserObject object = null;
+		if (cell instanceof IUserObject) {
+			object = (IUserObject)cell;
+		} else if (key instanceof IUserObject) {
+			object = (IUserObject)key; 
+		}
+		if (object != null) {
+			object.setUserObject(objects);
+		} else {
+			keyCounts.put(key, objects);
+		}
+		if (objects instanceof Collection<?>) {
+			int size = ((Collection<?>)objects).size();
+			return size;
+		}
+		return 1;
 	}
 	
 	/* (non-Javadoc)
@@ -101,17 +126,17 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 		Key key = event.getKey();
 		ICell cell = event.getCell();
 		int mIndex = event.getMeasureIndex();
-		if (mIndex != countOnMeasureIndex) {
+		if (countOnMeasureIndex != -1 && mIndex != countOnMeasureIndex && mIndex != measureIndex) {
 			// don't count on this measure
 			return;
 		}
-		Set<Object> objects = getCounts(key, cell, true);
+		Serializable objects = getCounts(key, cell, true);
 		
 		// add countOn object
-		objects.add(countOn);
-
-		// set count in cell
-		cell.setValue(measureIndex, (double)objects.size());
+		objects = IUserObject.ObjectsHelper.addObjects(objects, (Serializable)countOn);
+		
+		int size = setCounts(key, cell, objects);
+		cell.setValue(measureIndex, (double)size);	
 	}
 	
 	/* (non-Javadoc)
@@ -123,16 +148,17 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 		Key parentKey = event.getParentKey();
 		ICell parentCell = event.getParentCell();
 		ICell childCell = event.getChildCell();
-		Set<Object> childObjects = getCounts(childKey, childCell, false);
+		Serializable childObjects = getCounts(childKey, childCell, false);
 		if (childObjects == null) {
 			// nothing to count
 			return;
 		}
+		Serializable parentObjects = getCounts(parentKey, parentCell, true);
 		
-		Set<Object> objects = getCounts(parentKey, parentCell, true);
-		objects.addAll(childObjects);
+		Serializable objects = IUserObject.ObjectsHelper.addObjects(parentObjects, childObjects);
+		int size = setCounts(parentKey, parentCell, objects);
 		// set count
-		parentCell.setValue(measureIndex, (double)objects.size());
+		parentCell.setValue(measureIndex, (double)size);
 	}
 
 	/**
@@ -150,6 +176,20 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	}
 
 	/**
+	 * @return the countOnMeasureKey
+	 */
+	public String getCountOnMeasureKey() {
+		return countOnMeasureKey;
+	}
+
+	/**
+	 * @param countOnMeasureKey the countOnMeasureKey to set
+	 */
+	public void setCountOnMeasureKey(String countOnMeasureKey) {
+		this.countOnMeasureKey = countOnMeasureKey;
+	}
+
+	/**
 	 * @return the countOn
 	 */
 	public Object getCountOn() {
@@ -161,12 +201,15 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	 * @see de.xwic.cube.IMeasureLoader#setObjectFocus(java.lang.Object)
 	 */
 	public void setObjectFocus(Object objectFocus) {
+		/*
 		Object obj = mapCounts.get(objectFocus);
 		if (obj == null) {
 			obj = objectFocus;
 			mapCounts.put(obj, obj);
 		}
 		this.countOn = obj;
+		*/
+		countOn = objectFocus;
 	}
 
 	/**
@@ -202,7 +245,7 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	 */
 	public void clear() {
 		countOn = null;
-		mapCounts.clear();
+		//mapCounts.clear();
 		keyCounts.clear();
 	}
 
@@ -218,12 +261,21 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	 * @see de.xwic.cube.IMeasureLoader#accept(de.xwic.cube.ICube, de.xwic.cube.Key, de.xwic.cube.IMeasure, java.lang.Double)
 	 */
 	public boolean accept(ICube cube, Key key, IMeasure measure, Double value) {
+		if (countOnMeasureIndex == -1 && countOnMeasureKey == null) {
+			// accept all measures
+			return true;
+		}
 		if (countOnMeasureKey == null) {
 			int idx = cube.getMeasureIndex(measure);
 			if (idx == countOnMeasureIndex) {
 				countOnMeasureKey = measure.getKey();
 			} else {
 				return false;
+			}
+		} else if (countOnMeasureIndex == -1) { 
+			if (measure.getKey().equals(countOnMeasureKey)) {
+				int idx = cube.getMeasureIndex(measure);
+				countOnMeasureIndex = idx;
 			}
 		}
 		return countOnMeasureKey.equals(measure.getKey());
