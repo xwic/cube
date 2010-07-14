@@ -1,6 +1,18 @@
 Change Notes
 ============
 
+2010-07-14 jbornema
+	- DimensionBehavior now serializable
+	- IUserObject added implemented by KeyExt and CellExt
+	- Key supports uses DimensionBehavior in isSubKey and isSubKeyElement methods
+	- Cell.toString, .hashCode and .equals added
+	- CellExt missing writeExternal and readExternal added
+	- Cube.writeExternal fixed DimensionBehavior usage
+	- CubeFlexCalc removed unused code and fixed DimensionBehavior usage in .writeExternal
+	- CubePreCache fixed DimensionBehavior usage
+	- DefaultDimensionResolver(ICube) added to support DimensionBehavior
+	- CountLoader cleaned: in future CountLoader will use a function instead of measure
+
 2010-07-05 jbornema
 	- CubeUtil.parseDimensionElementId(String, boolean) and CubeUtil.parseDimensionElementId(String, IDimension, boolean) added
 	  to support auto create elements.

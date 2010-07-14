@@ -16,11 +16,17 @@ public class DefaultDimensionResolver implements IDimensionResolver, Serializabl
 
 	private static final long serialVersionUID = 7347660598177270783L;
 
+	protected Cube cube;
+
+	public DefaultDimensionResolver(Cube cube) {
+		this.cube = cube;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDimensionResolver#isSubKey(de.xwic.cube.Key, de.xwic.cube.Key, de.xwic.cube.impl.Cell)
 	 */
 	public boolean isSubKey(Key parentKey, Key rawKey) {
-		return parentKey.isSubKey(rawKey);
+		return parentKey.isSubKey(rawKey, cube.dimensionBehavior);
 	}
 
 	/* (non-Javadoc)

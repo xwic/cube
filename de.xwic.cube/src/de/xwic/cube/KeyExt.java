@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @author JBORNEMA
  *
  */
-public class KeyExt extends Key {
+public class KeyExt extends Key implements IUserObject {
 
 	private static final long serialVersionUID = 796614174206092706L;
 	
@@ -57,7 +57,7 @@ public class KeyExt extends Key {
 	/**
 	 * @return the userObject
 	 */
-	public Object getUserObject() {
+	public Serializable getUserObject() {
 		return userObject;
 	}
 
@@ -127,5 +127,9 @@ public class KeyExt extends Key {
 		super.writeObject(out);
 		out.writeObject(userObject);
 	}
-	
+
+	@Override
+	public void addUserObjects(Serializable userObject) {
+		userObject = ObjectsHelper.addObjects(this.userObject, userObject);
+	}
 }

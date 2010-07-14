@@ -13,7 +13,6 @@ import java.io.ObjectOutput;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -110,184 +109,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		}
 	}
 	
-	public class CachePath implements Serializable {
-		private static final long serialVersionUID = 1L;
-
-		private CachePathDimensionDepth[] dimensionsDepth;
-		
-		public CachePath(Key key) {
-			dimensionsDepth = new CachePathDimensionDepth[dimensionMap.size()];
-			
-			for (int i = 0; i < dimensionMap.size(); i++) {
-				IDimensionElement element = key.getDimensionElement(i);
-				dimensionsDepth[i] = new CachePathDimensionDepth(i);
-				dimensionsDepth[i].depth = element.getDepth();
-			}
-		}
-		
-		public boolean matches(Key key) {
-			for (int i = 0; i < dimensionsDepth.length; i++) {
-				CachePathDimensionDepth path = dimensionsDepth[i];
-				if (path == null) {
-					continue;
-				}
-				if (!path.matches(key)) {
-					return false;
-				}
-			}
-			return true;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Object#hashCode()
-		 */
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + Arrays.hashCode(dimensionsDepth);
-			return result;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			CachePath other = (CachePath) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (!Arrays.equals(dimensionsDepth, other.dimensionsDepth))
-				return false;
-			return true;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Object#toString()
-		 */
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			for (CachePathDimensionDepth depth : dimensionsDepth) {
-				sb.append(depth);
-			}
-			return sb.toString();
-		}
-
-		private CubeFlexCalc getOuterType() {
-			return CubeFlexCalc.this;
-		}
-
-		/**
-		 * @param rawKey
-		 * @return
-		 */
-		public Key makePathKey(Key rawKey) {
-			Key key = new Key(new IDimensionElement[dimensionMap.size()]);
-			for (CachePathDimensionDepth dimensionDepth : dimensionsDepth) {
-				IDimensionElement element = rawKey.getDimensionElement(dimensionDepth.dimensionIndex);
-				for (int depth = element.getDepth(); depth > dimensionDepth.depth; depth--) {
-					element = element.getParent();
-				}
-				key.setDimensionElement(dimensionDepth.dimensionIndex, element);
-			}
-			dimensionResolver.adjustKey(key, rawKey);
-			return key;
-		}
-	}
-	
-	public class CachePathDimensionDepth implements Serializable {
-		private static final long serialVersionUID = 1L;
-		
-		/** Dimension for cache path */
-		int dimensionIndex;
-		
-		/** Depth level of cache path for this dimension */
-		int depth;
-		
-		public CachePathDimensionDepth(int dimensionIndex) {
-			this.dimensionIndex = dimensionIndex;
-		}
-		
-		public boolean matches(Key key) {
-			IDimensionElement element = key.getDimensionElement(dimensionIndex);
-			if (element.getDepth() == depth) {
-				return true;
-			}
-			return false;
-		}
-		
-		/* (non-Javadoc)
-		 * @see java.lang.Object#hashCode()
-		 */
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + depth;
-			result = prime * result + dimensionIndex;
-			return result;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			CachePathDimensionDepth other = (CachePathDimensionDepth) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (depth != other.depth)
-				return false;
-			if (dimensionIndex != other.dimensionIndex)
-				return false;
-			return true;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Object#toString()
-		 */
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			sb.append('[').append(new ArrayList<IDimension>(dimensionMap.values()).get(dimensionIndex));
-			sb.append("/").append(depth).append(']');
-			return sb.toString();
-		}
-
-		private CubeFlexCalc getOuterType() {
-			return CubeFlexCalc.this;
-		}
-	}
-	
-	public class CachePathCellAggregatedEvent {
-		protected Key childKey;
-		protected Cell childCell;
-		protected Key parentKey;
-		protected Cell parentCell;
-
-		public CellAggregatedEvent use(CellAggregatedEvent event) {
-			event.setChildCell(childCell);
-			event.setChildKey(childKey);
-			event.setParentCell(parentCell);
-			event.setParentKey(parentKey);
-			return event;
-		}
-	}
 	
 	/**
 	 * INTERNAL: This constructor is used by the serialization mechanism. 
@@ -488,7 +309,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @return
 	 */
 	private CachedCell[] serialCalc(Key[] keys) {
-		
+
 		int max = dimensionMap.size();
 		boolean checkBehavior = false;
 		for (DimensionBehavior db : dimensionBehavior) {
@@ -546,7 +367,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 */
 	@Override
 	protected void removeEmptyCells(Key key, int measureIndex) {
-		if (key.isLeaf()) { // only execute on leafs...
+		if (isLeafLikeKey(key)) { // only execute on leafs...
 			super.removeEmptyCells(key, measureIndex);
 		}
 	}
@@ -742,7 +563,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		out.writeObject(cellProvider);
 		
 		for (int i = 0; i < dimensionBehavior.length; i++) {
-			out.writeObject(dimensionBehavior);
+			out.writeObject(dimensionBehavior[i]);
 		}
 
 		// data serialization mode

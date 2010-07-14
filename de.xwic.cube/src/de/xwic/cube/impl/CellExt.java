@@ -3,13 +3,18 @@
  */
 package de.xwic.cube.impl;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.Serializable;
+
+import de.xwic.cube.IUserObject;
 
 /**
  * @author jbornema
  *
  */
-public class CellExt extends Cell {
+public class CellExt extends Cell implements IUserObject {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -31,7 +36,7 @@ public class CellExt extends Cell {
 	/**
 	 * @return the userObject
 	 */
-	public Object getUserObject() {
+	public Serializable getUserObject() {
 		return userObject;
 	}
 
@@ -42,4 +47,20 @@ public class CellExt extends Cell {
 		this.userObject = userObject;
 	}
 
+	@Override
+	public void addUserObjects(Serializable userObject) {
+		userObject = ObjectsHelper.addObjects(this.userObject, userObject);
+	}
+	
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		super.readExternal(in);
+		userObject = (Serializable)in.readObject();
+	}
+	
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		super.writeExternal(out);
+		out.writeObject(userObject);
+	}
 }

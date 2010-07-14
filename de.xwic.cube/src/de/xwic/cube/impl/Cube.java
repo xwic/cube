@@ -54,7 +54,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	
 	protected boolean allowSplash = true;
 		
-	protected IDimensionResolver dimensionResolver = new DefaultDimensionResolver();
+	protected IDimensionResolver dimensionResolver = new DefaultDimensionResolver(this);
 	protected IKeyProvider keyProvider = new DefaultKeyProvider();
 	protected ICellProvider cellProvider = new DefaultCellProvider();
 	
@@ -153,6 +153,13 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		return getCell(key, false);
 	}
 	
+	/**
+	 * Returns the cell for specified key. Non existing cell is created
+	 * when createNew flag is set.
+	 * @param key
+	 * @param createNew
+	 * @return
+	 */
 	protected ICell getCell(Key key, boolean createNew) {
 		ICell cell = data.get(key);
 		if (cell == null && createNew) {
@@ -726,7 +733,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		out.writeObject(cellProvider);
 		
 		for (int i = 0; i < dimensionBehavior.length; i++) {
-			out.writeObject(dimensionBehavior);
+			out.writeObject(dimensionBehavior[i]);
 		}
 		
 		// data serialization mode
