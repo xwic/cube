@@ -112,7 +112,7 @@ public interface IDataPool extends IIdentifyable {
 	public abstract Collection<IMeasure> getMeasures();
 
 	/**
-	 * Create a new cube.
+	 * Create a new measure.
 	 * @param key
 	 * @return
 	 */

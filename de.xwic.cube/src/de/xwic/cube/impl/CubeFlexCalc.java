@@ -150,7 +150,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @see de.xwic.cube.impl.Cube#getCell(de.xwic.cube.Key, boolean)
 	 */
 	@Override
-	protected ICell getCell(Key key, boolean createNew) {
+	public ICell getCell(Key key, boolean createNew) {
 		//buildCacheForPaths("[Customer:1][Time:0][Time:1][Time:3][GEO:0][GEO:2][GEO:4][OnOrder:0][OnOrder:1][Product:0][Product:1]");
 		
 		if (isLeafLikeKey(key)) {

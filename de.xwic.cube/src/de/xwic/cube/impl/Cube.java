@@ -153,6 +153,8 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		return getCell(key, false);
 	}
 	
+	
+	
 	/**
 	 * Returns the cell for specified key. Non existing cell is created
 	 * when createNew flag is set.
@@ -160,7 +162,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	 * @param createNew
 	 * @return
 	 */
-	protected ICell getCell(Key key, boolean createNew) {
+	public ICell getCell(Key key, boolean createNew) {
 		ICell cell = data.get(key);
 		if (cell == null && createNew) {
 			cell = createNewCell(key, measureMap.size());
@@ -202,8 +204,17 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	public int addCellValue(Key key, IMeasure measure, double value) {
 		
 		if (!allowSplash && !key.isLeaf()) {
-			// splash not implemented yet.
-			throw new IllegalArgumentException("The key must contain only leafs.");
+			// splash not supported
+			StringBuilder nonLeafs = new StringBuilder();
+			for (IDimensionElement elm : key.getDimensionElements()) {
+				if (!elm.isLeaf()) {
+					if (nonLeafs.length() > 0) {
+						nonLeafs.append(", ");
+					}
+					nonLeafs.append(elm.getID());
+				}
+			}
+			throw new IllegalArgumentException("The key must contain only leafs (check " + nonLeafs + " of "  + key + ")");
 		}
 		
 		int measureIndex = getMeasureIndex(measure);
@@ -621,7 +632,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			}
 			idx++;
 		}
-		throw new IllegalArgumentException("The specified measure is not used int his cube.");
+		throw new IllegalArgumentException("The specified " + measure + " is not used in this cube.");
 	}
 	
 	/**

@@ -130,6 +130,6 @@ public class KeyExt extends Key implements IUserObject {
 
 	@Override
 	public void addUserObjects(Serializable userObject) {
-		userObject = ObjectsHelper.addObjects(this.userObject, userObject);
+		userObject = Helper.addObjects(this.userObject, userObject);
 	}
 }
