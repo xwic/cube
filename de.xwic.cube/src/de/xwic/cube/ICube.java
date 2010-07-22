@@ -99,12 +99,22 @@ public interface ICube extends IIdentifyable {
 	public abstract IQuery createQuery(Key key);
 	
 	/**
-	 * Returns the cell for the specified key.
+	 * Returns the cell for the specified key (null if cell doesn't exist).
 	 * @param key
 	 * @return
 	 */
 	public abstract ICell getCell(Key key);
 
+	
+	/**
+	 * Returns the cell for specified key. Non existing cell is created
+	 * when createNew flag is set.
+	 * @param key
+	 * @param createNew
+	 * @return
+	 */
+	public abstract ICell getCell(Key key, boolean createNew);
+	
 	/**
 	 * Returns the DataPool this cube belongs too.
 	 * @return

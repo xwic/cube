@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.xwic.cube.ICell;
+import de.xwic.cube.ICellLoader;
 import de.xwic.cube.ICube;
 import de.xwic.cube.ICubeListener;
 import de.xwic.cube.IMeasure;
@@ -38,7 +39,7 @@ import de.xwic.cube.impl.AbstractCubeListener;
  * @author JBORNEMA
  */
 
-public class CountLoader extends AbstractCubeListener implements IMeasureLoader, ICubeListener, Serializable {
+public class CountLoader extends AbstractCubeListener implements IMeasureLoader, ICellLoader, ICubeListener, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -52,45 +53,62 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	 */
 	protected int countOnMeasureIndex = -1;
 	protected String countOnMeasureKey;
-
+	
 	protected transient Object countOn;
+	protected String key;
+	
+	/**
+	 * @param key
+	 */
+	public CountLoader(String key) {
+		this.key = key;
+	}
+	
+	/**
+	 * @return the key
+	 */
+	public String getKey() {
+		return key;
+	}
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() * 31 + measureIndex;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((key == null) ? 0 : key.hashCode());
+		return result;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == this) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null || obj.getClass() != getClass()) {
+		if (obj == null)
 			return false;
-		}
-		CountLoader other = (CountLoader)obj;
-		return other.measureIndex == measureIndex;
+		if (getClass() != obj.getClass())
+			return false;
+		CountLoader other = (CountLoader) obj;
+		if (key == null) {
+			if (other.key != null)
+				return false;
+		} else if (!key.equals(other.key))
+			return false;
+		return true;
 	}
 
 	/**
-	 * Returns the Set where the countOn objects are place
+	 * Returns the Serializable where the countOn objects are placed
 	 * @param key
-	 * @param createNew
 	 * @return
 	 */
-	protected Serializable getCounts(Key key, ICell cell, boolean createNew) {
-		IUserObject object = null;
-		if (cell instanceof IUserObject) {
-			object = (IUserObject)cell;
-		} else if (key instanceof IUserObject) {
-			object = (IUserObject)key; 
-		}
+	protected Serializable getCounts(Key key, ICell cell) {
+		IUserObject object = IUserObject.Helper.getFirstUserObject(cell, key);
 		Serializable objects = null;
 		if (object != null) {
 			objects = object.getUserObject();
@@ -101,12 +119,7 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	}
 	
 	protected int setCounts(Key key, ICell cell, Serializable objects) {
-		IUserObject object = null;
-		if (cell instanceof IUserObject) {
-			object = (IUserObject)cell;
-		} else if (key instanceof IUserObject) {
-			object = (IUserObject)key; 
-		}
+		IUserObject object = IUserObject.Helper.getFirstUserObject(cell, key);
 		if (object != null) {
 			object.setUserObject(objects);
 		} else {
@@ -123,6 +136,10 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	 * @see de.xwic.cube.impl.AbstractCubeListener#onCellValueChanged(de.xwic.cube.event.CellValueChangedEvent)
 	 */
 	public void onCellValueChanged(CellValueChangedEvent event) {
+		if (measureIndex == -1) {
+			// running in function mode
+			return;
+		}
 		Key key = event.getKey();
 		ICell cell = event.getCell();
 		int mIndex = event.getMeasureIndex();
@@ -130,13 +147,28 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 			// don't count on this measure
 			return;
 		}
-		Serializable objects = getCounts(key, cell, true);
+		Serializable objects = getCounts(key, cell);
 		
 		// add countOn object
-		objects = IUserObject.ObjectsHelper.addObjects(objects, (Serializable)countOn);
+		objects = IUserObject.Helper.addObjects(objects, (Serializable)countOn);
 		
 		int size = setCounts(key, cell, objects);
 		cell.setValue(measureIndex, (double)size);	
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICellLoader#updateCell(de.xwic.cube.ICube, de.xwic.cube.Key, de.xwic.cube.ICell, java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public void updateCell(ICube cube, Key key, ICell cell, Object columnName, Object value) {
+		if (measureIndex != -1) {
+			// running in measure mode
+			return;
+		}
+		Serializable objects = getCounts(key, cell);
+		// add countOn object
+		objects = IUserObject.Helper.addObjects(objects, (Serializable)value);
+		setCounts(key, cell, objects);
 	}
 	
 	/* (non-Javadoc)
@@ -148,17 +180,20 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 		Key parentKey = event.getParentKey();
 		ICell parentCell = event.getParentCell();
 		ICell childCell = event.getChildCell();
-		Serializable childObjects = getCounts(childKey, childCell, false);
+		Serializable childObjects = getCounts(childKey, childCell);
 		if (childObjects == null) {
 			// nothing to count
 			return;
 		}
-		Serializable parentObjects = getCounts(parentKey, parentCell, true);
+		Serializable parentObjects = getCounts(parentKey, parentCell);
 		
-		Serializable objects = IUserObject.ObjectsHelper.addObjects(parentObjects, childObjects);
+		Serializable objects = IUserObject.Helper.addObjects(parentObjects, childObjects);
 		int size = setCounts(parentKey, parentCell, objects);
 		// set count
-		parentCell.setValue(measureIndex, (double)size);
+		if (measureIndex != -1) {
+			// running in measure mode, so update measure now
+			parentCell.setValue(measureIndex, (double)size);
+		}
 	}
 
 	/**
@@ -201,14 +236,6 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	 * @see de.xwic.cube.IMeasureLoader#setObjectFocus(java.lang.Object)
 	 */
 	public void setObjectFocus(Object objectFocus) {
-		/*
-		Object obj = mapCounts.get(objectFocus);
-		if (obj == null) {
-			obj = objectFocus;
-			mapCounts.put(obj, obj);
-		}
-		this.countOn = obj;
-		*/
 		countOn = objectFocus;
 	}
 
@@ -261,6 +288,10 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 	 * @see de.xwic.cube.IMeasureLoader#accept(de.xwic.cube.ICube, de.xwic.cube.Key, de.xwic.cube.IMeasure, java.lang.Double)
 	 */
 	public boolean accept(ICube cube, Key key, IMeasure measure, Double value) {
+		if (measureIndex == -1) {
+			// running in function mode
+			return false;
+		}
 		if (countOnMeasureIndex == -1 && countOnMeasureKey == null) {
 			// accept all measures
 			return true;
@@ -280,4 +311,5 @@ public class CountLoader extends AbstractCubeListener implements IMeasureLoader,
 		}
 		return countOnMeasureKey.equals(measure.getKey());
 	}
+
 }

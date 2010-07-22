@@ -1,6 +1,14 @@
 Change Notes
 ============
 
+2010-07-22 jbornema
+	- ICellLoader added used by CountLoader to store count information in CellExt.
+	- ICube.getCell(ICell, boolean) added
+	- CountFunction added
+	- CellExt.isEmpty() implemented
+	- Cube exception messages improved
+	- CountLoader supports now CellExt and KeyExt for storing count information as well
+	
 2010-07-14 jbornema
 	- DimensionBehavior now serializable
 	- IUserObject added implemented by KeyExt and CellExt

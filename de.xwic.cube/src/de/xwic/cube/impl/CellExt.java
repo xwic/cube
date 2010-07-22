@@ -49,7 +49,12 @@ public class CellExt extends Cell implements IUserObject {
 
 	@Override
 	public void addUserObjects(Serializable userObject) {
-		userObject = ObjectsHelper.addObjects(this.userObject, userObject);
+		userObject = Helper.addObjects(this.userObject, userObject);
+	}
+	
+	@Override
+	public boolean isEmpty() {
+		return userObject == null && super.isEmpty();
 	}
 	
 	@Override
