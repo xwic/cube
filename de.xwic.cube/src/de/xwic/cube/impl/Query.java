@@ -143,4 +143,13 @@ public class Query implements IQuery {
 		clone.selection = new HashMap<IDimension, Set<IDimensionElement>>(selection);
 		return clone;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IQuery#getSelectedDimensions()
+	 */
+	@Override
+	public Set<IDimension> getSelectedDimensions() {
+		return selection.keySet();
+	}
+
 }
