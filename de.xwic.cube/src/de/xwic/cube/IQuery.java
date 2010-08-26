@@ -49,4 +49,10 @@ public interface IQuery {
 	 * @return
 	 */
 	public IQuery clone();
+	
+	/**
+	 * Returns set of selected IDimension objects available for all selected IDimensionElements.
+	 * @return
+	 */
+	public Set<IDimension> getSelectedDimensions();
 }

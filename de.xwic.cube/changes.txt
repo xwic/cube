@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2010-08-26 jbornema
+	- Query/IQuery.getSelectedDimensions() added.
+
 2010-07-22 jbornema
 	- ICellLoader added used by CountLoader to store count information in CellExt.
 	- ICube.getCell(ICell, boolean) added
