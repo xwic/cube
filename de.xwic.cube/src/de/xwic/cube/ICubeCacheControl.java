@@ -55,12 +55,13 @@ public interface ICubeCacheControl {
 	public abstract void buildCacheFromCube(ICube cube);
 	
 	/**
-	 * Rebuild the cache based on cache statistics.
-	 */
-
-	/**
-	 * @return
+	 * @return current size of the cache
 	 */
 	public abstract int getCacheSize();
+	
+	/**
+	 * Clears the cache.
+	 */
+	public void clearCache();
 
 }

@@ -458,6 +458,7 @@ public class CubePreCache extends CubeFlexCalc {
 		cachePaths.clear();
 		newCachePaths.clear();
 		newCacheKeys.clear();
+		newCachePathCellAggregatedEvents.clear();
 	}
 	
 	/**

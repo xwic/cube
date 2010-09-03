@@ -616,7 +616,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	/**
 	 * Data has been written or the cube has been cleared. 
 	 */
-	protected void clearCache() {
+	public void clearCache() {
 		cache.clear();
 		rootIndex.clear();
 	}

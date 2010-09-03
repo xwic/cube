@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2010-10-03 jbornema
+	- ICubeCacheControl.clearCache() added.
+
 2010-08-26 jbornema
 	- Query/IQuery.getSelectedDimensions() added.
 
