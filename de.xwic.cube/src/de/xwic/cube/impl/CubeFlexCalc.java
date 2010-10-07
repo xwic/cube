@@ -504,6 +504,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	@Override
 	public void massUpdateFinished() {
 		
+		clearCache(); // clear the cache!
 		// build index.
 		buildIndex();
 		massUpdateMode = false;

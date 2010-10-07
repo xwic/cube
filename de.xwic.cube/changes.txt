@@ -1,6 +1,11 @@
 Change Notes
 ============
 
+2010-10-07 FLI
+	- Fixed a problem in the CubeFlexCalc where "empty" spots could
+	  occur in the cache if data is read from the cube during mass-insert 
+	  mode.
+	   
 2010-10-03 jbornema
 	- ICubeCacheControl.clearCache() added.
 
