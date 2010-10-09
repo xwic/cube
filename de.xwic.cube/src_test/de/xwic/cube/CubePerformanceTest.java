@@ -87,7 +87,7 @@ public class CubePerformanceTest extends TestCase {
 		cube = pool.createCube("Bookings", 
 				new IDimension[] { dimTime, dimGEO, dimLOB, dimAccount, dimLocalAccount, dimOT, dimSupportType, dimProductGrouping},
 				new IMeasure[] { meBookings, meListprice, meBookingsFR },
-				IDataPool.CubeType.FLEX_CALC);
+				IDataPool.CubeType.INDEXED);
 		
 	}
 		

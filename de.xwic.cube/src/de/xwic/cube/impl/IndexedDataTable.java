@@ -129,7 +129,7 @@ public class IndexedDataTable implements ICellStore, Serializable {
 		// search the elements.
 		scanElements(ctx, 0, ctx.maxRow);
 		
-		//System.out.println("Entries touched: " + ctx.ibScan);
+		//System.out.println("Entries touched: " + ctx.ibScan + " out of " + indexData.size());
 		
 		return ctx.cell;
 	}
