@@ -11,12 +11,10 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,10 +28,10 @@ import de.xwic.cube.ICubeListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IDimensionResolver;
+import de.xwic.cube.IKeyProvider;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.IQuery;
 import de.xwic.cube.Key;
-import de.xwic.cube.IKeyProvider;
 import de.xwic.cube.IDataPool.CubeType;
 import de.xwic.cube.event.CellAggregatedEvent;
 import de.xwic.cube.event.CellValueChangedEvent;
@@ -47,7 +45,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	protected DataPool dataPool;
 	protected Map<String, IDimension> dimensionMap = new LinkedHashMap<String, IDimension>();
 	protected Map<String, IMeasure> measureMap = new LinkedHashMap<String, IMeasure>();
-	protected Map<Key, ICell> data;
+	protected ICellStore data;
 	
 	protected List<ICubeListener> cubeListeners = new ArrayList<ICubeListener>();
 	protected DimensionBehavior[] dimensionBehavior = null;
@@ -112,17 +110,15 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			dimensionBehavior[i] = DimensionBehavior.DEFAULT;
 		}
 		
-		data = newHashMap(500);
+		data = createCellStore();
 		
 	}
 
 	/**
-	 * @param size
 	 * @return
 	 */
-	protected Map<Key, ICell> newHashMap(int size) {
-		Map<Key, ICell> map = new HashMap<Key, ICell>(size);
-		return map;
+	protected ICellStore createCellStore() {
+		return new MapCellStore(dimensionMap.size(), 500); 
 	}
 
 	/* (non-Javadoc)
@@ -404,7 +400,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	 */
 	public void clear(IMeasure measure) {
 		int mIdx = getMeasureIndex(measure);
-		for (Iterator<Key> it = data.keySet().iterator(); it.hasNext(); ) {
+		for (Iterator<Key> it = data.getKeyIterator(); it.hasNext(); ) {
 			Key key = it.next();
 			ICell cell = data.get(key);
 			cell.setValue(mIdx, null);
@@ -653,8 +649,9 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	 * @see de.xwic.cube.ICube#forEachCell(de.xwic.cube.ICellListener)
 	 */
 	public void forEachCell(ICellListener listener) {
-		for(Entry<Key, ICell> entry: data.entrySet()) {
-			if(!listener.onCell(entry.getKey(), entry.getValue())) {
+		for(Iterator<Key> it = data.getKeyIterator(); it.hasNext();) {
+			Key key = it.next();
+			if(!listener.onCell(key, data.get(key))) {
 				return;
 			}
 		}
@@ -668,7 +665,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 			ClassNotFoundException {
 
 		int version = in.readInt();
-		if (version > 5) {
+		if (version > 6) {
 			throw new IOException("Can not deserialize cube -> data file version is " + version + ", but expected between 1..5");
 		}
 		key = (String) in.readObject();
@@ -707,19 +704,11 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		// read data
 		if (!serializeData) {
 			// optimized data read
-			int size = in.readInt();
-			int dimSize = dimensionMap.size();
-			
-			data = newHashMap(size);
-			for (int i = 0; i < size; i++) {
-				Key key = createNewKey(null);
-				key.readObject(in, dimSize);
-				Cell cell = (Cell)in.readObject();
-				data.put(key, cell);
-			}
+			data = createCellStore();
+			data.restore(in, keyProvider);
 		} else {
 			// customer Key implementation
-			data = (Map<Key, ICell>)in.readObject();
+			data = (ICellStore)in.readObject();
 		}
 		
 	}
@@ -730,7 +719,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	public void writeExternal(ObjectOutput out) throws IOException {
 
 		// serialize -> write the cube data.
-		int version = 5;
+		int version = 6;
 		out.writeInt(version); // version number
 		out.writeObject(key);
 		out.writeObject(title);
@@ -753,13 +742,7 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		// write data...
 		if (!serializeData) {
 			// default, optimized data serialization
-			out.writeInt(data.size());
-			for(Entry<Key, ICell> entry: data.entrySet()) {
-				
-				entry.getKey().writeObject(out);
-				out.writeObject(entry.getValue());
-				
-			}
+			data.serialize(out);
 		} else {
 			// customer Key implementation used, serialize data
 			out.writeObject(data);

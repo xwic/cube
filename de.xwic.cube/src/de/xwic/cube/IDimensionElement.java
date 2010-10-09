@@ -82,6 +82,13 @@ public interface IDimensionElement extends IIdentifyable {
 	 * @return
 	 */
 	public abstract String getTitlePath();
+	
+	/**
+	 * Returns the path as an array where the root element is in 
+	 * index position 0.
+	 * @return
+	 */
+	public abstract String[] getPathArray();
 
 	/**
 	 * Returns the index position within the parent's dimension element collection.

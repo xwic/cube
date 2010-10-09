@@ -325,7 +325,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		}
 		CellAggregatedEvent event = new CellAggregatedEvent();
 		event.setCube(this);
-		for(Entry<Key, ICell> entry: data.entrySet()) {
+		for(Entry<Key, ICell> entry: ((MapCellStore)data).entrySet()) {
 		
 			ICell rawCell = entry.getValue();
 			Key rawKey = entry.getKey();
@@ -450,19 +450,11 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		// read data
 		if (!serializeData) {
 			// optimized data read
-			int size = in.readInt();
-			int dimSize = dimensionMap.size();
-			
-			data = newHashMap(size);
-			for (int i = 0; i < size; i++) {
-				Key key = createNewKey(null);
-				key.readObject(in, dimSize);
-				Cell cell = (Cell)in.readObject();
-				data.put(key, cell);
-			}
+			data = createCellStore();
+			data.restore(in, keyProvider);
 		} else {
 			// customer Key implementation
-			data = (Map<Key, ICell>)in.readObject();
+			data = (ICellStore)in.readObject();
 		}
 		
 		if (version > 3) {
@@ -527,7 +519,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	protected void buildIndex() {
 		
 		rootIndex.clear();
-		for(Entry<Key, ICell> entry: data.entrySet()) {
+		for(Entry<Key, ICell> entry: ((MapCellStore)data).entrySet()) {
 			IDimensionElement elm = entry.getKey().getDimensionElement(0);
 			IDimensionElement e = elm;
 			// do not build a cache for the root element, as it would just include all keys.
@@ -573,14 +565,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		// write data...
 		if (!serializeData) {
 			// default, optimized data serialization
-			out.writeInt(data.size());
-			for(Entry<Key, ICell> entry: data.entrySet()) {
-				
-				for (IDimensionElement elm : entry.getKey().getDimensionElements()) {
-					out.writeObject(elm);
-				}
-				out.writeObject(entry.getValue());
-			}
+			data.serialize(out);
 		} else {
 			// customer Key implementation used, serialize data
 			out.writeObject(data);
@@ -599,7 +584,8 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 				out.writeObject(entry.getValue());
 				
 			}
-		}		
+		}
+		
 	}
 	
 	/* (non-Javadoc)

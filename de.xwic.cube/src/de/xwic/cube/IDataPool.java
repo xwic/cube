@@ -27,7 +27,13 @@ public interface IDataPool extends IIdentifyable {
 		 * This cube extends FLEX_CALC with pre-caching (key patch caching) when aggregated cell
 		 * calculation exceeds a given threshold - buildCacheForPathsTimeout (by default 1000 msec) 
 		 */
-		PRE_CACHE
+		PRE_CACHE,
+		
+		/**
+		 * The INDEXED cube uses an internal, indexed and linked set of leaf elements that is
+		 * optimized for fast leaf aggregation.
+		 */
+		INDEXED
 	}
 	
 	/**
