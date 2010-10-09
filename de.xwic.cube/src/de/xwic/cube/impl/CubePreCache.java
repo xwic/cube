@@ -341,18 +341,11 @@ public class CubePreCache extends CubeFlexCalc {
 		// read data
 		if (!serializeData) {
 			// optimized data read
-			size = in.readInt();
-			
-			data = newHashMap(size);
-			for (int i = 0; i < size; i++) {
-				Key key = createNewKey(null);
-				key.readObject(in, dimSize);
-				Cell cell = (Cell)in.readObject();
-				data.put(key, cell);
-			}
+			data = createCellStore();
+			data.restore(in, keyProvider);
 		} else {
 			// customer Key implementation
-			data = (Map<Key, ICell>)in.readObject();
+			data = (ICellStore)in.readObject();
 		}
 		
 		externalizeCache = in.readBoolean();
@@ -408,7 +401,7 @@ public class CubePreCache extends CubeFlexCalc {
 		// write data...
 		if (!serializeData) {
 			out.writeInt(data.size());
-			for(Entry<Key, ICell> entry: data.entrySet()) {
+			for(Entry<Key, ICell> entry: ((MapCellStore)data).entrySet()) {
 				
 				for (IDimensionElement elm : entry.getKey().getDimensionElements()) {
 					out.writeObject(elm);
@@ -509,7 +502,7 @@ public class CubePreCache extends CubeFlexCalc {
 				}
 				
 				// iterate all raw (leaf) cells and calculate the paths
-				for(Entry<Key, ICell> entry: data.entrySet()) {
+				for(Entry<Key, ICell> entry: ((MapCellStore)data).entrySet()) {
 					Key rawKey = entry.getKey();
 					ICell rawCell = entry.getValue();
 					cachePathCell(rawKey, rawCell);

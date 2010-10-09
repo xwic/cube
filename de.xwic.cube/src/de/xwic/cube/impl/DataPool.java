@@ -139,6 +139,9 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 		case FLEX_CALC:
 			newCube = new CubeFlexCalc(this, key, dimensions, measures);
 			break;
+		case INDEXED:
+			newCube = new CubeIndexed(this, key, dimensions, measures);
+			break;
 		case PRE_CACHE:
 			newCube = new CubePreCache(this, key, dimensions, measures);
 			break;

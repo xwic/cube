@@ -44,17 +44,16 @@ import de.xwic.cube.event.CellAggregatedEvent;
 import de.xwic.cube.event.CellValueChangedEvent;
 
 /**
- * This cube implementation stores only the leaf cells. Aggregated values are stored
- * in a flexible cache.
+ * This cube implementation stores only the leaf cells in an indexed array. This
+ * provides a faster lookup performance of non-cached elements.
  * 
  * @author Florian Lippisch
  */
-public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCacheControl {
+public class CubeIndexed extends Cube implements ICube, Externalizable, ICubeCacheControl {
 
 	private static final long serialVersionUID = 1L;
 	
 	protected Map<Key, CachedCell> cache = new HashMap<Key, CachedCell>();
-	protected Map<IDimensionElement, Set<Key>> rootIndex = new HashMap<IDimensionElement, Set<Key>>();
 
 	protected boolean massUpdateMode = false;
 	protected int maxCacheSize = 100000;
@@ -67,7 +66,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	@SuppressWarnings("unused")
 	private transient Log log;
 	{
-		log = LogFactory.getLog(CubeFlexCalc.class);
+		log = LogFactory.getLog(CubeIndexed.class);
 	}
 
 	/**
@@ -113,7 +112,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	/**
 	 * INTERNAL: This constructor is used by the serialization mechanism. 
 	 */
-	public CubeFlexCalc() {
+	public CubeIndexed() {
 		super(); 
 	}
 	
@@ -123,11 +122,19 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @param measures 
 	 * @param dimensions 
 	 */
-	public CubeFlexCalc(DataPool dataPool, String key, IDimension[] dimensions, IMeasure[] measures) {
+	public CubeIndexed(DataPool dataPool, String key, IDimension[] dimensions, IMeasure[] measures) {
 		super(dataPool, key, dimensions, measures);
 	}
 
-
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.Cube#createCellStore()
+	 */
+	@Override
+	protected ICellStore createCellStore() {
+		return new IndexedDataTable(dimensionMap.size(), measureMap.size());
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.impl.Cube#applyValueChange(int, de.xwic.cube.Key, int, double)
 	 */
@@ -151,7 +158,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 */
 	@Override
 	public ICell getCell(Key key, boolean createNew) {
-		//buildCacheForPaths("[Customer:1][Time:0][Time:1][Time:3][GEO:0][GEO:2][GEO:4][OnOrder:0][OnOrder:1][Product:0][Product:1]");
 		
 		if (isLeafLikeKey(key)) {
 			// is leaf key
@@ -169,42 +175,11 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		} else {
 			// create cell
 			synchronized (this) { // must sync, otherwise the cache might get damaged
-				boolean f = false;
-				if (f) {
-					// TODO Can this be removed?
-					ICell cell = createNewCell(key, measureMap.size());
-					boolean hasData = calcCell(0, key.clone(), cell);
-					result = hasData ? cell : null;
-					
-				} else {
-					// check if it is cached, if autoCachePaths is on unknownCachePaths is filled
-					if (isCachedKey(key)) {
-						// it is a cached path but not in the cache, so not available
-						// don't cache empty CachedCell
-					} else {
 
-						ICell cachedCell = probeCachedCell(key, createNew);
-						if (cachedCell != null) {
-							return cachedCell;
-						}
-						
-						// measure time to calculate, used for autoCachePaths mode
-						long start = System.currentTimeMillis();
-						
-						if (key.getDimensionElement(0).getDepth() > 0 && rootIndex.size() > 0) {
-							// use indexed calculation
-							cc = calcCellFromIndex(key);
-						} else {
-							CachedCell[] cells = serialCalc(new Key[] { key });
-							cc = cells[0];
-						}
-						
-						// calculation finished
-						calcCellTime += (System.currentTimeMillis() - start);
-						
-						// remove the key for new buildCacheForPaths run
-						addNewCachedKey(key);
-					}
+				// re-check for sync issues 
+				cc = cache.get(key);
+				if (cc == null) { // still empty -> create
+					cc = calcCellFromIndex(key);
 				}
 				if (cc != null) {
 					cc.hits++;
@@ -219,17 +194,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		return result;
 	}
 	
-	protected void addNewCachedKey(Key key) {
-	}
-
-	protected ICell probeCachedCell(Key key, boolean createNew) {
-		return null;
-	}
-
-	protected boolean isCachedKey(Key key) {
-		return false;
-	}
-
 	/**
 	 * @param key
 	 * @return
@@ -246,120 +210,9 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			}
 		}
 		
-		Set<Key> keys = rootIndex.get(searchKey.getDimensionElement(0));
-		if (keys != null) {
-			CellAggregatedEvent event = new CellAggregatedEvent(this, null, null, searchKey, null);
-			for (Key key : keys) {
-				// if the behavior for a key is set to NO_AGGREGATION and NO_SPLASH, only elements must be
-				// taken into account that EQUAL the search key.
-				boolean accept = dimensionResolver.isSubKey(searchKey, key);
-				if (checkBehavior && accept) {
-					for (int i = 0; i < max; i++) {
-						if (dimensionBehavior[i].isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION)) {
-							if (!searchKey.getDimensionElement(i).equals(key.getDimensionElement(i))) {
-								accept = false;
-								break;
-							}
-						}
-					}
-				}
-				if (accept) {
-					cc.leafCount++;
-					ICell rawCell = data.get(key);
-					if (rawCell != null) {
-					
-						if (cc.cell == null) {
-							cc.cell = createNewCell(searchKey, measureMap.size());
-						}
-						aggregateCells(cc.cell, rawCell);
-						// invoke ICubeListener
-						event.setChildKey(key);
-						event.setChildCell(rawCell);
-						event.setParentCell(cc.cell);
-						onCellAggregated(event);
-					}
-				}
-			}
-		}
+		IndexedDataTable idt = (IndexedDataTable)data;
+		cc.cell = idt.calcCell(searchKey);
 		return cc;
-	}
-
-	/**
-	 * Aggregates the valueCell to the cell.
-	 * @param cell
-	 * @param valueCell
-	 */
-	protected void aggregateCells(ICell cell, ICell valueCell) {
-		for (int m = 0; m < measureMap.size(); m++) {
-			Double value = valueCell.getValue(m); 
-			if (value != null) {
-				Double aggrValue = cell.getValue(m);  
-				if (aggrValue == null) {
-					cell.setValue(m, value);
-				} else {
-					cell.setValue(m, aggrValue + value);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Calculate the requested value(s) by aggregating all leafs.
-	 * @param keys
-	 * @return
-	 */
-	private CachedCell[] serialCalc(Key[] keys) {
-
-		int max = dimensionMap.size();
-		boolean checkBehavior = false;
-		for (DimensionBehavior db : dimensionBehavior) {
-			if (db.isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION) || db.isFlagged(DimensionBehavior.FLAG_NO_SPLASH)) {
-				checkBehavior = true;
-				break;
-			}
-		}
-
-		CachedCell[] cachedCells = new CachedCell[keys.length];
-		for (int i = 0; i < keys.length; i++) {
-			cachedCells[i] = new CachedCell(null);
-		}
-		CellAggregatedEvent event = new CellAggregatedEvent();
-		event.setCube(this);
-		for(Entry<Key, ICell> entry: ((MapCellStore)data).entrySet()) {
-		
-			ICell rawCell = entry.getValue();
-			Key rawKey = entry.getKey();
-			for (int i = 0; i < keys.length; i++) {
-				boolean accept = dimensionResolver.isSubKey(keys[i], rawKey);
-				if (checkBehavior && accept) {
-					for (int k = 0; k < max; k++) {
-						if (dimensionBehavior[k].isFlagged(DimensionBehavior.FLAG_NO_AGGREGATION)) {
-							if (!keys[i].getDimensionElement(k).equals(rawKey.getDimensionElement(k))) {
-								accept = false;
-								break;
-							}
-						}
-					}
-				}
-				if (accept) {
-					cachedCells[i].leafCount++;
-					if (cachedCells[i].cell == null) {
-						cachedCells[i].cell = createNewCell(keys[i], measureMap.size());
-					}
-					aggregateCells(cachedCells[i].cell, rawCell);
-					// invoke ICubeListener
-					event.setChildKey(rawKey);
-					event.setChildCell(rawCell);
-					event.setParentKey(keys[i]);
-					event.setParentCell(cachedCells[i].cell);
-					onCellAggregated(event);
-				}
-			}
-			
-		}
-		
-		return cachedCells;
-		
 	}
 	
 	/* (non-Javadoc)
@@ -370,38 +223,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		if (isLeafLikeKey(key)) { // only execute on leafs...
 			super.removeEmptyCells(key, measureIndex);
 		}
-	}
-	
-	/**
-	 * @param i
-	 * @param key
-	 * @param cell
-	 * @return
-	 */
-	private boolean calcCell(int idx, Key key, ICell cell) {
-
-		boolean hasData = false;
-		if (key.isLeaf()) {
-			ICell rawCell = data.get(key);
-			if (rawCell != null) {
-				aggregateCells(cell, rawCell);
-				hasData = true;
-			}
-		} else {
-			IDimensionElement elmCurr = key.getDimensionElement(idx);
-			if (!elmCurr.isLeaf()) {
-				Key subKey = key.clone();
-				// splash and iterate over children
-				for (Iterator<IDimensionElement> it =  elmCurr.getDimensionElements().iterator(); it.hasNext(); ) {
-					IDimensionElement de = it.next();
-					subKey.setDimensionElement(idx, de);
-					hasData |= calcCell(idx, subKey, cell);
-				}
-			} else {
-				hasData |= calcCell(idx + 1, key, cell);
-			}
-		}
-		return hasData;
 	}
 
 	/* (non-Javadoc)
@@ -487,7 +308,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 			cache = new HashMap<Key, CachedCell>();
 		}
 		
-		buildIndex();
 	}
 	
 	/* (non-Javadoc)
@@ -513,26 +333,11 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	}
 	
 	/**
-	 * Build an index for all elements of the first defined dimension.
-	 * 
+	 * Trigger the rebuilding of the index.
 	 */
 	protected void buildIndex() {
 		
-		rootIndex.clear();
-		for(Entry<Key, ICell> entry: ((MapCellStore)data).entrySet()) {
-			IDimensionElement elm = entry.getKey().getDimensionElement(0);
-			IDimensionElement e = elm;
-			// do not build a cache for the root element, as it would just include all keys.
-			while (!(e instanceof IDimension)) {
-				Set<Key> keys = rootIndex.get(e);
-				if (keys == null) {
-					keys = new HashSet<Key>();
-					rootIndex.put(e, keys);
-				}
-				keys.add(entry.getKey());
-				e = e.getParent();
-			}
-		}
+		((IndexedDataTable)data).buildIndex();
 		
 	}
 
@@ -584,8 +389,7 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 				out.writeObject(entry.getValue());
 				
 			}
-		}
-		
+		}		
 	}
 	
 	/* (non-Javadoc)
@@ -605,7 +409,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 */
 	public void clearCache() {
 		cache.clear();
-		rootIndex.clear();
 	}
 	
 	/* (non-Javadoc)
@@ -645,15 +448,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 		
 		out.println("Data : " + data.size());
 		out.println("Cache: " + cache.size());
-		out.println("RootIndex: " + rootIndex.size());
-		if (rootIndex.size() > 0) {
-			int total = 0;
-			for (Set<Key> keys : rootIndex.values()) {
-				total += keys.size();
-			}
-			out.println("Total Ref: " + total);
-			out.println("Avr. Size: " + (total / rootIndex.size()));
-		}
 		
 	}
 	
@@ -714,20 +508,16 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	}
 
 	private void batchRefreshCache(Map<Key, CachedCell> cellMap) {
-		// now batch-refresh cache
-		Key[] keys = new Key[cellMap.size()];
-		int idx = 0;
-		for (Key key : cellMap.keySet()) {
-			keys[idx++] = key;
+
+		for (Entry<Key, CachedCell> entry : cellMap.entrySet()) {
+			Key key = entry.getKey();
+			CachedCell cell = calcCellFromIndex(key);
+			CachedCell oldCell = entry.getValue();
+			cell.hits = oldCell.hits;
+			cell.unusedCount = oldCell.unusedCount + 1;
+			cache.put(key, cell);
 		}
 		
-		CachedCell[] cells = serialCalc(keys);
-		for (int i = 0; i < cells.length; i++) {
-			CachedCell oldCell = cellMap.get(keys[i]);
-			cells[i].hits = oldCell.hits;
-			cells[i].unusedCount = oldCell.unusedCount + 1;
-			cache.put(keys[i], cells[i]);
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -735,11 +525,11 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 */
 	public synchronized void buildCacheFromCube(ICube cube) {
 		
-		if(cube.getClass().isAssignableFrom(CubeFlexCalc.class)) {
+		if(cube.getClass().isAssignableFrom(CubeIndexed.class)) {
 			
 			cache.clear();
 									
-			batchRefreshCache(((CubeFlexCalc)cube).cache);	
+			batchRefreshCache(((CubeIndexed)cube).cache);	
 			
 		}
 		
@@ -807,6 +597,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @see de.xwic.cube.ICube#getCubeType()
 	 */
 	public CubeType getCubeType() {
-		return CubeType.FLEX_CALC;
+		return CubeType.INDEXED;
 	}
 }

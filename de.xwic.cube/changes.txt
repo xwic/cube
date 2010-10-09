@@ -1,6 +1,15 @@
 Change Notes
 ============
 
+2010-10-09 FLI
+	- Added new cube type INDEXED (CubeIndexed). This cube uses an internal, indexed
+	  data table for fast search. The cube is about 9-30 times faster then the FlexCube.
+	  The memory consumption is about twice as much as the FLEX_CUBE.
+	  NOTE: The indexed cube does NOT YET SUPPPORT the dimension behaiviors NO_SPLASH and
+	  		NO_AGGREGATION!
+	- The cube cell map is now stored in a ICellStore implementation. The default
+	  implementation is the MapCellStore
+
 2010-10-07 FLI
 	- Fixed a problem in the CubeFlexCalc where "empty" spots could
 	  occur in the cache if data is read from the cube during mass-insert 

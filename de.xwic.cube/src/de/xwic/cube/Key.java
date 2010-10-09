@@ -233,4 +233,12 @@ public class Key implements Serializable {
 			elementKeys[dIdx] = (IDimensionElement)in.readObject();
 		}
 	}
+	
+	/**
+	 * Returns the number of Dimensions specified in that key. 
+	 * @return
+	 */
+	public int getDimensionCount() {
+		return elementKeys.length;
+	}
 }

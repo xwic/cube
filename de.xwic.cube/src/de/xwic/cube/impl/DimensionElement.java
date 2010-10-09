@@ -150,6 +150,21 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	}
 
 	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDimensionElement#getPathArray()
+	 */
+	@Override
+	public String[] getPathArray() {
+		int depth = getDepth();
+		String[] path = new String[depth];
+		IDimensionElement elm = this;
+		for (int i = depth - 1; i >= 0; i--) {
+			path[i] = elm.getKey();
+			elm = elm.getParent();
+		}
+		return path;
+	}
+	
+	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDimensionElement#getTitlePath()
 	 */
 	public String getTitlePath() {
