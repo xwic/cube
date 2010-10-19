@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import de.xwic.cube.ICell;
 import de.xwic.cube.IDimensionElement;
@@ -380,17 +379,12 @@ public class IndexedDataTable implements ICellStore, Serializable {
 		indexDirty = in.readBoolean();
 		int size = in.readInt();
 		hashData = new HashMap<Key, ICell>(size);
-		for (int i = 0; i < size; i++) {
-			Key key = keyProvider.createNewKey(null);
-			key.readObject(in, dimensionCount);
-			Cell cell = (Cell)in.readObject();
-			hashData.put(key, cell);
-		}
 		indexData = new ArrayList<IndexedData>(size);
 		for (int i = 0; i < size; i++) {
 			IndexedData id = new IndexedData();
 			id.restore(in, keyProvider, dimensionCount);
 			indexData.add(id);
+			hashData.put(id.getKey(), id.getCell());
 		}
 	}
 
@@ -405,13 +399,7 @@ public class IndexedDataTable implements ICellStore, Serializable {
 		}
 		
 		out.writeBoolean(indexDirty);
-		out.writeInt(hashData.size());
-		for(Entry<Key, ICell> entry: hashData.entrySet()) {
-			
-			entry.getKey().writeObject(out);
-			out.writeObject(entry.getValue());
-			
-		}
+		out.writeInt(indexData.size());
 		
 		for (IndexedData id : indexData) {
 			id.serialize(out);

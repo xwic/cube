@@ -114,7 +114,16 @@ public class IndexedData implements Comparable<IndexedData>, Serializable {
 		
 		key.writeObject(out);
 		out.writeObject(cell);
-		out.writeObject(nextEntry);
+		// write array
+		out.writeInt(nextEntry.length);
+		for (int i = 0; i < nextEntry.length; i++) {
+			int[] sa = nextEntry[i];
+			out.writeInt(sa.length);
+			for (int a = 0; a < sa.length; a++) {
+				out.writeInt(sa[a]);
+			}
+		}
+			
 		
 	}
 	/**
@@ -130,7 +139,17 @@ public class IndexedData implements Comparable<IndexedData>, Serializable {
 		key = keyProvider.createNewKey(null);
 		key.readObject(in, dimensionCount);
 		cell = (ICell)in.readObject();
-		nextEntry = (int[][]) in.readObject();
+		// read array
+		int baseSize = in.readInt();
+		nextEntry = new int[baseSize][0];
+		for (int i = 0; i < baseSize; i++) {
+			int subSize = in.readInt();
+			int[] subArray = new int[subSize];
+			for (int a = 0; a < subSize; a++) {
+				subArray[a] = in.readInt();
+			}
+			nextEntry[i] = subArray;
+		}
 		
 	}
 }

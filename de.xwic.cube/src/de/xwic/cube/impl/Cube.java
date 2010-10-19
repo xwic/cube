@@ -675,6 +675,8 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 		dimensionMap = (Map<String, IDimension>) in.readObject();
 		measureMap = (Map<String, IMeasure>) in.readObject();
 
+		log.debug("Restoring Cube '" + key + "' ...");
+		
 		dimensionBehavior = new DimensionBehavior[dimensionMap.size()];
 		for (int i = 0; i < dimensionBehavior.length; i++) {
 			dimensionBehavior[i] = DimensionBehavior.DEFAULT;
