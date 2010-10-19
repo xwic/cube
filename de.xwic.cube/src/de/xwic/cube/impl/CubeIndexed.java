@@ -16,11 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
@@ -40,7 +37,6 @@ import de.xwic.cube.IKeyProvider;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
 import de.xwic.cube.IDataPool.CubeType;
-import de.xwic.cube.event.CellAggregatedEvent;
 import de.xwic.cube.event.CellValueChangedEvent;
 
 /**
@@ -242,6 +238,8 @@ public class CubeIndexed extends Cube implements ICube, Externalizable, ICubeCac
 		dataPool = (DataPool) in.readObject();
 		dimensionMap = (Map<String, IDimension>) in.readObject();
 		measureMap = (Map<String, IMeasure>) in.readObject();
+		
+		log.debug("Restoring Cube '" + key + "' ...");
 		
 		dimensionBehavior = new DimensionBehavior[dimensionMap.size()];
 		for (int i = 0; i < dimensionBehavior.length; i++) {

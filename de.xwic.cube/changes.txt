@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2010-10-19 FLI
+	- Optimized Indexed Cube serialization/deserialization performance and size
+	
 2010-10-09 FLI
 	- Added new cube type INDEXED (CubeIndexed). This cube uses an internal, indexed
 	  data table for fast search. The cube is about 9-30 times faster then the FlexCube.
