@@ -98,10 +98,13 @@ public class LastLeafFunction implements IMeasureFunction {
 				if (value != null) {
 					key.setDimensionElement(dimIdx, child);
 					
-					if (cube.getCell(key) != null) {
-						result.value = cube.getCell(key).getValue(measureIdx);
-						result.found = true;
+					ICell valueCell = cube.getCell(key);
+					if (valueCell != null) {
+						result.value = valueCell.getValue(measureIdx);
+					} else {
+						result.value = null;
 					}
+					result.found = true;
 				}
 			} else {
 				result = findLastLeaf(cube, key, searchKey, child);
