@@ -59,7 +59,6 @@ public class CubeIndexed extends Cube implements ICube, Externalizable, ICubeCac
 	protected transient int calcCellTime = 0;
 	
 	// Commons log
-	@SuppressWarnings("unused")
 	private transient Log log;
 	{
 		log = LogFactory.getLog(CubeIndexed.class);
@@ -197,6 +196,7 @@ public class CubeIndexed extends Cube implements ICube, Externalizable, ICubeCac
 	private CachedCell calcCellFromIndex(Key searchKey) {
 		CachedCell cc = new CachedCell(null);
 		
+		/* UNUSED code
 		int max = dimensionMap.size();
 		boolean checkBehavior = false;
 		for (DimensionBehavior db : dimensionBehavior) {
@@ -205,6 +205,7 @@ public class CubeIndexed extends Cube implements ICube, Externalizable, ICubeCac
 				break;
 			}
 		}
+		*/
 		
 		IndexedDataTable idt = (IndexedDataTable)data;
 		cc.cell = idt.calcCell(searchKey);

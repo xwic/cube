@@ -64,7 +64,6 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	protected transient int calcCellTime = 0;
 	
 	// Commons log
-	@SuppressWarnings("unused")
 	private transient Log log;
 	{
 		log = LogFactory.getLog(CubeFlexCalc.class);
