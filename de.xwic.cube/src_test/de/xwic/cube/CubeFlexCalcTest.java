@@ -9,7 +9,6 @@ import java.util.List;
 import junit.framework.TestCase;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
-import de.xwic.cube.impl.CubePreCache;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.cube.util.DataDump;
 
@@ -343,12 +342,13 @@ public class CubeFlexCalcTest extends TestCase {
 	public void testBehaiviorNoSplash() {
 		
 		cube.setDimensionBehavior(dimLOB, DimensionBehavior.NO_SPLASH);
+		cube.setDimensionBehavior(dimTime, DimensionBehavior.NO_SPLASH);
 		
 		Key key = cube.createKey("[AOO][PS][2008]");
 		
-		cube.setCellValue(key, meBookings, 1000d);
+		cube.addCellValue(key, meBookings, 1000d);
 		
-		cube.setCellValue(cube.createKey("[AOO][Hardware]"), meBookings, 500d);
+		cube.addCellValue(cube.createKey("[AOO][Hardware][2008]"), meBookings, 500d);
 		
 		
 		DataDump.printValues(System.out, cube, dimLOB, dimOT , meBookings);
