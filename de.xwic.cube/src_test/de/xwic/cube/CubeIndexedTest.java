@@ -9,7 +9,6 @@ import java.util.List;
 import junit.framework.TestCase;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
-import de.xwic.cube.impl.CubePreCache;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.cube.util.DataDump;
 

@@ -1,6 +1,9 @@
 Change Notes
 ============
 
+2011-05-13 FLI
+	- Removed Warnings
+
 2010-10-19 FLI
 	- Optimized Indexed Cube serialization/deserialization performance and size
 	

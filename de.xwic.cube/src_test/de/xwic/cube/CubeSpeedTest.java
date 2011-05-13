@@ -4,14 +4,11 @@
 package de.xwic.cube;
 
 import java.io.File;
-import java.util.List;
-import java.util.Scanner;
 
 import junit.framework.TestCase;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
-import de.xwic.cube.util.DataDump;
 
 /**
  * @author Florian Lippisch

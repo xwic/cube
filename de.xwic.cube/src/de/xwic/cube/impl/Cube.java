@@ -59,7 +59,6 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	protected boolean serializeData = false;
 
 	// Commons log
-	@SuppressWarnings("unused")
 	private transient Log log;
 	{
 		log = LogFactory.getLog(getClass());

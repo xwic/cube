@@ -18,7 +18,6 @@ import de.xwic.cube.util.DataDump;
  */
 public class SpeedTest extends TestCase {
 
-	private ICube cubeDefault = null;
 	private ICube cubeFlex = null;
 	private IMeasure meBookings;
 	private IMeasure mePlan;
@@ -110,7 +109,7 @@ public class SpeedTest extends TestCase {
 		meDiff.setFunction(function);
 		meDiff.setValueFormatProvider(new PercentageValueFormatProvider());
 		
-		cubeDefault = pool.createCube("testDef", new IDimension[] { dimOT, dimLOB, dimTime, dimGEO, dimAccount }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.DEFAULT);
+		pool.createCube("testDef", new IDimension[] { dimOT, dimLOB, dimTime, dimGEO, dimAccount }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.DEFAULT);
 		cubeFlex = pool.createCube("testFlex", new IDimension[] { dimAccount, dimLOB, dimOT, dimTime, dimGEO, }, new IMeasure[] { meBookings, mePlan, meDiff }, IDataPool.CubeType.FLEX_CALC);
 		
 	}
