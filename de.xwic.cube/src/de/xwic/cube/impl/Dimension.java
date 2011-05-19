@@ -28,6 +28,8 @@ public class Dimension extends DimensionElement implements IDimension, Serializa
 		super(null, null, key);
 		this.dataPool = dataPool;
 		this.dimension = this;
+		this.objectId = dataPool.issueNextId();
+		dataPool.addObject(this.objectId, this);
 	}
 
 	/* (non-Javadoc)
@@ -49,6 +51,7 @@ public class Dimension extends DimensionElement implements IDimension, Serializa
 	 * @see de.xwic.cube.IDimension#remove()
 	 */
 	public void remove() {
+		dataPool.removeObject(objectId);
 		dataPool.removeDimension(this);
 	}
 
@@ -134,6 +137,6 @@ public class Dimension extends DimensionElement implements IDimension, Serializa
 	 */
 	@Override
 	public String toString() {
-		return getKey();
+		return getKey() + "#" + objectId;
 	}
 }

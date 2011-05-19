@@ -33,7 +33,13 @@ public interface IDataPool extends IIdentifyable {
 		 * The INDEXED cube uses an internal, indexed and linked set of leaf elements that is
 		 * optimized for fast leaf aggregation.
 		 */
-		INDEXED
+		INDEXED,
+		
+		/**
+		 * This cube stores the indexed data on the file system after a mass-update is done. This is for
+		 * larger cubes that trade size vs. performance.
+		 */
+		INDEXED_SWAP
 	}
 	
 	/**
@@ -64,6 +70,16 @@ public interface IDataPool extends IIdentifyable {
 	 */
 	public abstract boolean containsDimension(String key);
 
+	
+	/**
+	 * Returns an identifiable object with the specified object id. This may be either
+	 * a IDimensionElement, IDimension or IMeasure.
+	 * @param id
+	 * @return
+	 */
+	public IIdentifyable getObject(int objectId);
+
+	
 	/**
 	 * @return the cubes
 	 */
@@ -145,6 +161,12 @@ public interface IDataPool extends IIdentifyable {
 	 */
 	public abstract void save() throws StorageException;
 
+	/**
+	 * Close the DataPool, which releases all underlying open resources.
+	 * @throws StorageException
+	 */
+	public abstract void close() throws StorageException;
+	
 	/**
 	 * Delete the DataPool (both from memory and the underlying storage).
 	 * @throws StorageException

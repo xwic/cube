@@ -12,6 +12,11 @@ import java.util.List;
 public interface IDimensionElement extends IIdentifyable {
 
 	/**
+	 * Returns the unique id of this dimension element.
+	 */
+	public int getObjectId();
+	
+	/**
 	 * Create a new DimensionElement.
 	 * @param key
 	 * @return

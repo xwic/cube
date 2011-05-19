@@ -186,4 +186,11 @@ public class FileDataPoolStorageProvider implements IDataPoolStorageProvider {
 		this.zipDataPool = zipDataPool;
 	}
 
+	/**
+	 * @return the dataDir
+	 */
+	public File getDataDir() {
+		return dataDir;
+	}
+
 }

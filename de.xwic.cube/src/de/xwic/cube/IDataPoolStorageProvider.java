@@ -3,6 +3,7 @@
  */
 package de.xwic.cube;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -44,5 +45,12 @@ public interface IDataPoolStorageProvider {
 	 * @param key
 	 */
 	public abstract void deleteDataPool(String key);
+	
+	/**
+	 * Returns a folder that stores the data of the cube. If the storage provider
+	 * is not providing a file storage location, it will return null.
+	 * @return
+	 */
+	public abstract File getDataDir();
 	
 }

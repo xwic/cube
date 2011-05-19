@@ -116,6 +116,11 @@ public class DataPoolManager implements IDataPoolManager {
 	 * @see de.xwic.cube.IDataPoolManager#releaseDataPool(de.xwic.cube.IDataPool)
 	 */
 	public void releaseDataPool(IDataPool pool) {
+		try {
+			pool.close();
+		} catch (StorageException e) {
+			throw new IllegalStateException("Error closing dataPool");
+		}
 		poolMap.remove(pool.getKey());
 	}
 
@@ -156,6 +161,15 @@ public class DataPoolManager implements IDataPoolManager {
 			}
 		}
 		return keys;
+	}
+
+
+
+	/**
+	 * @return the storageProvider
+	 */
+	public IDataPoolStorageProvider getStorageProvider() {
+		return storageProvider;
 	}
 	
 }

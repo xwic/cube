@@ -1,6 +1,11 @@
 Change Notes
 ============
 
+** Major Structure Update - This new version is not datafile compatible with previous versions! **
+2011-05-16/17 FLI
+	- Added unique object identifier to allow simple ID based referencing in external storage
+	- Added a cube version that is able to swap the leaf-elements to disk to free up memory (CubeSwapIndexed)
+
 2011-05-13 FLI
 	- Removed Warnings
 

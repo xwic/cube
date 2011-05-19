@@ -55,4 +55,12 @@ public interface IDataPoolManager {
 	 * @throws StorageException
 	 */
 	public abstract List<String> listDataPoolKeys() throws StorageException;
+	
+
+	/**
+	 * Returns the StorageProvider.
+	 * @return the storageProvider
+	 */
+	public IDataPoolStorageProvider getStorageProvider();
+	
 }
