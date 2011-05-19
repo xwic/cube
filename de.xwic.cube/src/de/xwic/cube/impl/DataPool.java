@@ -8,6 +8,7 @@ import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDataPoolManager;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
+import de.xwic.cube.IIdentifyable;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.StorageException;
 
@@ -27,13 +29,17 @@ import de.xwic.cube.StorageException;
  */
 public class DataPool extends Identifyable implements IDataPool, Serializable {
 
-	private static final long serialVersionUID = -8857844492316508015L;
+	private static final long serialVersionUID = 1772L;
+	
 	private Map<String, ICube> cubeMap = new LinkedHashMap<String, ICube>();
 	private transient Map<String, SoftReference<ICube>> softRefCubeMap = new LinkedHashMap<String, SoftReference<ICube>>();
 	private Map<String, IDimension> dimensionMap = new LinkedHashMap<String, IDimension>();
 	private Map<String, IMeasure> measureMap = new LinkedHashMap<String, IMeasure>();
 	private transient DataPoolManager dataPoolManager;
 
+	private int nextId = 0;	// Internal counter to create unique IDs for dimension and measure elements.
+	
+	private Map<Integer, IIdentifyable> allObjects = new HashMap<Integer, IIdentifyable>();
 	
 	/**
 	 * @param dataPoolManager 
@@ -42,6 +48,20 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	public DataPool(DataPoolManager dataPoolManager, String key) {
 		super(key);
 		this.dataPoolManager = dataPoolManager;
+	}
+	
+	/**
+	 * Issues the next Id.
+	 * @return
+	 */
+	public synchronized int issueNextId() {
+		int i = nextId;
+		if (nextId == Integer.MAX_VALUE) {
+			nextId = Integer.MIN_VALUE + 1; // MIN_VALUE means <not-assigned>
+		} else {
+			nextId++;
+		}
+		return i;
 	}
 	
 	/* (non-Javadoc)
@@ -80,6 +100,33 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	public boolean containsDimension(String key) {
 		return dimensionMap.containsKey(key);
 	}
+	
+	/**
+	 * Returns an identifyable object with the specified object id.
+	 * @param id
+	 * @return
+	 */
+	public IIdentifyable getObject(int objectId) {
+		return allObjects.get(objectId);
+	}
+	
+	/**
+	 * INTERNAL - register an object.
+	 * @param objectId
+	 * @param object
+	 */
+	void addObject(int objectId, IIdentifyable object) {
+		allObjects.put(objectId, object);
+	}
+	
+	/**
+	 * INTERNAL - remove an object from the map.
+	 * @param objectId
+	 */
+	void removeObject(int objectId) {
+		allObjects.remove(objectId);
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDataPool#getCubes()
@@ -141,6 +188,9 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 			break;
 		case INDEXED:
 			newCube = new CubeIndexed(this, key, dimensions, measures);
+			break;
+		case INDEXED_SWAP:
+			newCube = new CubeSwapIndexed(this, key, dimensions, measures);
 			break;
 		case PRE_CACHE:
 			newCube = new CubePreCache(this, key, dimensions, measures);
@@ -333,6 +383,18 @@ public class DataPool extends Identifyable implements IDataPool, Serializable {
 	 */
 	public void delete() throws StorageException {
 		dataPoolManager.deleteDataPool(this);
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IDataPool#close()
+	 */
+	@Override
+	public void close() throws StorageException {
+		// notify all cubes
+		for (ICube cube : this.cubeMap.values()) {
+			cube.close();
+		}
 		
 	}
 

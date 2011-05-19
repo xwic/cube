@@ -47,4 +47,10 @@ public interface IMeasure extends IIdentifyable {
 	 */
 	public void setValueFormatProvider(IValueFormatProvider format);
 	
+	/**
+	 * Returns the unique object id of this element.
+	 * @return
+	 */
+	public int getObjectId();
+
 }

@@ -17,7 +17,7 @@ public abstract class Identifyable implements IIdentifyable, Serializable {
 	
 	protected String key = null;
 	protected String title = null;
-
+	
 	/**
 	 * @param key
 	 */

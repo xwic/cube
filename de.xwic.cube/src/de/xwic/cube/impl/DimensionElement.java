@@ -27,6 +27,8 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	
 	protected double weight = 1.0;
 	
+	protected int objectId;
+	
 	// because the parent, dimension and key of an element is final after
 	// the creation, the hashcode stays the same. Caching the hashcode 
 	// improves performance a lot.
@@ -41,8 +43,20 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 		super(key);
 		this.dimension = dimension;
 		this.parent = parent;
+		if (dimension != null) {
+			DataPool dp = (DataPool)dimension.getDataPool();
+			this.objectId = dp.issueNextId();
+			dp.addObject(this.objectId, this);
+		}
 	}
 
+	/**
+	 * Returns the unique id of this dimension element.
+	 */
+	public int getObjectId() {
+		return objectId;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IDimensionElement#createDimensionElement(java.lang.String)
 	 */
@@ -102,6 +116,7 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 */
 	void removeDimensionElement(DimensionElement dimensionElement) {
 		
+		((DataPool)dimension.getDataPool()).removeObject(dimensionElement.getObjectId());
 		elements.remove(dimensionElement);
 		elementMap.remove(dimensionElement.getKey());
 		
@@ -362,7 +377,7 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 */
 	@Override
 	public String toString() {
-		return getPath();
+		return getPath() + "#" + objectId;
 	}
 	
 	/**

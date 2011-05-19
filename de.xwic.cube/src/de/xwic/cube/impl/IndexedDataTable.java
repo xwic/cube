@@ -14,6 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.xwic.cube.ICell;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IKeyProvider;
@@ -26,22 +29,27 @@ import de.xwic.cube.Key;
  */
 public class IndexedDataTable implements ICellStore, Serializable {
 
-	private final static int EOL = -1; // end of list
+	protected final static int EOL = -1; // end of list
 	
-	private List<IndexedData> indexData = new ArrayList<IndexedData>();
-	private Map<Key, ICell> hashData = new HashMap<Key, ICell>();
+	protected transient Log log = LogFactory.getLog(getClass());
 	
-	private boolean indexDirty = true;
-	private final int dimensionCount;
+	protected List<IndexedData> indexData = new ArrayList<IndexedData>();
+	protected Map<Key, ICell> hashData = new HashMap<Key, ICell>();
+	
+	protected boolean indexDirty = true;
+	protected final int dimensionCount;
 
-	private final int measureCount;
+	protected final int measureCount;
+	
+	protected int maxDepth = 0; 
 
-	private class SearchContext {
+	protected class SearchContext {
 		Key key = null;
 		int measureIndex = 0;
 		Cell cell = null;
 		int rowIdx = 0;
 		int maxRow = 0;
+		int currIdx = 0;
 		IndexedData currId = null;
 		int ibScan = 0;
 	}
@@ -106,12 +114,12 @@ public class IndexedDataTable implements ICellStore, Serializable {
 	 */
 	public ICell calcCell(Key key) {
 
-		if (indexData.size() == 0) {
+		if (getIndexDataSize() == 0) {
 			return null; // exit if no elements..
 		}
 
 		if (key.isLeaf()) { // leafs can be "looked up" through the map
-			return hashData.get(key);
+			return getLeafValue(key);
 		}
 		
 		if (indexDirty) {
@@ -120,13 +128,17 @@ public class IndexedDataTable implements ICellStore, Serializable {
 
 		SearchContext ctx = new SearchContext();
 		ctx.key = key;
-		ctx.maxRow = indexData.size();
+		ctx.maxRow = getIndexDataSize();
 		ctx.rowIdx = 0;
 		ctx.cell = null;
-		ctx.currId = indexData.get(0); // start with the first one
+		ctx.currId = getStartIndexData(); // start with the first one
+		ctx.currIdx = ctx.currId == null ? -1 : 0;
 
+		onBeginScan();
 		// search the elements.
 		scanElements(ctx, 0, ctx.maxRow);
+		
+		onFinishedScan();
 		
 		//System.out.println("Entries touched: " + ctx.ibScan + " out of " + indexData.size());
 		
@@ -134,10 +146,48 @@ public class IndexedDataTable implements ICellStore, Serializable {
 	}
 	
 	/**
+	 * 
+	 */
+	protected void onFinishedScan() {
+		
+	}
+
+	/**
+	 * @return
+	 */
+	protected IndexedData getStartIndexData() {
+		return indexData.get(0);
+	}
+
+	/**
+	 * @return
+	 */
+	protected int getIndexDataSize() {
+		return indexData.size();
+	}
+
+	/**
+	 * Sub-implemtations may prepare the scan process. 
+	 */
+	protected void onBeginScan() {
+	
+	}
+
+	/**
+	 * @param key
+	 * @return
+	 */
+	protected ICell getLeafValue(Key key) {
+		
+		return hashData.get(key);
+
+	}
+
+	/**
 	 * @param ctx
 	 * @param i
 	 */
-	private void scanElements(SearchContext ctx, int dimIdx, int max) {
+	protected void scanElements(SearchContext ctx, int dimIdx, int max) {
 
 		IDimensionElement elm = ctx.key.getDimensionElement(dimIdx);
 		String[] searchPath = elm.getPathArray();
@@ -145,7 +195,9 @@ public class IndexedDataTable implements ICellStore, Serializable {
 		boolean hadMatch = false;
 		while (ctx.rowIdx != -1 && ctx.rowIdx < max) {
 
-			ctx.currId = indexData.get(ctx.rowIdx);
+			if (ctx.currIdx != ctx.rowIdx) { // only get IndexedData again if pointers have changed
+				ctx.currId = onScanElement(ctx);
+			}
 			Key otherKey = ctx.currId.getKey();
 			int[][] nextPnt = ctx.currId.getNextEntry();
 			
@@ -198,6 +250,16 @@ public class IndexedDataTable implements ICellStore, Serializable {
 		
 	}
 
+
+	
+	/**
+	 * @param ctx
+	 * @return
+	 */
+	protected IndexedData onScanElement(SearchContext ctx) {
+		return indexData.get(ctx.rowIdx);
+	}
+
 	/**
 	 * Aggregates the valueCell to the cell.
 	 * @param cell
@@ -221,6 +283,9 @@ public class IndexedDataTable implements ICellStore, Serializable {
 	 * Rebuild the index for fast non-leaf-search.
 	 */
 	public void buildIndex() {
+
+		System.out.println("BuildIndex");
+		maxDepth = 0;
 		
 		if (indexData.size() == 0) {
 			return; // nothing to do
@@ -267,6 +332,10 @@ public class IndexedDataTable implements ICellStore, Serializable {
 			for (int di = 0; di < dimensionCount; di++) {
 				IDimensionElement elm = key.getDimensionElement(di);
 				int depth = elm.getDepth();
+				if (depth > maxDepth) {
+					maxDepth = depth;
+				}
+				
 				
 				String[] path = new String[depth];
 				for (int ed = depth - 1; ed >= 0; ed--) {
@@ -376,6 +445,8 @@ public class IndexedDataTable implements ICellStore, Serializable {
 	@Override
 	public void restore(ObjectInput in, IKeyProvider keyProvider) throws IOException, ClassNotFoundException {
 
+		log = LogFactory.getLog(getClass());
+		
 		indexDirty = in.readBoolean();
 		int size = in.readInt();
 		hashData = new HashMap<Key, ICell>(size);

@@ -21,6 +21,8 @@ public class Measure extends Identifyable implements IMeasure, Serializable {
 	private IMeasureFunction function = null;
 	private IValueFormatProvider formatProvider = new DefaultValueFormatProvider();
 	
+	protected int objectId = 0;
+	
 	/**
 	 * @param dataPool 
 	 * @param key
@@ -28,12 +30,22 @@ public class Measure extends Identifyable implements IMeasure, Serializable {
 	public Measure(DataPool dataPool, String key) {
 		super(key);
 		this.dataPool = dataPool;
+		objectId = dataPool.issueNextId();
 	}
 
+	/**
+	 * Returns the unique object id of this element.
+	 * @return
+	 */
+	public int getObjectId() {
+		return objectId;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.IMeasure#remove()
 	 */
 	public void remove() {
+		dataPool.removeObject(objectId);
 		dataPool.removeMeasure(this);
 	}
 

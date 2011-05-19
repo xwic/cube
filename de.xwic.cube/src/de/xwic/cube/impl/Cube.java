@@ -32,6 +32,7 @@ import de.xwic.cube.IKeyProvider;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.IQuery;
 import de.xwic.cube.Key;
+import de.xwic.cube.StorageException;
 import de.xwic.cube.IDataPool.CubeType;
 import de.xwic.cube.event.CellAggregatedEvent;
 import de.xwic.cube.event.CellValueChangedEvent;
@@ -139,6 +140,14 @@ public class Cube extends Identifyable implements ICube, Externalizable {
 	 */
 	public void remove() {
 		dataPool.removeCube(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.ICube#close()
+	 */
+	@Override
+	public void close() throws StorageException {
+		// Nothing to do.		
 	}
 	
 	/* (non-Javadoc)

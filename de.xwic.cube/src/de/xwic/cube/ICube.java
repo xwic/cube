@@ -293,5 +293,12 @@ public interface ICube extends IIdentifyable {
 	 * @return
 	 */
 	public DimensionBehavior getDimensionBehaivior(IDimension dimension);
+
+	/**
+	 * INTERNAL - Closes the cube and the underlying resources. This method
+	 * is invoked by the DataPool when the pool is closed. 
+	 * @throws StorageException 
+	 */
+	public abstract void close() throws StorageException;
 	
 }

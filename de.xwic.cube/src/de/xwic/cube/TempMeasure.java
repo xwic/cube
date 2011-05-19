@@ -48,6 +48,14 @@ public class TempMeasure extends Identifyable implements IMeasure, Serializable 
 	public void remove() {
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.IMeasure#getObjectId()
+	 */
+	@Override
+	public int getObjectId() {
+		return Integer.MIN_VALUE;
+	}
 
 	/**
 	 * @return the function
