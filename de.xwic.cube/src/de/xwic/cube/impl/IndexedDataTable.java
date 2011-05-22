@@ -3,6 +3,8 @@
  */
 package de.xwic.cube.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -52,6 +54,17 @@ public class IndexedDataTable implements ICellStore, Serializable {
 		int currIdx = 0;
 		IndexedData currId = null;
 		int ibScan = 0;
+		boolean wasMatch = false;
+		
+		long readCount = 0;
+		long seekCount = 0;
+		long bufferStart = 0;
+		int bufferPos = 0;
+		int bufferMax = 0;
+		byte[] buffer = null;
+		ByteArrayInputStream bufferIn = null;
+		DataInputStream objIn = null;
+
 	}
 	
 	/**
@@ -134,11 +147,11 @@ public class IndexedDataTable implements ICellStore, Serializable {
 		ctx.currId = getStartIndexData(); // start with the first one
 		ctx.currIdx = ctx.currId == null ? -1 : 0;
 
-		onBeginScan();
+		onBeginScan(ctx);
 		// search the elements.
 		scanElements(ctx, 0, ctx.maxRow);
 		
-		onFinishedScan();
+		onFinishedScan(ctx);
 		
 		//System.out.println("Entries touched: " + ctx.ibScan + " out of " + indexData.size());
 		
@@ -146,9 +159,10 @@ public class IndexedDataTable implements ICellStore, Serializable {
 	}
 	
 	/**
+	 * @param ctx 
 	 * 
 	 */
-	protected void onFinishedScan() {
+	protected void onFinishedScan(SearchContext ctx) {
 		
 	}
 
@@ -169,7 +183,7 @@ public class IndexedDataTable implements ICellStore, Serializable {
 	/**
 	 * Sub-implemtations may prepare the scan process. 
 	 */
-	protected void onBeginScan() {
+	protected void onBeginScan(SearchContext ctx) {
 	
 	}
 
@@ -197,6 +211,7 @@ public class IndexedDataTable implements ICellStore, Serializable {
 
 			if (ctx.currIdx != ctx.rowIdx) { // only get IndexedData again if pointers have changed
 				ctx.currId = onScanElement(ctx);
+				ctx.currIdx = ctx.rowIdx;
 			}
 			Key otherKey = ctx.currId.getKey();
 			int[][] nextPnt = ctx.currId.getNextEntry();
@@ -223,10 +238,10 @@ public class IndexedDataTable implements ICellStore, Serializable {
 					}
 				}
 			}
+			ctx.wasMatch = match;
 			if (match) {
 				hadMatch = true;
 				if (dimIdx + 1 == dimensionCount) { // we are at the lowest level
-					ctx.ibScan++;
 					//System.out.println("Match found for: " + otherKey);
 					if (ctx.cell == null) {
 						ctx.cell = new Cell(measureCount);
@@ -257,6 +272,7 @@ public class IndexedDataTable implements ICellStore, Serializable {
 	 * @return
 	 */
 	protected IndexedData onScanElement(SearchContext ctx) {
+		ctx.ibScan++;
 		return indexData.get(ctx.rowIdx);
 	}
 

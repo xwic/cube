@@ -35,6 +35,7 @@ public class FileIndexedDataTable extends IndexedDataTable {
 
 	private final static int HEADER_SIZE = 4 * 4; // header has 4 x int
 	private final static int MAX_LEAF_CACHE_SIZE = 10000;
+	private final static int MAX_FETCH_BYTES = 8192; // 8k seems the optimal balance
 	
 	private String swapFileName;
 	private File swapFile;
@@ -42,19 +43,12 @@ public class FileIndexedDataTable extends IndexedDataTable {
 	
 	private boolean swapped = false;
 	private RandomAccessFile fileAccess = null;
-	private long myPos = 0;
+
 	private int maxSize = 0;
 	private int recordSize = 0;
-	private long readCount = 0;
-	private long seekCount = 0;
-
 	private int totalReadCount = 0;
+	private long myPos = 0;
 	
-	private byte[] buffer;
-
-	private ByteArrayInputStream bufferIn;
-
-	private DataInputStream objIn;
 	private IndexedData startId = null;
 	
 	private Map<Key, ICell> leafCache;
@@ -95,11 +89,11 @@ public class FileIndexedDataTable extends IndexedDataTable {
 	public ICell get(Key key) {
 		if (swapped) {
 			// since this method is called for leafs, check the cache
+			ICell c = leafCache.get(key);
+			if (c != null) {
+				return c;
+			}
 			synchronized (this) {
-				ICell c = leafCache.get(key);
-				if (c != null) {
-					return c;
-				}
 				c = calcCell(key);
 				leafCache.put(key.clone(), c);
 				return c;
@@ -188,10 +182,6 @@ public class FileIndexedDataTable extends IndexedDataTable {
 			out.close();
 			
 			fileAccess = new RandomAccessFile(swapFile, "r"); // open the file.
-			
-			buffer = new byte[recordSize];
-			bufferIn = new ByteArrayInputStream(buffer);
-			objIn = new DataInputStream(bufferIn);
 
 		} catch (IOException e) {
 			throw new RuntimeException("Error writing swap file ", e);
@@ -258,11 +248,11 @@ public class FileIndexedDataTable extends IndexedDataTable {
 		ctx.currId = getStartIndexData(); // start with the first one
 		ctx.currIdx = ctx.currId == null ? -1 : 0;
 
-		onBeginScan();
+		onBeginScan(ctx);
 		// search the elements.
 		scanElements(ctx, 0, ctx.maxRow);
 		
-		onFinishedScan();
+		onFinishedScan(ctx);
 		
 		System.out.println("Entries touched: " + ctx.ibScan + " out of " + indexData.size());
 		
@@ -293,42 +283,46 @@ public class FileIndexedDataTable extends IndexedDataTable {
 	 * @see de.xwic.cube.impl.IndexedDataTable#onBeginScan()
 	 */
 	@Override
-	protected void onBeginScan() {
-		super.onBeginScan();
+	protected void onBeginScan(SearchContext ctx) {
+		super.onBeginScan(ctx);
 		if (swapped) {
 			try {
 				if (fileAccess == null) { // open file for first time
-					checkSwapFile();
-					fileAccess = new RandomAccessFile(swapFile, "r");
+					synchronized (this) {
+						if (fileAccess == null) {
+							checkSwapFile();
+							fileAccess = new RandomAccessFile(swapFile, "r");
+						
+							maxSize = fileAccess.readInt();
+							int dimCnt = fileAccess.readInt();
+							int meaCnt = fileAccess.readInt();
 				
-					maxSize = fileAccess.readInt();
-					int dimCnt = fileAccess.readInt();
-					int meaCnt = fileAccess.readInt();
+							if (dimCnt != dimensionCount || meaCnt != measureCount) {
+								throw new IllegalStateException("The cube swap file does not match the size of the actual cube.");
+							}
 		
-					if (dimCnt != dimensionCount || meaCnt != measureCount) {
-						throw new IllegalStateException("The cube swap file does not match the size of the actual cube.");
+							maxDepth = fileAccess.readInt();
+		
+							recordSize = (dimensionCount * maxDepth * 4)  // pointers (integer values)
+									+ (dimensionCount * 4) // length Information.
+									+ (dimensionCount * 4) // Key elements
+									+ (measureCount * 8);
+		
+							myPos = fileAccess.getFilePointer();
+						}
 					}
-
-					maxDepth = fileAccess.readInt();
-
-					recordSize = (dimensionCount * maxDepth * 4)  // pointers (integer values)
-							+ (dimensionCount * 4) // length Information.
-							+ (dimensionCount * 4) // Key elements
-							+ (measureCount * 8);
-
-					myPos = fileAccess.getFilePointer();
 	
-					buffer = new byte[recordSize];
-					bufferIn = new ByteArrayInputStream(buffer);
-					objIn = new DataInputStream(bufferIn);
-					
 				}
+				int maxRecords = MAX_FETCH_BYTES / recordSize;
+				ctx.buffer = new byte[Math.max(1, maxRecords) * recordSize];
+				ctx.bufferIn = new ByteArrayInputStream(ctx.buffer);
+				ctx.objIn = new DataInputStream(ctx.bufferIn);
 				
 			} catch (IOException e) {
 				throw new IllegalStateException("Can not read data from swap file", e);
 			}
-			readCount = 0;
-			seekCount = 0;
+			ctx.readCount = 0;
+			ctx.seekCount = 0;
 		}
 	}
 
@@ -336,9 +330,9 @@ public class FileIndexedDataTable extends IndexedDataTable {
 	 * @see de.xwic.cube.impl.IndexedDataTable#onFinishedScan()
 	 */
 	@Override
-	protected void onFinishedScan() {
-		System.out.println("Finished scanning, did read " + readCount + " records; seek= " + seekCount);
-		totalReadCount += readCount;
+	protected void onFinishedScan(SearchContext ctx) {
+		totalReadCount += ctx.readCount;
+//		System.out.println("Finished scanning, did read " + ctx.ibScan + " records (" + ctx.readCount + " physical reads) records (total=" + totalReadCount + "); seek= " + ctx.seekCount + " :: " + ctx.key);
 	}
 	
 	/* (non-Javadoc)
@@ -347,17 +341,26 @@ public class FileIndexedDataTable extends IndexedDataTable {
 	@Override
 	protected IndexedData onScanElement(SearchContext ctx) {
 		if (swapped) {
+			ctx.ibScan++;
 			try {
 				long pos = HEADER_SIZE + (ctx.rowIdx * recordSize);
-				if (pos != myPos) {
-					seekCount++;
-					fileAccess.seek(pos);
-					myPos = pos; 
+				if ((ctx.bufferStart + ctx.bufferPos) != pos || ctx.bufferPos >= ctx.bufferMax) {
+					
+					if (pos != myPos) {
+						ctx.seekCount++;
+						fileAccess.seek(pos);
+						myPos = pos; 
+					}
+					ctx.bufferStart = pos;
+					myPos += fileAccess.read(ctx.buffer); // read the full buffer
+					ctx.bufferMax = ctx.buffer.length;
+					ctx.readCount++;
+					ctx.bufferIn.reset(); // make sure to read from the start
+					ctx.bufferPos = 0;
 				}
-				myPos += fileAccess.read(buffer);
-				readCount++;
-				bufferIn.reset(); // make sure to read from the start
-				IndexedData id = restoreIndexedData(objIn);
+				
+				IndexedData id = restoreIndexedData(ctx.objIn);
+				ctx.bufferPos += recordSize;
 				return id;
 				
 			} catch (IOException e) {
@@ -568,6 +571,17 @@ public class FileIndexedDataTable extends IndexedDataTable {
 	 */
 	public int getTotalReadCount() {
 		return totalReadCount;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.IndexedDataTable#size()
+	 */
+	@Override
+	public int size() {
+		if (swapped) {
+			return maxSize;
+		}
+		return super.size();
 	}
 	
 }
