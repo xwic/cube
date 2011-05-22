@@ -47,6 +47,8 @@ public class CubeExportUtil {
 	
 	public void export(ICube cube, OutputStream output, boolean leafsOnly) throws IOException {
 		
+		cube.beginMassUpdate();
+		
 		this.leafsOnly = leafsOnly;
 		out = new CSVWriter(new PrintWriter(output));
 		
@@ -67,6 +69,8 @@ public class CubeExportUtil {
 		cube.forEachCell(new Exporter());
 		
 		out.flush();
+		
+		cube.massUpdateFinished();
 		
 	}
 
