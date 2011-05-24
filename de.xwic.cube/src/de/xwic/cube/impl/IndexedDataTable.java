@@ -256,8 +256,7 @@ public class IndexedDataTable implements ICellStore, Serializable {
 					}
 					scanElements(ctx, dimIdx + 1, subMax);
 				}
-			} else {
-				ctx.ibScan++;
+			
 			}
 			
 		}
