@@ -203,6 +203,39 @@ public class FileIndexedDataTable extends IndexedDataTable {
 		
 	}
 	
+	/**
+	 * This method releases the data loaded into memory if a swap file exists. This may be
+	 * used if the whole data was loaded into memory (i.e. for cache rebuild) without modifying
+	 * it. 
+	 */
+	public void releaseInMemoryData() {
+		if (swapped) {
+			log.warn("releaseInMemoryData skipped as already in swapped state");
+			return; // data already swapped out 
+		}
+		
+		checkSwapFile();
+		if (!swapFile.exists()) {
+			log.warn("releaseInMemoryData: No swap file exists - using storeToDisk instead");
+			storeToDisk();
+		} else {
+			
+			if (indexData.size() > 0) {
+				startId = indexData.get(0);
+			} else {
+				startId = null;
+			}
+			
+			indexData.clear();
+			hashData.clear();
+			
+			swapped = true;
+			log.debug("Data released, returning into swapped state (release only)");
+			
+		}
+
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.cube.impl.IndexedDataTable#getStartIndexData()
 	 */
@@ -482,6 +515,7 @@ public class FileIndexedDataTable extends IndexedDataTable {
 			throw new RuntimeException("Error closing file.");
 		}
 
+		swapped = false;
 		long time = System.currentTimeMillis() - start;
 		log.debug("RestoreFromDisk done in " + time + "ms");
 		
