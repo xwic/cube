@@ -22,6 +22,8 @@ import de.xwic.cube.IDataPool.CubeType;
  */
 public class CubeSwapIndexed extends CubeIndexed {
 
+	private static final long serialVersionUID = -8944690909580629023L;
+
 	private FileIndexedDataTable dataTable;
 	
 	/**
