@@ -506,7 +506,7 @@ public class CubeIndexed extends Cube implements ICube, Externalizable, ICubeCac
 		
 	}
 
-	private void batchRefreshCache(Map<Key, CachedCell> cellMap) {
+	protected void batchRefreshCache(Map<Key, CachedCell> cellMap) {
 
 		for (Entry<Key, CachedCell> entry : cellMap.entrySet()) {
 			Key key = entry.getKey();

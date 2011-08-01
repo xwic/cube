@@ -3,12 +3,16 @@
  */
 package de.xwic.cube;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.List;
+
+import junit.framework.TestCase;
 
 import org.apache.log4j.BasicConfigurator;
 
-import junit.framework.TestCase;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
@@ -204,6 +208,72 @@ public class CubeSwapIndexedTest extends TestCase {
 		
 
 		pool.close();
+		
+	}
+	
+	public void testCache() throws Exception {
+		
+		cube.beginMassUpdate();
+		
+		Key key = cube.createKey("[AOO][Hardware][2008/Q1/Jan]");
+		cube.setCellValue(key, meBookings, 100.0);
+
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Feb]");
+		cube.setCellValue(key, meBookings, 40.0);
+
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Mar]");
+		cube.setCellValue(key, meBookings, 80.0);
+		
+		key = cube.createKey("[AOO][PS/Consulting][2008/Q1/Feb]");
+		cube.setCellValue(key, meBookings, 50.0);
+
+		key = cube.createKey("[COO][PS/Consulting][2008/Q1/Mar]");
+		cube.setCellValue(key, meBookings, 200.0);
+		
+		cube.massUpdateFinished(); // causes dump
+
+
+		ICubeCacheControl ccc = (ICubeCacheControl)cube;
+		System.out.println("Cache Size: " + ccc.getCacheSize());
+
+		Double val = cube.getCellValue("[*][Hardware]", meBookings);
+		System.out.println(val);
+
+		assertEquals(1, ccc.getCacheSize());
+		System.out.println("Cache Size: " + ccc.getCacheSize());
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ccc.printCacheProfile(new PrintStream(bos));
+		
+		System.out.println(bos.toString());
+		// now clear the whole cube
+		cube.beginMassUpdate();
+		cube.clear();
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Jan]");
+		cube.setCellValue(key, meBookings, 100.0);
+
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Feb]");
+		cube.setCellValue(key, meBookings, 40.0);
+
+		key = cube.createKey("[AOO][Hardware][2008/Q1/Mar]");
+		cube.setCellValue(key, meBookings, 80.0);
+		
+		key = cube.createKey("[AOO][PS/Consulting][2008/Q1/Feb]");
+		cube.setCellValue(key, meBookings, 50.0);
+
+		key = cube.createKey("[COO][PS/Consulting][2008/Q1/Mar]");
+		cube.setCellValue(key, meBookings, 200.0);
+		
+		assertEquals(0, ccc.getCacheSize());
+
+		cube.massUpdateFinished();
+
+		// refresh the cache
+		ccc.buildCacheFromStats(new ByteArrayInputStream(bos.toByteArray()));		
+		
+		
+		assertEquals(1, ccc.getCacheSize());
+		cube.printCacheProfile(System.out);
 		
 	}
 

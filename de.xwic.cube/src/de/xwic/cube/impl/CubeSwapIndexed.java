@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.PrintStream;
+import java.util.Map;
 
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IMeasure;
@@ -56,6 +57,23 @@ public class CubeSwapIndexed extends CubeIndexed {
 	@Override
 	public void close() throws StorageException {
 		dataTable.close();
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.cube.impl.CubeIndexed#batchRefreshCache(java.util.Map)
+	 */
+	@Override
+	protected void batchRefreshCache(Map<Key, CachedCell> cellMap) {
+		
+		if(massUpdateMode) {
+			throw new IllegalStateException("batchRefreshCache should not be done while in massUpdateMode!!!");
+		}
+		
+		// temporary load the data into memory to make loading (much) faster..
+		dataTable.restoreFromDisk();
+		super.batchRefreshCache(cellMap);
+		dataTable.releaseInMemoryData();
+		
 	}
 	
 	/* (non-Javadoc)
