@@ -197,3 +197,10 @@ Change Notes
 	- Optimized memory usage by refactoring the internal data model. This has
 	  lead to a few API changes, but also improved performance. The memory
 	  usage decreased by 24%, performance gain is at about 33%. 
+	  
+2012-05-03	Mirceas
+	-Add new interface for IMeasureFunction with Query support. Change cube 
+	getCellValue(query) to let the measure function do the calculation if 
+	we have a IMeasureFunctionQuerySupport measure. Used for multiple selection.
+	-add createQuery(IQuery) to create a new query with elements from given query. 
+	

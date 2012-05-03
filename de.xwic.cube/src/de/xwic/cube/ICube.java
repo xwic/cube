@@ -99,6 +99,13 @@ public interface ICube extends IIdentifyable {
 	public abstract IQuery createQuery(Key key);
 	
 	/**
+	 * Create a query for the specified query.
+	 * @param query
+	 * @return
+	 */
+	public IQuery createQuery(IQuery query);
+	
+	/**
 	 * Returns the cell for the specified key (null if cell doesn't exist).
 	 * @param key
 	 * @return
