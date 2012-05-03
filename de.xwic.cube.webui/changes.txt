@@ -1,6 +1,16 @@
 Change Notes
 =============
 
+2012-05-03	Mirceas
+	-Add enable/disable feature for back/next buttons in dimension selectors
+	-Add multiselection possibility for dimension element selector
+	-Files changed:
+				-DimensionElementSelectedEvent.java
+				-DimensionElementSelectedListener.java
+				-DimensionElementSelector.java
+				-DimensionElementSelector.vtl
+				-xwiccube.js
+
 2010-05-19 FLI
 	- Added DimensionNavigationProvider.setDimensions(..)
 	
@@ -56,13 +66,3 @@ Change Notes
 2008-11-13	FLI
 	Added an indention level for navigation providers. This allows to better customize the viewer
 	when using multiple NavigationProviders, for example a Total and some Dimensions.
-	
-2012-05-03	Mirceas
-	-Add enable/disable feature for back/next buttons in dimension selectors
-	-Add multiselection possibility for dimension element selector
-	-Files changed:
-				-DimensionElementSelectedEvent.java
-				-DimensionElementSelectedListener.java
-				-DimensionElementSelector.java
-				-DimensionElementSelector.vtl
-				-xwiccube.js
