@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,24 +27,24 @@ import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.webui.viewer.IDimensionFilter;
 
 /**
- * This selector control allows the selection of a leaf DimensionElement 
- * and the easy iteration over elements. It is commonly used for a 
- * time dimension.
+ * This selector control allows the selection of a leaf DimensionElement and the
+ * easy iteration over elements. It is commonly used for a time dimension.
  * 
  * 
  * @author lippisch
  */
-public class DimensionElementSelector extends HTMLElement implements IResourceControl{
+public class DimensionElementSelector extends HTMLElement implements IResourceControl {
 
 	private IDimension dimension;
-	private IDimensionElement dimensionElement = null;
+	private List<IDimensionElement> dimensionElements = new ArrayList<IDimensionElement>();
 	private List<IDimensionElement> flatList = new ArrayList<IDimensionElement>();
 	private boolean selectLeafsOnly = false;
+	private boolean isMultiSelection = false;
+
 	private boolean showDimensionTitle = false;
 
 	private Comparator<IDimensionElement> sortComparator = null;
 
-	
 	private List<ElementSelectedListener> listeners;
 	{
 		if (listeners == null) {
@@ -51,64 +52,97 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		}
 	}
 	private final IDimensionFilter filter;
-	
+
+	/**
+	 * 
+	 * @param container
+	 * @param name
+	 * @param dimension
+	 * @param multiSelection
+	 */
+	public DimensionElementSelector(IControlContainer container, String name, IDimension dimension,
+			boolean multiSelection) {
+		this(container, name, dimension, null, multiSelection);
+	}
+
 	/**
 	 * Constructor.
+	 * 
 	 * @param container
 	 * @param name
 	 * @param dimension
 	 */
 	public DimensionElementSelector(IControlContainer container, String name, IDimension dimension) {
-		this(container, name, dimension, null);
+		this(container, name, dimension, null, false);
 	}
+
+	/**
+	 * 
+	 * @param container
+	 * @param name
+	 * @param dimension
+	 * @param filter
+	 */
+	public DimensionElementSelector(IControlContainer container, String name, IDimension dimension,
+			IDimensionFilter filter) {
+		this(container, name, dimension, filter, false);
+	}
+
 	/**
 	 * @param container
 	 * @param name
 	 */
-	public DimensionElementSelector(IControlContainer container, String name, IDimension dimension, IDimensionFilter filter) {
+	public DimensionElementSelector(IControlContainer container, String name, IDimension dimension,
+			IDimensionFilter filter, boolean multiSelection) {
 		super(container, name);
 		this.dimension = dimension;
 		this.filter = filter;
-		
+		this.isMultiSelection = multiSelection;
+
 		setCssClass("xcube-leafsel");
-		
+
 		if (dimension == null) {
 			throw new NullPointerException("Dimension must not be null");
 		}
-		
+
 		loadData();
-		
+
 	}
-	
+
 	public void loadData() {
 		flatList.clear();
-		
+
+		IDimensionElement dimensionElement = null;
+
 		if (dimension.isLeaf()) {
 			dimensionElement = dimension;
 			flatList.add(dimension);
- 		} else {
- 			addLeafs(dimension, filter);
- 			
- 			if (dimensionElement == null || !flatList.contains(dimensionElement)) {
-	 			if (flatList.size() > 0) {
-	 				dimensionElement = flatList.get(0);
-	 				fireEvent(new ElementSelectedEvent(this, dimensionElement));
-	 			} else {
-	 				dimensionElement = dimension;
-	 			}
- 			}
- 		}
+		} else {
+			addLeafs(dimension, filter);
+
+			if (dimensionElement == null || !flatList.contains(dimensionElement)) {
+				if (flatList.size() > 0) {
+					dimensionElement = flatList.get(0);
+					fireEvent(new ElementSelectedEvent(this, dimensionElement));
+				} else {
+					dimensionElement = dimension;
+				}
+			}
+		}
+
+		dimensionElements.clear();
+		dimensionElements.add(dimensionElement);
 	}
-	
+
 	/**
-	 * @param filter 
+	 * @param filter
 	 * @param dimension
 	 */
 	private void addLeafs(IDimensionElement elm, IDimensionFilter filter) {
 		if (filter == null || filter.accept(elm)) {
 			if (!selectLeafsOnly || elm.isLeaf()) {
 				flatList.add(elm);
-				
+
 			}
 			if (!elm.isLeaf()) {
 				for (IDimensionElement de : elm.getDimensionElements()) {
@@ -117,11 +151,12 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 			}
 
 		}
-		
+
 	}
 
 	/**
 	 * Add an element selected listener.
+	 * 
 	 * @param listener
 	 */
 	public void addElementSelectedListener(ElementSelectedListener listener) {
@@ -130,17 +165,19 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		}
 		listeners.add(listener);
 	}
-	
+
 	/**
 	 * Remove an element selected listener.
+	 * 
 	 * @param listener
 	 */
 	public void removeElementSelectedListener(ElementSelectedListener listener) {
 		listeners.remove(listener);
 	}
-	
+
 	/**
 	 * Fire the selection event.
+	 * 
 	 * @param event
 	 */
 	protected void fireEvent(ElementSelectedEvent event) {
@@ -150,59 +187,130 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 			l.elementSelected(event);
 		}
 	}
-	
+
 	/**
-	 * @return the dimensionElement
+	 * @return the first selected dimensionElement.
 	 */
 	public IDimensionElement getDimensionElement() {
-		return dimensionElement;
+		return dimensionElements.get(0);
 	}
 
 	/**
-	 * @param dimensionElement the dimensionElement to set
+	 * @return the list with selected dimensionElements.
+	 */
+	public List<IDimensionElement> getDimensionElements() {
+		return dimensionElements;
+	}
+
+	/**
+	 * @return the list with selected dimensionElements paths.
+	 */
+	public List<String> getDimensionElementsPaths() {
+
+		List<String> selectedPaths = new ArrayList<String>();
+		for (Iterator<IDimensionElement> iterator = dimensionElements.iterator(); iterator.hasNext();) {
+			IDimensionElement elem = (IDimensionElement) iterator.next();
+			selectedPaths.add("'" + elem.getPath() + "'");
+		}
+		return selectedPaths;
+	}
+
+	/**
+	 * @param dimensionElement
+	 *            the dimensionElement to set
 	 */
 	public void setDimensionElement(IDimensionElement dimensionElement) {
-		if (this.dimensionElement != dimensionElement) {
-			IDimensionElement previousDimensionElement = this.dimensionElement;
-			this.dimensionElement = dimensionElement;
-			requireRedraw();
-			fireEvent(new DimensionElementSelectedEvent(this, dimensionElement, previousDimensionElement));
+		if (dimensionElements.size() == 1 && dimensionElements.get(0) == dimensionElement) {
+			//no need to refresh.
+			return;
 		}
+		List<IDimensionElement> previousDimensionElements = this.dimensionElements;
+		this.dimensionElements = new ArrayList<IDimensionElement>();
+		this.dimensionElements.add(dimensionElement);
+		requireRedraw();
+		fireEvent(new DimensionElementSelectedEvent(this, dimensionElements, previousDimensionElements));
+
+	}
+
+	/**
+	 * Set the list of selected dimension elements.
+	 * 
+	 * @param dimensionElements
+	 */
+	public void setDimensionElements(List<IDimensionElement> dimensionElements) {
+		IDimensionElement previousDimensionElements = this.dimensionElements.get(0);
+		this.dimensionElements = dimensionElements;
+		fireEvent(new DimensionElementSelectedEvent(this, dimensionElements.get(0), previousDimensionElements));
+	}
+
+	/**
+	 * Set the list of selected dimension elements.
+	 * 
+	 * @param dimensionElements
+	 */
+	public void setDimensionElements(IDimensionElement... dimensionElements) {
+		this.dimensionElements = new ArrayList<IDimensionElement>();
+		for (IDimensionElement dimElem : dimensionElements) {
+			this.dimensionElements.add(dimElem);
+		}
+
 	}
 
 	/**
 	 * Returns the element that follows the next element.
+	 * 
 	 * @return
 	 */
 	public IDimensionElement getNext() {
-		int idx = flatList.indexOf(dimensionElement);
+		if (!isEnabled() || this.isMultiSelection) {
+			return null;
+		}
+		int idx = flatList.indexOf(dimensionElements.get(0));
 		if (idx + 1 < flatList.size()) {
 			return flatList.get(idx + 1);
-		} 
+		}
 		return null;
 	}
-	
+
 	/**
 	 * Return the element before the current element.
+	 * 
 	 * @return
 	 */
 	public IDimensionElement getPrev() {
-		int idx = flatList.indexOf(dimensionElement);
+		if (!isEnabled() || this.isMultiSelection) {
+			return null;
+		}
+		int idx = flatList.indexOf(dimensionElements.get(0));
 		if (idx > 0) {
 			return flatList.get(idx - 1);
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Element selected.
+	 * 
 	 * @param path
 	 */
 	public void actionSelection(String path) {
-		IDimensionElement elm = dimension.parsePath(path);
-		setDimensionElement(elm);
+		if (isMultiSelection && !path.isEmpty()) {
+			// parse path for ## delimiter
+			String[] paths = path.split("##");
+			List<IDimensionElement> dimElements = new ArrayList<IDimensionElement>();
+			for (int i = 0; i < paths.length; i++) {
+				IDimensionElement elm = dimension.parsePath(paths[i]);
+				dimElements.add(elm);
+			}
+			setDimensionElements(dimElements);
+			requireRedraw();
+		} else {
+			IDimensionElement elm = dimension.parsePath(path);
+			setDimensionElement(elm);
+			requireRedraw();
+		}
 	}
-	
+
 	/**
 	 * Select next leaf.
 	 */
@@ -212,7 +320,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 			setDimensionElement(next);
 		}
 	}
-	
+
 	/**
 	 * Select previous leaf.
 	 */
@@ -222,7 +330,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 			setDimensionElement(prev);
 		}
 	}
-	
+
 	/**
 	 * Choose last element.
 	 */
@@ -240,7 +348,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 			setDimensionElement(flatList.get(0));
 		}
 	}
-	
+
 	/**
 	 * @return the dimension
 	 */
@@ -248,47 +356,58 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		return dimension;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see de.jwic.base.IResourceControl#attachResource(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seede.jwic.base.IResourceControl#attachResource(javax.servlet.http.
+	 * HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	public void attachResource(HttpServletRequest req, HttpServletResponse res) throws IOException {
-		
+
 		log.debug("Data Requested..");
 		res.setContentType("text/json");
 		PrintWriter pw = res.getWriter();
-		
+
+		// get paths of selected elements
+		List<String> selectedPaths = new ArrayList<String>();
+		for (Iterator<IDimensionElement> iterator = dimensionElements.iterator(); iterator.hasNext();) {
+			IDimensionElement elem = (IDimensionElement) iterator.next();
+			selectedPaths.add(elem.getPath());
+		}
 		// build object tree and send it...
-		
 		JSONWriter jw = new JSONWriter(pw);
 		try {
-			
+
 			jw.object();
 			jw.key("dimension");
 			jw.value(dimension.getDimension().getKey());
-			jw.key("selection").value(dimensionElement != null ? dimensionElement.getPath() : null);
+			jw.key("isMulti");
+			jw.value(isMultiSelection);
+			jw.key("selection");
+			jw.value(selectedPaths);
 			jw.key("elements");
 			jw.array();
 			addData(jw, dimension.getDimensionElements());
 			jw.endArray();
-			
+
 			jw.endObject();
-			
+
 		} catch (JSONException e) {
 			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error: " + e);
 			log.error("Error while sending dimension elements...", e);
 		}
-		
+
 		pw.close();
-		
+
 	}
+
 	/**
 	 * @param jw
 	 * @param dimension2
-	 * @throws JSONException 
+	 * @throws JSONException
 	 */
 	private void addData(JSONWriter jw, List<IDimensionElement> list) throws JSONException {
-		
+
 		if (sortComparator != null) {
 			// need to copy the list in order to modify it.
 			List<IDimensionElement> tempList = new ArrayList<IDimensionElement>();
@@ -296,7 +415,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 			Collections.sort(tempList, sortComparator);
 			list = tempList;
 		}
-		
+
 		for (IDimensionElement child : list) {
 			if (filter == null || filter.accept(child)) {
 				jw.object();
@@ -317,42 +436,72 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	public boolean isSelectLeafsOnly() {
 		return selectLeafsOnly;
 	}
+
 	/**
-	 * @param selectLeafsOnly the selectLeafsOnly to set
+	 * @param selectLeafsOnly
+	 *            the selectLeafsOnly to set
 	 */
 	public void setSelectLeafsOnly(boolean selectLeafsOnly) {
 		this.selectLeafsOnly = selectLeafsOnly;
 		flatList = new ArrayList<IDimensionElement>();
 		addLeafs(dimension, filter);
-		
-		if (dimensionElement != null && !dimensionElement.isLeaf() && flatList.size() > 0) {
-			dimensionElement = flatList.get(0);
+
+		// check selected elements to be leafs
+		List<IDimensionElement> oldSelectedElems = dimensionElements;
+		dimensionElements = new ArrayList<IDimensionElement>();
+
+		for (Iterator<IDimensionElement> iterator = oldSelectedElems.iterator(); iterator.hasNext();) {
+			IDimensionElement element = (IDimensionElement) iterator.next();
+			if (element.isLeaf()) {
+				dimensionElements.add(element);
+			}
+
 		}
-		
+
+		// set the first from flat list.
+		if (dimensionElements.size() <= 0 && flatList.size() > 0) {
+			dimensionElements.add(flatList.get(0));
+		}
+
 	}
+
 	/**
 	 * @return the showDimensionTitle
 	 */
 	public boolean isShowDimensionTitle() {
 		return showDimensionTitle;
 	}
+
 	/**
-	 * @param showDimensionTitle the showDimensionTitle to set
+	 * @param showDimensionTitle
+	 *            the showDimensionTitle to set
 	 */
 	public void setShowDimensionTitle(boolean showDimensionTitle) {
 		this.showDimensionTitle = showDimensionTitle;
 	}
+
 	/**
 	 * @return the sortComparator
 	 */
 	public Comparator<IDimensionElement> getSortComparator() {
 		return sortComparator;
 	}
+
 	/**
-	 * @param sortComparator the sortComparator to set
+	 * @param sortComparator
+	 *            the sortComparator to set
 	 */
 	public void setSortComparator(Comparator<IDimensionElement> sortComparator) {
 		this.sortComparator = sortComparator;
+	}
+
+	/**
+	 * Flag for multiple selection.
+	 * 
+	 * @return the isMultiSelection
+	 */
+	public boolean isMultiSelection() {
+		return isMultiSelection;
 	}
 
 }

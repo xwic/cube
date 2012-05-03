@@ -1,7 +1,21 @@
 #set($currElm = $control.getDimensionElement())
-#if ($currElm.dimension == $currElm) #set($title = "- All -") #else #set($title = $currElm.titlePath) #end
+
+#if($control.isMultiSelection())
+	#if ($control.getDimensionElements().size() == 0) 
+		#set($title = "- All -") 
+	#else
+		#if ($control.getDimensionElements().size() == 1)
+			#if ($currElm.dimension == $currElm) #set($title = "- All -") #else #set($title = $currElm.titlePath) #end
+		#else
+			#set($title = "- Multiple -")
+		#end 
+	#end
+#else
+	#if ($currElm.dimension == $currElm) #set($title = "- All -") #else #set($title = $currElm.titlePath) #end
+#end
 #set($prev = $control.prev)
 #set($next = $control.next)
+#set($enablement = $control.enabled)
 <table cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl_${control.controlID}">
  <tr>
   #if($control.showDimensionTitle)<td>#if($control.dimension.title)$control.dimension.title#else$control.dimension.key#end</td>#end
@@ -12,7 +26,17 @@
 	<img src="$jwic.contextPath/xwiccube/images/resultset_previous_dis.gif" border="0">
 #end
   </td>
-  <td valign="middle"><a href="#" onClick="xcube_showTree('$control.controlID');return false;">$title</a></td>
+  <td valign="middle">
+  	#if($enablement)
+  		#if($control.isMultiSelection())
+  			<a href="#" onClick="xcube_showTree('$control.controlID', $control.getDimensionElementsPaths());return false;">$title</a>
+  		#else
+  			<a href="#" onClick="xcube_showTree('$control.controlID', ['']);return false;">$title</a>
+  		#end
+	#else
+		<div>$title</div>
+	#end
+  </td>
 <td width="22" valign="middle">
 #if($next)
   <a href="$control.createActionURL("next", "")"><img title="$next.key" src="$jwic.contextPath/xwiccube/images/resultset_next.gif" border="0"></a>
