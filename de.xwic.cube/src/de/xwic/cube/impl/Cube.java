@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import sun.rmi.runtime.Log;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.xwic.cube.DimensionBehavior;
 import de.xwic.cube.ICell;
 import de.xwic.cube.ICellListener;
