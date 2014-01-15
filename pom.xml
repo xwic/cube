@@ -85,7 +85,9 @@
         <compileTarget>1.6</compileTarget>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <runEnvironment></runEnvironment>
+		<jwicUpdateApplication></jwicUpdateApplication>
+		<jwicUpdateVersion></jwicUpdateVersion>		
+        <cubeUpdateVersion></cubeUpdateVersion>
     </properties>
 
     <build>
@@ -282,85 +284,71 @@
                 <artifactId>commons-logging</artifactId>
                 <version>1.1.1</version>
             </dependency>
-			
             <dependency>
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>2.6</version>
             </dependency>
-
             <dependency>
                 <groupId>commons-digester</groupId>
                 <artifactId>commons-digester</artifactId>
                 <version>2.1</version>
             </dependency>
-            
 			<dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils-core</artifactId>
                 <version>1.8.3</version>
             </dependency>
-            
 			<dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>1.8.3</version>
             </dependency>
-            
 			<dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils-bean-collections</artifactId>
                 <version>1.8.3</version>
             </dependency>
-            
 			<dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>3.2.1</version>
             </dependency>
-			
-			<dependency>
-				<groupId>net.sf.opencsv</groupId>
-				<artifactId>opencsv</artifactId>
-				<version>1.8</version>
-			</dependency>
-
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.17</version>
             </dependency>
-
-			<dependency>
-				<groupId>org.apache.poi</groupId>
-				<artifactId>poi</artifactId>
-				<version>3.6</version>
-			</dependency>			
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.5</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity</artifactId>
                 <version>1.7</version>
             </dependency>
-
             <dependency>
                 <groupId>dom4j</groupId>
                 <artifactId>dom4j</artifactId>
                 <version>1.6</version>
             </dependency>
-
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
             </dependency>
-            
+			<dependency>
+				<groupId>net.sf.opencsv</groupId>
+				<artifactId>opencsv</artifactId>
+				<version>1.8</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi</artifactId>
+				<version>3.6</version>
+			</dependency>			
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.7.5</version>
+            </dependency>
 			<dependency>
                 <groupId>de.java2html</groupId>
                 <artifactId>java2html</artifactId>
@@ -415,110 +403,18 @@
                 <directory>target-ide</directory>
             </build>
         </profile>
+		<profile>
+			<id>update-samples</id>
+			<properties>
+				<jwicUpdateApplication>de.xwic.cube.webui.samples</jwicUpdateApplication>
+				<jwicUpdateVersion>5.2-SNAPSHOT</jwicUpdateVersion>
+				<cubeUpdateVersion>5.2-SNAPSHOT</cubeUpdateVersion>
+			</properties>
+		</profile>
         <profile>
-            <id>run-webui-samples</id>
-            <properties>
-                <runEnvironment>de.xwic.cube.webui.samples</runEnvironment>
-            </properties>
-        </profile>
-        <profile>
-            <id>jetty-run</id>
+            <id>jwic-web-version-update</id>
             <build>
                 <plugins>
-                <plugin>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>jetty-maven-plugin</artifactId>
-                    <version>8.1.9.v20130131</version>
-                    <configuration>
-                        <stopKey>STOP</stopKey>
-                        <stopPort>9999</stopPort>
-                        <scanIntervalSeconds>2</scanIntervalSeconds>
-                        <webAppConfig>
-                            <extraClasspath>de.xwic.cube/target-ide/classes;de.xwic.cube.webui/target-ide/classes;de.xwic.cube.xlsbridge/target-ide/classes</extraClasspath>
-                            <baseResource implementation="org.eclipse.jetty.util.resource.ResourceCollection">
-                                <resourcesAsCSV>${runEnvironment}/web_root</resourcesAsCSV>
-                            </baseResource>
-                        </webAppConfig>
-                        <classesDirectory>${runEnvironment}/target-ide/classes</classesDirectory>
-                        <scanTargets>
-                            <scanTarget>${project.basedir}/${runEnvironment}/target-ide/classes</scanTarget>
-                            <scanTarget>${project.basedir}/de.xwic.cube/target-ide/classes</scanTarget>
-                            <scanTarget>${project.basedir}/de.xwic.cube.xlsbridge/target-ide/classes</scanTarget>
-                            <scanTarget>${project.basedir}/de.xwic.cube.webui/target-ide/classes</scanTarget>
-                        </scanTargets>
-                        <scanTargetPatterns>
-                            <scanTargetPattern>
-                                <directory>${project.basedir}/${runEnvironment}/web_root</directory>
-                                <directory>${project.basedir}/${runEnvironment}/src</directory>
-                                <directory>${project.basedir}/de.xwic.cube/src</directory>
-                                <directory>${project.basedir}/de.xwic.cube.xlsbridge/src</directory>
-                                <directory>${project.basedir}/de.xwic.cube.webui/src</directory>
-                                <includes>
-                                    <include>**/*.vtl</include>
-                                    <include>**/*.js</include>
-                                    <include>**/*.properties</include>
-                                </includes>
-                                <excludes>
-                                    <exclude>**/sessions</exclude>
-                                    <exclude>**/*.log</exclude>
-                                    <exclude>**/*.java</exclude>
-                                </excludes>
-                            </scanTargetPattern>
-                        </scanTargetPatterns>
-
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>commons-logging</groupId>
-                            <artifactId>commons-logging</artifactId>
-                            <version>1.1.1</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>log4j</groupId>
-                            <artifactId>log4j</artifactId>
-                            <version>1.2.17</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                            <version>1.7.5</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>dom4j</groupId>
-                            <artifactId>dom4j</artifactId>
-                            <version>1.6</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.apache.velocity</groupId>
-                            <artifactId>velocity</artifactId>
-                            <version>1.7</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>commons-digester</groupId>
-                            <artifactId>commons-digester</artifactId>
-                            <version>2.1</version>
-                        </dependency>
-
-                        <dependency>
-                            <groupId>de.xwic.jwic</groupId>
-                            <artifactId>jwic-core</artifactId>
-                            <version>5.2-SNAPSHOT</version>
-                        </dependency>
-
-                        <dependency>
-                            <groupId>de.xwic.jwic</groupId>
-                            <artifactId>jwic-controls</artifactId>
-                            <version>5.2-SNAPSHOT</version>
-                        </dependency>
-
-                        <dependency>
-                            <groupId>de.xwic.jwic</groupId>
-                            <artifactId>jwic-compatibility</artifactId>
-                            <version>5.2-SNAPSHOT</version>
-                        </dependency>
-
-                    </dependencies>
-                </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
@@ -528,19 +424,19 @@
                                 <artifactItem>
                                     <groupId>de.xwic.jwic</groupId>
                                     <artifactId>jwic-web</artifactId>
-                                    <version>5.2-SNAPSHOT</version>
+                                    <version>${jwicUpdateVersion}</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.basedir}/${runEnvironment}/web_root</outputDirectory>
+                                    <outputDirectory>${project.basedir}/${jwicUpdateApplication}/web_root</outputDirectory>
 									<excludes>**/*.jar</excludes>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>de.xwic.cube</groupId>
                                     <artifactId>cube-webui</artifactId>
-                                    <version>5.2-SNAPSHOT</version>
+                                    <version>${cubeUpdateVersion}</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.basedir}/${runEnvironment}/web_root</outputDirectory>
+                                    <outputDirectory>${project.basedir}/${jwicUpdateApplication}/web_root</outputDirectory>
 									<excludes>**/*.jar</excludes>
                                 </artifactItem>
                             </artifactItems>
