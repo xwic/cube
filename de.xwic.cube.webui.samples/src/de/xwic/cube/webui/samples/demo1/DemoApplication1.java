@@ -1,32 +1,16 @@
 package de.xwic.cube.webui.samples.demo1;
 
-import java.io.File;
-
 import de.jwic.base.Application;
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.Page;
-import de.jwic.events.ElementSelectedEvent;
-import de.jwic.events.ElementSelectedListener;
-import de.xwic.cube.DataPoolManagerFactory;
-import de.xwic.cube.ICube;
-import de.xwic.cube.IDataPool;
-import de.xwic.cube.IDataPoolManager;
-import de.xwic.cube.IDimension;
-import de.xwic.cube.IDimensionElement;
-import de.xwic.cube.IMeasure;
-import de.xwic.cube.Key;
+import de.xwic.cube.*;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
-import de.xwic.cube.webui.controls.DimensionElementSelector;
-import de.xwic.cube.webui.viewer.CubeFilter;
-import de.xwic.cube.webui.viewer.CubeViewer;
-import de.xwic.cube.webui.viewer.CubeViewerModel;
-import de.xwic.cube.webui.viewer.CubeViewerModelAdapter;
-import de.xwic.cube.webui.viewer.CubeViewerModelEvent;
-import de.xwic.cube.webui.viewer.CubeWriter;
-import de.xwic.cube.webui.viewer.DimensionNavigationProvider;
+import de.xwic.cube.webui.viewer.*;
+
+import java.io.File;
 
 /**
  * Sample Application.

@@ -7,18 +7,18 @@
 	<session-swap-time>2</session-swap-time>	
 
     <!-- The path where jWic should store the applications. -->
-	<session-storage-path>${rootPath}WEB-INF/sessions</session-storage-path>
+	<session-storage-path>${rootPath}/WEB-INF/sessions</session-storage-path>
  
     <!-- Setup the default velocity engine. The engine is used by the velocity-type renderer 
        - implementations.
       -->
     <velocity-engine id="default">
 		<properties>
-			<prop key="runtime.log">${rootPath}WEB-INF/velocity.log</prop>
+			<prop key="runtime.log">${rootPath}/WEB-INF/velocity.log</prop>
 			<prop key="resource.loader">file, class</prop>
 			<prop key="file.resource.loader.description">Velocity File Resource Loader</prop>
 			<prop key="file.resource.loader.class">org.apache.velocity.runtime.resource.loader.FileResourceLoader</prop>
-			<prop key="file.resource.loader.path">${rootPath}WEB-INF/jwic/ctrl_vtls</prop>
+			<prop key="file.resource.loader.path">${rootPath}/WEB-INF/jwic/ctrl_vtls</prop>
 			<prop key="file.resource.loader.cache">true</prop>
 			<prop key="file.resource.loader.modificationCheckInterval">2</prop>
 			<prop key="class.resource.loader.description">Velocity Classpath Resource Loader</prop>

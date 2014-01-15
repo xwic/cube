@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>de.xwic.cube</groupId>
+        <artifactId>cube</artifactId>
+        <version>5.2-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <name>Cube::WebUI::Samples</name>
+
+    <groupId>de.xwic.cube</groupId>
+    <artifactId>cube-webui-samples</artifactId>
+    <version>5.2-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+
+    <dependencies>
+		<!-- Related projects -->
+        <dependency>
+            <groupId>de.xwic.cube</groupId>
+            <artifactId>cube-webui</artifactId>
+            <version>5.2-SNAPSHOT</version>
+			<classifier>classes</classifier>
+        </dependency>
+
+		<!-- jWic dependencies -->
+        <dependency>
+            <groupId>de.xwic.jwic</groupId>
+            <artifactId>jwic-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.xwic.jwic</groupId>
+            <artifactId>jwic-controls</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.xwic.jwic</groupId>
+            <artifactId>jwic-compatibility</artifactId>
+        </dependency>
+
+		<!-- General dependencies -->
+        <dependency>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+		<!-- Test dependencies -->
+        <dependency>
+            <!-- Common Public License 1.0 -->
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>
