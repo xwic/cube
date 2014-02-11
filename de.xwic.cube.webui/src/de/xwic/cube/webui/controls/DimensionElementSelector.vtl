@@ -16,7 +16,7 @@
 #set($prev = $control.prev)
 #set($next = $control.next)
 #set($enablement = $control.enabled)
-<table cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl_${control.controlID}">
+<table cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl">
  <tr>
   #if($control.showDimensionTitle)<td>#if($control.dimension.title)$control.dimension.title#else$control.dimension.key#end</td>#end
   <td width="22" valign="middle">
@@ -29,13 +29,13 @@
   <td valign="middle">
   	#if($enablement)
   		#if($control.isMultiSelection())
-  			<a href="#" onClick="xcube_showTree('$control.controlID', $control.getDimensionElementsPaths());return false;">$title</a>
+  			<a id="showTree" href="javascript: void 0">$title</a>
   		#else
-  			<a href="#" onClick="xcube_showTree('$control.controlID', ['']);return false;">$title</a>
+  			<a id="showTree" href="javascript: void 0">$title</a>
   		#end
 	#else
 		<div>$title</div>
-	#end
+	#end	
   </td>
 <td width="22" valign="middle">
 #if($next)
@@ -46,6 +46,7 @@
 </td>
  </tr>
 </table>
-<div id="xcubeLeafselBox_${control.controlID}" class="xcube-leafsel-box" style="display: none;" 
+
+<div id="xcubeLeafselBox" class="xcube-leafsel-box" style="display: none;" 
 #if($control.selectLeafsOnly) xwcSelectionMode="leaf" #else xwcSelectionMode="all" #end
->Loading...</div>
+><span id="xcubeLeafselBoxLoading" style="background: #00ff00;">Loading...</span><div id="xcubeLeafselBoxContent"></div></div>

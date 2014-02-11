@@ -1,3 +1,9 @@
+var Cube = (function(){
+	//add util functions here
+	return {
+		
+	};
+}());
 
 	var currentOpenCtrlId = null;
 	var xcube_TreeReq = null;
@@ -7,58 +13,16 @@
 	 * @param ctrlId
 	 * @return
 	 */
-	function xcube_showTree(ctrlId) {
-
-		if (currentOpenCtrlId != null) {
-			xcube_closeTree();
-		}
-		
-		var elm = document.getElementById("xcubeLeafselBox_" + ctrlId);
-		var elmTbl = document.getElementById("xcubeLeafselTbl_" + ctrlId);
-		if (elm && elmTbl) {
-			insideClick = true; // prevents immidiate closing
-			currentOpenCtrlId = null;
-			xcube_alignElement(elm, elmTbl);
-			elm.style.display = "inline";
-			elm.innerHTML = "Loading......";
-			
-			if (!elm.xwc_expanded) {
-				elm.xwc_expanded = new Array();
-			}
-		
-			// install "close" hook
-			document.onclick = function () {
-				//debugger;
-				if (!insideClick) {
-					xcube_closeTree();
-				}
-				insideClick = false;
-			}
-			elm.onclick = function innerClick() {
-				insideClick = true;
-			}
-			currentOpenCtrlId = ctrlId;
-			
-			// load the data...
-			if (!elm.xwc_data) {
-				xcube_TreeReq = jWic_sendResourceRequest(ctrlId, xcube_processResponse);
-			} else {
-				xcube_renderTree(elm);
-			}
-			
-		} else {
-			alert("selbox element for " + ctrlId + " not found on page.");
-		}
-	}
 	
 	/**
 	 * Process server response.
 	 * @return
 	 */
-	function xcube_processResponse() {
-		if (currentOpenCtrlId != null && xcube_TreeReq != null) {
-			if (xcube_TreeReq.readyState == 4 && xcube_TreeReq.status == 200) {
-				var resultString = xcube_TreeReq.responseText;
+	function xcube_processResponse(response) {
+		
+		if (currentOpenCtrlId != null) {
+			console.warn('process response')
+				var resultString = response.responseText;
 				try {
 					var result = JSON.parse(resultString);
 					var elm = document.getElementById("xcubeLeafselBox_" + currentOpenCtrlId);
@@ -74,9 +38,9 @@
 					elm.xwc_expanded["/" + result.dimension] = "+"; // initialy expand root
 					xcube_renderTree(elm);
 				} catch (e) {
-					alert("Error parsing data:" + e);
+//					alert("Error parsing data:" + e);
 				}
-			}
+			
 		}
 	}
 	
@@ -178,7 +142,7 @@
 	 * @return
 	 */
 	function xcube_selectElement(elmId) {
-		jWic().fireAction(currentOpenCtrlId, 'selection', elmId.substring(1));
+		JWic.fireAction(currentOpenCtrlId, 'selection', elmId.substring(1));
 		xcube_closeTree();
 	}
 	

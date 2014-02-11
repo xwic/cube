@@ -1,4 +1,4 @@
-#parse("jwic/jwic.page.header")
+#parse("jwic/include.header.vtl")
 
 	## add your custom META, SCRIPT or LINK tags here
 	<link rel="stylesheet" type="text/css" href="sample.css">
@@ -6,7 +6,7 @@
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/json2.js"></SCRIPT>
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/xwiccube.js"></SCRIPT>
 
-#parse("jwic/jwic.page.body")
+#parse("jwic/include.body.vtl")
 
 ## Uncomment the following line to enable debug informations
 ## #parse("jwic/jwic.page.debug")
@@ -15,4 +15,4 @@
 $content.render()
 <!-- /content -->
 
-#parse("jwic/jwic.page.footer")
+#parse("jwic/include.footer.vtl")

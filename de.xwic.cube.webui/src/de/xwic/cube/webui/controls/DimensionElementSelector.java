@@ -19,6 +19,8 @@ import org.json.JSONWriter;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IResourceControl;
+import de.jwic.base.IncludeJsOption;
+import de.jwic.base.JavaScriptSupport;
 import de.jwic.controls.HTMLElement;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
@@ -33,6 +35,7 @@ import de.xwic.cube.webui.viewer.IDimensionFilter;
  * 
  * @author lippisch
  */
+@JavaScriptSupport
 public class DimensionElementSelector extends HTMLElement implements IResourceControl {
 
 	private IDimension dimension;
@@ -205,6 +208,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	/**
 	 * @return the list with selected dimensionElements paths.
 	 */
+	@IncludeJsOption
 	public List<String> getDimensionElementsPaths() {
 
 		List<String> selectedPaths = new ArrayList<String>();
@@ -214,7 +218,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		}
 		return selectedPaths;
 	}
-
+	
 	/**
 	 * @param dimensionElement
 	 *            the dimensionElement to set
@@ -433,6 +437,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	/**
 	 * @return the selectLeafsOnly
 	 */
+	@IncludeJsOption
 	public boolean isSelectLeafsOnly() {
 		return selectLeafsOnly;
 	}
@@ -468,6 +473,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	/**
 	 * @return the showDimensionTitle
 	 */
+	@IncludeJsOption
 	public boolean isShowDimensionTitle() {
 		return showDimensionTitle;
 	}
@@ -500,6 +506,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 * 
 	 * @return the isMultiSelection
 	 */
+	@IncludeJsOption
 	public boolean isMultiSelection() {
 		return isMultiSelection;
 	}
