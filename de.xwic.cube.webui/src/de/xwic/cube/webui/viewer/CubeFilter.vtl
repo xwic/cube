@@ -7,7 +7,7 @@
 #end
 #foreach($dim in $control.dimensions)
 	<tr>
-		<td width="200">#if($dim.title != "")$dim.title #else $dim.key #end</td>
+		<td width="200">#if($dim.title) $dim.title #else $dim.key #end</td>
 		<td>$insert.control($control.getControlName($dim.key))</td>
 	</tr>
 #end

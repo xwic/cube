@@ -43,6 +43,8 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	private List<IDimensionElement> flatList = new ArrayList<IDimensionElement>();
 	private boolean selectLeafsOnly = false;
 	private boolean isMultiSelection = false;
+	private String defaultTitle = "- All -";
+	private String defaultMultipleTitle = "- Multiple -";
 
 	private boolean showDimensionTitle = false;
 
@@ -214,7 +216,11 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		List<String> selectedPaths = new ArrayList<String>();
 		for (Iterator<IDimensionElement> iterator = dimensionElements.iterator(); iterator.hasNext();) {
 			IDimensionElement elem = (IDimensionElement) iterator.next();
-			selectedPaths.add("'" + elem.getPath() + "'");
+			String path = elem.getPath();
+			if(path == null || path.isEmpty()){
+				continue;
+			}
+			selectedPaths.add(elem.getPath());
 		}
 		return selectedPaths;
 	}
@@ -510,5 +516,27 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	public boolean isMultiSelection() {
 		return isMultiSelection;
 	}
-
+	
+	/**
+	 * @param defaultTitle
+	 */
+	public void setDefaultTitle(String defaultTitle) {
+		this.defaultTitle = defaultTitle;
+	}
+	
+	/**
+	 * @param defaultMultipleTitle
+	 */
+	public void setDefaultMultipleTitle(String defaultMultipleTitle){
+		this.defaultMultipleTitle = defaultMultipleTitle;
+	}
+	
+	/**
+	 * @return
+	 */
+	@IncludeJsOption
+	public String getDefaultTitle() {
+		return this.isMultiSelection ? this.defaultMultipleTitle : this.defaultTitle;
+	}
+	
 }

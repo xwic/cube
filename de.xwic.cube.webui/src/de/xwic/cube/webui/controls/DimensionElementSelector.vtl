@@ -1,22 +1,19 @@
 #set($currElm = $control.getDimensionElement())
 
-#if($control.isMultiSelection())
-	#if ($control.getDimensionElements().size() == 0) 
-		#set($title = "- All -") 
-	#else
-		#if ($control.getDimensionElements().size() == 1)
-			#if ($currElm.dimension == $currElm) #set($title = "- All -") #else #set($title = $currElm.titlePath) #end
-		#else
-			#set($title = "- Multiple -")
-		#end 
-	#end
-#else
-	#if ($currElm.dimension == $currElm) #set($title = "- All -") #else #set($title = $currElm.titlePath) #end
+#if ($currElm.dimension == $currElm) 
+	#set($title = $control.defaultTitle) 
+#else 
+	#set($title = $currElm.titlePath) 
 #end
+
 #set($prev = $control.prev)
 #set($next = $control.next)
+#set($class="tree")
+#if($control.multiSelection)
+	#set($class = $class + " multiple")
+#end
 #set($enablement = $control.enabled)
-<table cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl">
+<table id="showTree_container" cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl">
  <tr>
   #if($control.showDimensionTitle)<td>#if($control.dimension.title)$control.dimension.title#else$control.dimension.key#end</td>#end
   <td width="22" valign="middle">
@@ -28,11 +25,7 @@
   </td>
   <td valign="middle">
   	#if($enablement)
-  		#if($control.isMultiSelection())
-  			<a id="showTree" href="javascript: void 0">$title</a>
-  		#else
-  			<a id="showTree" href="javascript: void 0">$title</a>
-  		#end
+  		<a id="showTree" href="javascript: void 0">$title</a>
 	#else
 		<div>$title</div>
 	#end	
@@ -47,6 +40,21 @@
  </tr>
 </table>
 
-<div id="xcubeLeafselBox" class="xcube-leafsel-box" style="display: none;" 
-#if($control.selectLeafsOnly) xwcSelectionMode="leaf" #else xwcSelectionMode="all" #end
-><span id="xcubeLeafselBoxLoading" style="background: #00ff00;">Loading...</span><div id="xcubeLeafselBoxContent"></div></div>
+<div id="tree-container" class="xcube-leafsel-box" style="display: none;" #if($control.selectLeafsOnly) xwcSelectionMode="leaf" #else xwcSelectionMode="all" #end>
+	<span id="tree-loading" style="background: #00ff00;">Loading...</span>
+	<div id="tree-content" class="xcube-tree">
+		<ul id="tree" class="${class}"></ul>
+	</div>
+	#if($control.multiSelection)
+	<div id="tree-multiselect" class="xcube-button"><button id="tree-submit">Submit</button></div>
+	#end
+</div>
+<!-- template for list item -->
+<li id="node-template" style="display:none;">
+	<a href="javascript:void(0);" id="expand"></a>
+	#if($control.multiSelection)
+	<a href="javascript:void(0);" id="select" class="check"></a>
+	#end 
+	<a href="javascript:void(0);" id="title"></a>
+	<ul id="children"></ul>
+</li>

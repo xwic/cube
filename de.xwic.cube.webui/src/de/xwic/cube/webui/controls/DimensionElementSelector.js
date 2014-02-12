@@ -1,12 +1,16 @@
 {//DimensionElementSelector.js
 	afterUpdate : function(){
 		#if($control.visible)
-		Cube.DimensionElementSelector.initialize('$control.controlID',$control.buildJsonOptions());
+		var options = $control.buildJsonOptions();
+		options.controlId = '$control.controlID';
+		Cube.DimensionElementSelector.initialize(options);
 		#end
 	},
 	destroy : function(){
 		#if($control.visible)
-		Cube.DimensionElementSelector.initialize('$control.controlID',$control.buildJsonOptions());
+		var options = $control.buildJsonOptions();
+		options.controlId = '$control.controlID';
+		Cube.DimensionElementSelector.initialize(options);
 		#end
 	}
 }
