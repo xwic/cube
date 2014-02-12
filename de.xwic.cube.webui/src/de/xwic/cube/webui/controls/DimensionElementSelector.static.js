@@ -8,7 +8,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		defineObservable = Cube.defineObservable,
 		load = JWic.resourceRequest,
 		fireAction = JWic.fireAction;
-	
+	//Node Date Model
 	function Node(title, key, path){
 		var childListener,
 			eventListeners = [],
@@ -129,8 +129,8 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			fireAction(controlId,'selection',buildMultiSelectKey(nodeModel));
 			return false;
 		});
-
 		return function(){
+			
 			//show the container
 			container.show();
 			//hide on outside click
@@ -163,6 +163,8 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 				nodeModel.state(Node.UNSELECTED);
 				intialOpen(nodeModel,options.dimensionElementsPaths);//reset what's checked on reopen
 			}
+			
+			return false;
 		};
 	});
 	
@@ -204,11 +206,12 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			expand = uiNode.find('#expand'),
 			children = uiNode.find('#children');
 		
-		
 		node.on('propertyChanged', function(propName,val, oldVal) {
+			
 			if (propName === 'state') {
-				if(oldVal)
+				if(oldVal){
 					select.removeClass(oldVal);
+				}
 				select.addClass(val);
 			}else if(propName === 'expanded'){
 				if(val){
@@ -220,7 +223,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 				}
 			}
 		});
-
+		
 		title.text(node.title()).on('click',function() {
 			var path = node.path();
 			if(options.multiSelection){
@@ -244,8 +247,10 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	intialOpen = function intialOpen(node, paths){
 		var children = node.children(),
 			path = node.path();
+		
 		path = path.substring(0,path.length-1);
-		if(paths.indexOf(path) != -1){
+		
+		if($.inArray(path,paths)){
 			node.expanded(true);
 			node.state(Node.SELECTED);
 		}
@@ -256,15 +261,12 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			intialOpen(i,paths);
 		});
 	};
-	
+	//exports
 	return {
 		initialize : function(options){
 			var control = JWic.$('ctrl_'+options.controlId),
 				build = buildHtml(control,options);
-			control.find("#showTree").on('click',function(){
-				build();
-				return false;
-			});
+			control.find("#showTree").on('click', build);
 		},
 		destroy : function(options){
 			JWic.$('ctrl_'+options.controlId).find("#showTree").unbind('click');
