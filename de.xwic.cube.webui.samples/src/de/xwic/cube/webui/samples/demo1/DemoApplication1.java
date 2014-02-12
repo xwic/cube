@@ -8,6 +8,7 @@ import de.xwic.cube.*;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
+import de.xwic.cube.webui.controls.DimensionElementSelector;
 import de.xwic.cube.webui.viewer.*;
 
 import java.io.File;
@@ -70,8 +71,9 @@ public class DemoApplication1 extends Application {
 		CubeFilter filter = new CubeFilter(page, "filter", model);
 		filter.setSelectMeasure(true);
 		filter.addDimension(dimOT);
-		filter.addDimension(dimGEO);
+		filter.addDimension(dimGEO).setMultiSelection(true);
 		filter.addDimension(dimTime).setSelectLeafsOnly(true);
+		
 		
 		// create writer
 		new CubeWriter(page, "writer", model);

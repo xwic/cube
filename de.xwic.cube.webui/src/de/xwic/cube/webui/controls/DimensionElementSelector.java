@@ -518,6 +518,13 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	}
 	
 	/**
+	 * @param isMultiSelection
+	 */
+	public void setMultiSelection(boolean isMultiSelection) {
+		this.isMultiSelection = isMultiSelection;
+	}
+	
+	/**
 	 * @param defaultTitle
 	 */
 	public void setDefaultTitle(String defaultTitle) {
