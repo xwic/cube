@@ -250,7 +250,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		
 		path = path.substring(0,path.length-1);
 		
-		if($.inArray(path,paths)){
+		if($.inArray(path,paths) != -1){
 			node.expanded(true);
 			node.state(Node.SELECTED);
 		}
