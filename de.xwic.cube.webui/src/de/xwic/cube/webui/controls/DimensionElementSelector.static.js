@@ -122,7 +122,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		rootNode.addClass("root").find('#expand').remove();
 		rootNode.find("#select").addClass("root-check");
 		
-		bindNode(nodeModel,rootNode, options);
+		bindNode(nodeModel,rootNode, options, {});
 		nodeModel.state(Node.UNSELECTED);
 		//multiselect ok button
 		buttonOk.unbind('click').on('click',function(){
@@ -172,7 +172,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		return reduce(data, function(acc, el){
 			var node = tmpl(control, "#node-template"),
 				newNode = new Node(el.title || el.key,el.key,nodeModel.path()+el.key+"/");
-			bindNode(newNode,node,options);
+			bindNode(newNode, node, options, el);
 			//setup intial states
 			newNode.expanded(false);
 			newNode.state(Node.UNSELECTED);
@@ -200,7 +200,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		return multiSelectKey.substring(0, multiSelectKey.length - 2);//trim off the ## bit at the end
 	};
 
-	bindNode = function bindNode(node, uiNode, options) {
+	bindNode = function bindNode(node, uiNode, options, rawNode) {
 		var select = uiNode.find('#select'), 
 			title = uiNode.find("#title"),
 			expand = uiNode.find('#expand'),
@@ -225,12 +225,17 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		});
 		
 		title.text(node.title()).on('click',function() {
-			var path = node.path();
+			var path = node.path(),
+				rawChildNodes = rawNode.elements; 
 			if(options.multiSelection){
-				node.toggle();
+				node.toggle();//multselect mode
 			}else{
-				fireAction(options.controlId, 'selection', path.substring(
-						0, path.length - 1));
+				if(options.selectLeafsOnly && rawChildNodes != null && rawChildNodes.length>0){
+					node.expanded(!node.expanded());//leaf only mode
+				}else{
+					fireAction(options.controlId, 'selection', path.substring(
+							0, path.length - 1));//regular mode
+				}
 			}
 			return false;
 		});
