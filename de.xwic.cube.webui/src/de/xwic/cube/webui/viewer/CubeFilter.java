@@ -6,31 +6,39 @@ package de.xwic.cube.webui.viewer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ListBoxControl;
+import de.jwic.controls.ListBox;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
+import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.webui.controls.DimensionElementSelector;
+import de.xwic.cube.webui.controls.filter.IFilter;
 
 /**
  * @author Florian Lippisch
  */
-public class CubeFilter extends ControlContainer {
+public class CubeFilter extends ControlContainer implements IFilter{
 
 	private static final long serialVersionUID = 1L;
 	private final CubeViewerModel model;
 
-	private ListBoxControl lbcMeasures = null;
+	private ListBox lbcMeasures = null;
 	private List<IDimension> dimensions = new ArrayList<IDimension>(); 
-	private Map<String, String> dimCtrlMap = new HashMap<String, String>();
+	private final Map<String, DimensionElementSelector> dimCtrlMap = new HashMap<String, DimensionElementSelector>();
 	private boolean selectMeasure = true;
+	private boolean inGroup;
 	
 	/**
 	 * @param container
@@ -57,8 +65,9 @@ public class CubeFilter extends ControlContainer {
 			}
 		});
 		
-		lbcMeasures = new ListBoxControl(this, "lbcMeasure");
-		lbcMeasures.setChangeNotification(true);
+		lbcMeasures = new ListBox(this, "lbcMeasure");
+		lbcMeasures.setConfirmMsg("");
+		
 		for (IMeasure measure : measures) {
 			lbcMeasures.addElement(measure.getTitle() != null && measure.getTitle().length() > 0 ? measure.getTitle() : measure.getKey(), measure.getKey());
 		}
@@ -70,6 +79,7 @@ public class CubeFilter extends ControlContainer {
 				onMeasureSelect((String)event.getElement());
 			}
 		});
+		lbcMeasures.setChangeNotification(true);
 	}
 	
 	/**
@@ -110,13 +120,14 @@ public class CubeFilter extends ControlContainer {
 	public DimensionElementSelector addDimension(IDimension dimension, IDimensionFilter filter) {
 		dimensions.add(dimension);
 		
-		DimensionElementSelector dsc = new DimensionElementSelector(this, null, dimension, filter);
+		final DimensionElementSelector dsc = new DimensionElementSelector(this, null, dimension, filter);
 		dsc.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
-				filterSelection((IDimensionElement)event.getElement());
+				if(!isInGroup())//not in group
+					filterSelection(dsc);
 			}
 		});
-		dimCtrlMap.put(dimension.getKey(), dsc.getName());
+		dimCtrlMap.put(dimension.getKey(), dsc);
 		return dsc;
 		
 	}
@@ -136,19 +147,18 @@ public class CubeFilter extends ControlContainer {
 	/**
 	 * @param element
 	 */
-	protected void filterSelection(IDimensionElement element) {
-		model.applyFilter(element);		
+	protected void filterSelection(DimensionElementSelector selector) {
+		List<IDimensionElement> elements = selector.getDimensionElements();
+		handleSingleSelect(elements.get(0));
 	}
 
 	/**
 	 * @param element
 	 */
-	protected void filterSelection(String id) {
-		
-		IDimensionElement selected = model.getCube().getDataPool().parseDimensionElementId(id); 
-		model.applyFilter(selected);
+	private void handleSingleSelect(IDimensionElement element){
+		model.applyFilter(element);
 	}
-
+	
 	/**
 	 * Returns the name of the control that contains the filter
 	 * selection for the specified dimension.
@@ -156,7 +166,7 @@ public class CubeFilter extends ControlContainer {
 	 * @return
 	 */
 	public String getControlName(String dimensionKey) {
-		return dimCtrlMap.get(dimensionKey);
+		return dimCtrlMap.get(dimensionKey).getName();
 	}
 
 	/**
@@ -178,6 +188,86 @@ public class CubeFilter extends ControlContainer {
 	 */
 	public void setSelectMeasure(boolean selectMeasure) {
 		this.selectMeasure = selectMeasure;
+	}
+
+	@Override
+	public String getId() {
+		return this.getControlID();
+	}
+
+	@Override
+	public String save() {
+		JSONObject object = new JSONObject(); 
+		for(DimensionElementSelector selector : this.dimCtrlMap.values()){
+			String id = selector.getDimension().getKey();
+			List<String> dimElements = new ArrayList<String>();
+			for(IDimensionElement elm : selector.getDimensionElements()){
+				dimElements.add(elm.getPath());
+			}
+			try {
+				object.put(id, dimElements);
+			} catch (JSONException e) {
+				log.error(e);
+			}
+		}
+		
+		return object.toString();
+	}
+
+	@Override
+	public void load(String state) {
+		try {
+			JSONObject object = new JSONObject(state);
+			Iterator<String> keys = object.keys();
+			final ICube cube = model.getCube();
+			while(keys.hasNext()){
+				String dimId = keys.next();
+				IDimension dim = null;
+				for(IDimension d : cube.getDimensions()){
+					if(d.getKey().equals(dimId)){
+						dim = d;
+						break;
+					}
+				}
+				if(dim == null){
+					continue;
+				}
+			
+				JSONArray dimElements = object.getJSONArray(dimId);
+				List<IDimensionElement> elements = new ArrayList<IDimensionElement>();
+				for (int i = 0; i < dimElements.length(); i++) {
+					try{
+						elements.add(dim.parsePath(dimElements.getString(i)));
+					}catch(IllegalArgumentException ex){
+						log.error(ex);
+						continue;
+					}
+				}
+				this.dimCtrlMap.get(dimId).setDimensionElements(elements);
+			}
+			this.requireRedraw();
+		} catch (JSONException e) {
+			log.error(e);
+		}
+		
+	}
+
+	@Override
+	public void applyFilter(){ 
+	//apply the whole filter
+		for(DimensionElementSelector selector : this.dimCtrlMap.values()){
+			filterSelection(selector);
+		}
+	}
+
+	@Override
+	public boolean isInGroup() {
+		return this.inGroup;
+	}
+
+	@Override
+	public void setInGroup(boolean inGroup) {
+		this.inGroup = inGroup;
 	}
 	
 	
