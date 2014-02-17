@@ -6,6 +6,10 @@
 	#set($title = $currElm.titlePath) 
 #end
 
+#if($control.getDimensionElements().size() > 1)
+	#set($title = $control.defaultMultipleTitle)
+#end
+
 #set($prev = $control.prev)
 #set($next = $control.next)
 #set($class="tree")

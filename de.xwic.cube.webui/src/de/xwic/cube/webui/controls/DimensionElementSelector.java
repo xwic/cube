@@ -543,7 +543,11 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 */
 	@IncludeJsOption
 	public String getDefaultTitle() {
-		return this.isMultiSelection ? this.defaultMultipleTitle : this.defaultTitle;
+		return this.defaultTitle;
+	}
+	
+	public String getDefaultMultipleTitle() {
+		return defaultMultipleTitle;
 	}
 	
 }
