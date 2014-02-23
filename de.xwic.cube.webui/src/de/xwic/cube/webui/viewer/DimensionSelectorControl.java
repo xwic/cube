@@ -5,8 +5,7 @@ package de.xwic.cube.webui.viewer;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ListBoxControl;
-import de.jwic.controls.ListEntry;
+import de.jwic.controls.ListBox;
 import de.jwic.events.ElementSelectedListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
@@ -17,7 +16,7 @@ import de.xwic.cube.IDimensionElement;
 public class DimensionSelectorControl extends ControlContainer {
 
 	private final IDimension dimension;
-	private ListBoxControl lbDim;
+	private ListBox lbDim;
 
 	/**
 	 * @param container
@@ -27,11 +26,11 @@ public class DimensionSelectorControl extends ControlContainer {
 		super(container, name);
 		this.dimension = dimension;
 		
-		lbDim = new ListBoxControl(this);
+		lbDim = new ListBox(this,"lbDim");
 		lbDim.setCssClass("xcube-cb");
 		lbDim.setChangeNotification(true);
 		
-		lbDim.addElement("- All -", dimension.getID()).setCssClass("xcube-cb-base");
+		lbDim.addElement("- All -", dimension.getID());
 		addEntries(lbDim, 0, dimension);
 		
 		lbDim.setSelectedKey(dimension.getID());
@@ -47,7 +46,7 @@ public class DimensionSelectorControl extends ControlContainer {
 	 * @param i
 	 * @param dimension
 	 */
-	private void addEntries(ListBoxControl lbc, int depth, IDimensionElement parent) {
+	private void addEntries(ListBox lbc, int depth, IDimensionElement parent) {
 	
 		StringBuilder indent = new StringBuilder();
 		for (int i = 0; i < depth; i++) {
@@ -59,8 +58,7 @@ public class DimensionSelectorControl extends ControlContainer {
 		for (IDimensionElement elm : parent.getDimensionElements()) {
 			
 			String title = elm.getTitle() != null && elm.getTitle().length() > 0 ? elm.getTitle() : elm.getKey();
-			ListEntry entry =  lbc.addElement(indent + title, elm.getID());
-			entry.setCssClass("xcube-cb-lvl" + depth);
+			lbc.addElement(indent + title, elm.getID());
 			if (!elm.isLeaf()) {
 				addEntries(lbc, depth + 1, elm);
 			}

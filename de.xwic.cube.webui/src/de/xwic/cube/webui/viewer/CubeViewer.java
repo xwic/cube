@@ -14,8 +14,8 @@ import de.jwic.base.UserAgentInfo;
 import de.jwic.renderer.self.ISelfRenderingControl;
 import de.jwic.renderer.self.SelfRenderer;
 import de.xwic.cube.IDimensionElement;
+import de.xwic.cube.webui.util.Table;
 import de.xwic.cube.webui.util.TableCell;
-import de.xwic.cube.webui.util.TableRenderer;
 
 /**
  * @author Florian Lippisch
@@ -42,7 +42,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	public CubeViewer(IControlContainer container, String name) {
 		super(container, name);
 
-		setRendererId(SelfRenderer.RENDERER_ID);
+//		setRendererId(SelfRenderer.RENDERER_ID);
 		
 		model = new CubeViewerModel(getSessionContext().getLocale());
 		model.addCubeViewerModelListener(new CubeViewerModelAdapter() {
@@ -117,7 +117,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		PrintWriter out = renderContext.getWriter();
 
 //		long start = System.currentTimeMillis();
-		TableRenderer tbl = renderTable();
+		Table tbl = renderTable();
 		tbl.render(out);
 //		long time = System.currentTimeMillis() - start;
 //		log.debug("Rendering Time for " + getName() + ": " + time);
@@ -130,8 +130,8 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	/**
 	 * @return
 	 */
-	public TableRenderer renderTable() {
-		TableRenderer tbl = new TableRenderer(this);
+	public Table renderTable() {
+		Table tbl = new Table(this);
 		tbl.setCssClass("xcube-tbl");
 		
 		UserAgentInfo userAgent = getSessionContext().getUserAgent();
@@ -162,18 +162,14 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		}
 		
 		// evaluate vertical header size (rows)
-		int rowDepth = 0;
+		int rowDepth = 1;
 		int rowCount = 0;
 		for (INavigationProvider navProvider : model.getRowProvider()) {
 			NavigationSize size = navProvider.getNavigationSize();
-			int depth = size.depth + navProvider.getIndention();
-			if (depth > rowDepth) {
-				rowDepth = depth;
-			}
 			rowCount += size.cells;
 		}
-		
-		tbl.initSize(colHeight + rowCount, rowDepth + colCount);
+		tbl.initHead(colHeight, rowDepth+colCount);
+		tbl.initSize(rowCount, rowDepth + colCount);
 		
 		if (columnWidth > 0) {
 			for (int col = rowDepth; col < (rowDepth + colCount); col ++) {
@@ -186,15 +182,9 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		for (INavigationProvider navProvider : model.getColumnProvider()) {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.cells += startCol;
-			renderNavigation(tbl, navProvider.getIndention(), startCol, navProvider, size, true);
+			renderNavigation(tbl, navProvider.getIndention(), startCol, navProvider, size, true,"");
 			startCol += (size.cells - startCol);
 		}		
-		
-		for (int r = 0; r < colHeight; r++) {
-			tbl.getCell(r, 0)
-				.setColSpan(rowDepth)
-				.setContent(IMG_SPACER.toImgTag(leftNavMinWidth, 2));
-		}
 		
 		// render rows
 		int startRow = colHeight;
@@ -202,19 +192,18 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.depth = rowDepth;
 			if (size.cells > 0) {
-				renderNavigation(tbl, startRow, navProvider.getIndention(), navProvider, size, false);
+				renderNavigation(tbl, startRow, navProvider.getIndention(), navProvider, size, false,"");
 			}
 			startRow += size.cells;
 		}		
 		
 		// render content
 		for (int row = 0; row < rowCount; row++) {
+			int rowIdx = row + colHeight;
+			ContentInfo ciRow = (ContentInfo) tbl.getRowData(rowIdx);
 			for (int col = 0; col < colCount; col++) {
-				int rowIdx = row + colHeight;
 				int colIdx = col + rowDepth;
-				ContentInfo ciRow = (ContentInfo) tbl.getRowData(rowIdx);
 				ContentInfo ciCol = (ContentInfo) tbl.getColumnData(colIdx);
-				
 				TableCell cell = tbl.getCell(rowIdx, colIdx);
 				boolean empty = true;
 				if (ciCol != null && ciRow != null) {
@@ -225,7 +214,6 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 					String content = dataProvider.getCellData(model, ciRow, ciCol);
 					empty = content == null || content.length() == 0;
 					cell.setContent(content);
-					cell.setCssClass("xcube-data xcube-data-vlvl-" + ciRow.getLevel() + " xcube-data-hlvl-" + ciCol.getLevel());
 				} else {
 					cell.setContent("NoCI");
 				}
@@ -233,6 +221,9 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 					cell.setAction("click");
 					cell.setActionParam(buildActionParameter(ciRow, ciCol));
 				}
+//				cell.setGroup(ciCol.getGroup());
+				cell.setLevel(ciCol.getLevel());
+				cell.getParent().setLevel(ciRow.getLevel());
 				
 			}
 		}
@@ -275,7 +266,7 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	 * @param size
 	 * @param b
 	 */
-	private NavigationSize renderNavigation(TableRenderer tbl, int startRow, int startCol, INavigationElementProvider parentElement, NavigationSize totalSize, boolean horizontal) {
+	private NavigationSize renderNavigation(Table tbl, int startRow, int startCol, INavigationElementProvider parentElement, NavigationSize totalSize, boolean horizontal,String group) {
 		
 		NavigationSize size = new NavigationSize();
 		int row = startRow;
@@ -291,15 +282,16 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 			int titleCol = col;
 			int items = 1;
 			ContentInfo contentInfo = elm.getContentInfo();
+			contentInfo.setGroup(group);
 			contentInfo.setLevel(level);
 			if (expanded) {
 				Align align = horizontal ? columnTotalAlign : rowTotalAlign;
 				int startIndent = !elm.hideTotal() && (align == Align.BEGIN) ? 1 : 0;
 				NavigationSize subSize;
 				if (horizontal) {
-					subSize = renderNavigation(tbl, row + 1, col + startIndent, elm, totalSize, horizontal);
+					subSize = renderNavigation(tbl, row + 1, col + startIndent, elm, totalSize, horizontal,group+" "+elm.getTitle());
 				} else {
-					subSize = renderNavigation(tbl, row + startIndent, col + 1, elm, totalSize, horizontal);
+					subSize = renderNavigation(tbl, row + startIndent, col, elm, totalSize, horizontal,group+" "+elm.getTitle());
 				}
 				if (size.depth < subSize.depth) {
 					size.depth = subSize.depth;
@@ -312,77 +304,39 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 					int stCol = col + (horizontal ? (align == Align.BEGIN ? 0 : subSize.cells) : subSize.depth);
 					if (horizontal) {
 						tbl.setColumnData(stCol, contentInfo);
-						for (int r = row + 1; r <= stRow; r++) {
-							if (r < tbl.getRowCount()) {
-								tbl.getCell(r, stCol).setCssClass("xcube-hl-" + level + " xcube-hor-end");
-							}
-							
-						}
 						titleCol = stCol;
 					} else {
 						tbl.setRowData(stRow, contentInfo);
-						for (int c = col + 1; c <= stCol; c++) {
-							tbl.getCell(stRow, c).setCssClass("xcube-hl-" + level);
-						}
 						titleRow = stRow;
-						//tbl.getCell(stRow, stCol).setContent(elm.getTitle() + " Total");
 					}
 				}
 			} else {
 				if (horizontal) {
 					tbl.setColumnData(col, contentInfo);
-					for (int r = row + 1; r <= totalSize.depth; r++) {
-						if (r < tbl.getRowCount()) {
-							tbl.getCell(r, col).setCssClass("xcube-hl-" + level + " xcube-hor-end");
-						}
-						
-					}
 				} else {
 					tbl.setRowData(row, contentInfo);
 				}
 			}
+			TableCell cell = tbl.getCell(titleRow, titleCol);
 			
 			// render navigation element cell
 			totalItems += items;
 			if (horizontal) {
-				for (int c = 0; c < items; c++) {
-					tbl.getCell(row, col + c).setCssClass("xcube-hl-" + level + " xcube-hor-span");
-				}
+				tbl.setMaxColLevel(Math.max(tbl.getMaxColLevel(), level));
 				col += items;
 			} else {
-				for (int r = 0; r < items; r++) {
-					tbl.getCell(row + r, col).setCssClass("xcube-hl-" + level)
-					.setContent(IMG_SPACER.toImgTag());
-
-				}
+				tbl.setMaxRowLevel(Math.max(tbl.getMaxRowLevel(), level));
 				row += items;
 			}
-
-			TableCell cell = tbl.getCell(titleRow, titleCol);
-			StringBuilder sb = new StringBuilder();
-			if (elm.isExpandable()) {
-				String action = expanded ? "collapse" : "expand";
-				sb.append("<a class=\"xcube-action-" + action + "\"");
-				sb.append(" href=\"" + createActionURL(action, elm.getElementId()) + "\">");
-				sb.append(elm.getTitle());
-				sb.append("</A>");
-			} else {
-				sb.append("<span class=\"xcube-title\">").append(elm.getTitle()).append("</span>");
-			}
-			cell.setContent(sb.toString());
-			cell.setCssClass("xcube-hl-" + level + " xcube-" +
-					(horizontal ? "hor" : (rowTotalAlign == Align.BEGIN ? "ver" : "verBt")) + 
-					"-end");
+			cell.setContent(elm.getTitle());
+			cell.setExpandable(elm.isExpandable());
+			cell.setTitle(true);
+			cell.setElementId(elm.getElementId());
+			cell.setLevel(level);
+			cell.setGroup(group);
 			
-			if (horizontal) {
-				if (columnTotalAlign == Align.BEGIN) {
-					cell.setColSpan(items);
-				}
-			} else {
-				cell.setColSpan(totalSize.depth - titleCol);
-			}
-
 		}
+		
 		size.cells = totalItems;
 		size.depth++; // add "myself";
 		return size;
@@ -404,6 +358,16 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	public void actionCollapse(String elementId) {
 		model.collapse(elementId);
 		requireRedraw(); // TODO to be replaced by listener mechanism.
+	}
+	
+	public void actionToggleExpand(String elementId){
+		if(model.isExpanded(elementId)){
+			model.collapse(elementId);
+		}else{
+			model.expand(elementId);
+		}
+		System.out.println(elementId);
+		this.requireRedraw();
 	}
 	
 	/**
@@ -493,6 +457,15 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	 */
 	public void setEmptyCellsClickable(boolean emptyCellsClickable) {
 		this.emptyCellsClickable = emptyCellsClickable;
+	}
+	
+	public Table getTable(){
+		try{
+			return renderTable();
+		}catch(Throwable t){
+			log.error(t.getMessage(),t);
+			return null;
+		}
 	}
 
 }

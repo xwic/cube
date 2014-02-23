@@ -72,12 +72,12 @@ public class DemoApplication1 extends Application {
 		
 		model.addRowNavigationProvider(navigationProvider);
 		
-		/*navigationProvider = new DimensionNavigationProvider(model, dimGEO);
+		navigationProvider = new DimensionNavigationProvider(model, dimTime);
 		navigationProvider.setHideEmptyElements(false);
 		navigationProvider.setShowRoot(true);
 		navigationProvider.setClickable(true);
-		navigationProvider.setIndention(1);
-		model.addRowNavigationProvider(navigationProvider);*/
+//		navigationProvider.setIndention(1);
+		model.addColumnNavigationProvider(navigationProvider);
 		
 		// create filter
 		final CubeFilter filter = new CubeFilter(page, "filter", model);
@@ -100,7 +100,9 @@ public class DemoApplication1 extends Application {
 		// create writer
 		new CubeWriter(page, "writer", model);
 		
-		new Button(page,"applyAll").addSelectionListener(new SelectionListener() {
+		Button applyButton = toolBar.addGroup().addButton();
+		applyButton.setTitle("Apply Filters");
+		applyButton.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void objectSelected(SelectionEvent arg0) {

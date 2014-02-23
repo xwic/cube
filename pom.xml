@@ -365,11 +365,11 @@
 				<artifactId>jwic-controls</artifactId>
 				<version>5.2-SNAPSHOT</version>
 			</dependency>
-			<dependency>
+			<!-- <dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-compatibility</artifactId>
 				<version>5.2-SNAPSHOT</version>
-			</dependency>
+			</dependency> -->
 			
             <dependency>
                 <!-- Common Public License 1.0 -->

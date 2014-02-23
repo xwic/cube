@@ -10,9 +10,9 @@ import java.util.Map;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.ListBoxControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.ListBox;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.ICube;
@@ -28,8 +28,8 @@ public class CubeWriter extends ControlContainer {
 
 	
 	private final CubeViewerModel model;
-	private ListBoxControl lbcMeasures;
-	private InputBoxControl inpValue;
+	private ListBox lbcMeasures;
+	private InputBox inpValue;
 	
 	private Map<IDimension, ClassicDimensionSelectorControl> selectors = new HashMap<IDimension, ClassicDimensionSelectorControl>();
 
@@ -41,10 +41,10 @@ public class CubeWriter extends ControlContainer {
 		super(container, name);
 		this.model = model;
 		
-		lbcMeasures = new ListBoxControl(this, "lbcMeasure");
-		inpValue = new InputBoxControl(this, "inpValue");
+		lbcMeasures = new ListBox(this, "lbcMeasure");
+		inpValue = new InputBox(this, "inpValue");
 		
-		ButtonControl btWrite = new ButtonControl(this, "btWrite");
+		Button btWrite = new Button(this, "btWrite");
 		btWrite.setTitle("Update");
 		btWrite.addSelectionListener(new SelectionListener() {
 			public void objectSelected(SelectionEvent event) {

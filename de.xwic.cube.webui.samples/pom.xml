@@ -33,10 +33,10 @@
             <groupId>de.xwic.jwic</groupId>
             <artifactId>jwic-controls</artifactId>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>de.xwic.jwic</groupId>
             <artifactId>jwic-compatibility</artifactId>
-        </dependency>
+        </dependency> -->
 
 		<!-- General dependencies -->
         <dependency>

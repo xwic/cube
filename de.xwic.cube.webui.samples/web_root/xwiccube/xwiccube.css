@@ -1,81 +1,128 @@
 table.xcube-tbl {
 	border-collapse: collapse;
-	border: 2px solid #808080;
+	font-size: 11px;
+	border-top: 1px solid #FFFFFF;
+	line-height: 14px;
+	/*border: 1px solid #3a5989;*/
 }
 
 .x-cube-info {
 	font-size: 7pt;
 }
 
-table.xcube-tbl td {
-	font-size: 8pt;
-	background-color: #C0C0C0;
+.xcube-tbl tr td, .xcube-tbl tr th {
+	border-bottom: 1px solid #eeeeee;
+	padding-top: 1px;
+	padding-right: 3px;
+	padding-bottom: 1px;
+	padding-left: 3px;
 	/*border: 1px solid red;*/
 }
 
 table.xcube-tbl td.x-clickable {
-	cursor: pointer;	
+	cursor: pointer;
+	text-decoration: underline;
+}
+table.xcube-tbl td.x-clickable:hover {
+	color: #0058AE;
+
+	
+}
+
+table.xcube-tbl td a {
+
 }
 
 table.xcube-tbl td.xcube-hl-0 {
-	background-color: #C0C0C0;
+	/*background-color: #FFFFFE;*/
+	color: #0096FF;
+}
+table.xcube-tbl td.xcube-hl-0 a {
+	color: #0096FF;
+}
+table.xcube-tbl td.xcube-hl-1 a {
+
 }
 table.xcube-tbl td.xcube-hl-1 {
-	background-color: #D0D0D0;
+
 }
 table.xcube-tbl td.xcube-hl-2 {
-	background-color: #E0E0E0;
+	/*background-color: #6a89B9;*/
+	color: #424142;
 }
 table.xcube-tbl td.xcube-hl-3 {
-	background-color: #F0F0F0;
+	/*background-color: #7a99C9;*/
+	color: #606060;
 }
 table.xcube-tbl td.xcube-hl-4 {
-	background-color: #FFFFFF;
+	/*background-color: #8aA9D9;*/
+	color: #606060;
+}
+table.xcube-tbl td.xcube-hl-5 {
+	/*background-color: #9aB9E9;*/
+	color: #606060;
 }
 
 table.xcube-tbl td.xcube-data {
 	text-align: right;
-	background-color: #ffffff;
+	/*background-color: #FFFFFE;*/
 	padding: 0px 3px 0px 8px;
-	border: 1px solid #A0A0A0;
+	/*border: 1px solid #3a5989;*/
 }
 
 td.xcube-data-vlvl-0 {
-	color: #004DFF;
-	font-weight: bold;
+	color: #0096FF;
+	font-style: italic;
+	/*font-weight: bold;*/
 }
 td.xcube-data-vlvl-1 {
-	color: #004DFF;
+
+}
+table.xcube-tbl td.xcube-data-vlvl-1 {
+	padding-top: 2px;
+	padding-bottom: 2px;
 }
 
 td.xcube-data-vlvl-2 {
-	color: #555;
+	color: #424142;
 }
 
 td.xcube-data-vlvl-3 {
-	color: #888;
+	color: #606060;
+}
+td.xcube-data-vlvl-4 {
+	color: #606060;
+}
+td.xcube-data-vlvl-5 {
+	color: #606060;
 }
 
 table.xcube-tbl td.xcube-data-hlvl-0 {
-	background-color: #E0E0FF;
+
 }
 table.xcube-tbl td.xcube-data-hlvl-1 {
-	background-color: #F0F0F0;
+	/*background-color: #5a79A9;*/
 }
-
+table.xcube-tbl td.xcube-data-hlvl-2 {
+	/*background-color: #6a89B9;*/
+}
+table.xcube-tbl td.xcube-data-hlvl-3 {
+	/*background-color: #7a99C9;*/
+}
 td.xcube-hor-end {
-	border-right: 1px solid #ffffff;
+	/*border-right: 1px solid #3a5989;*/
 }
 
 td.xcube-hor-span {
-	border-bottom: 1px solid #ffffff;
+	/*border-bottom: 1px solid #3a5989;*/
 }
 
 td.xcube-ver-end {
-	border-top: 1px solid #ffffff;
+	/*border-top: 1px solid #3a5989;*/
 }
 td.xcube-verBt-end {
-	border-bottom: 1px solid #ffffff;
+
+	/*border-bottom: 1px solid #3a5989;*/
 }
 
 
@@ -83,56 +130,132 @@ td.xcube-verBt-end {
 a.xcube-action-expand {
 	background-image: url(images/expand.png);
 	background-repeat: no-repeat;
-	padding-left: 14px;
+	padding-left: 16px;
 	text-decoration: none;
+	background-position: -1px -2px;
+	display: block;
 }
 a.xcube-action-collapse {
 	background-image: url(images/collapse.png);
 	background-repeat: no-repeat;
-	padding-left: 14px;
+	padding-left: 16px;
 	text-decoration: none;
+	background-position: -1px -2px;
+	display: block;
 }
 .xcube-title {
-	padding-left: 14px;
+
 }
 
 table.xcube-tbl tr:hover td.xcube-data  {
-	background-color: #D0D0FF;
+	background-color: #E0E0E0;
 }
-<!--[if IE 6]>
-table.xcube-tbl tr.hover td.xcube-data  {
-	background-color: #D0D0FF;
+table.xcube-tbl tr:hover td.xcube-hl-0  {
+	background-color: #E0E0E0;
 }
-table.xcube-tbl tr.hover td.xcube-data-hlvl-0 {
-	background-color: #C0C0FF;
+table.xcube-tbl tr:hover td.xcube-hl-1  {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr:hover td.xcube-hl-2  {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr:hover td.xcube-hl-3  {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr:hover td.xcube-hl-4  {
+	background-color: #E0E0E0;
 }
 
-<![endif]-->
+/** To support hover effects on IE 6, the following styles are required **/
+[if IE 6]>
+table.xcube-tbl tr.hover td.xcube-data  {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr.hover td.xcube-data-hlvl-0 {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr.hover td.xcube-data-hlvl-1 {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr.hover td.xcube-data-hlvl-2 {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr.hover td.xcube-data-hlvl-3 {
+	background-color: #E0E0E0;
+}
+
+table.xcube-tbl tr.hover td.xcube-hl-0  {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr.hover td.xcube-hl-1  {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr.hover td.xcube-hl-2  {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr.hover td.xcube-hl-3  {
+	background-color: #E0E0E0;
+}
+table.xcube-tbl tr.hover td.xcube-hl-4  {
+	background-color: #E0E0E0;
+}
+
+<![endif]
 
 .xcube-cb {
 	font-size: 10pt;
 }
 option.xcube-cb-base {
-	background-color: #FFFFFF;
+	background-color: #3a5989;
 }
 
 option.xcube-cb-lvl0 {
-	background-color: #F0F0F0;
+	background-color: #FFFFFE;
 }
 option.xcube-cb-lvl1 {
-	background-color: #E0E0E0;
+	background-color: #5a79A9;
 }
 option.xcube-cb-lvl2 {
-	background-color: #D0D0D0;
+	background-color: #6a89B9;
 }
 option.xcube-cb-lvl3 {
-	background-color: #C0C0C0;
+	background-color: #7a99C9;
 }
 
-
+table.xcube-leafsel {
+	margin: 2px;
+}
 table.xcube-leafsel td {
 	font-size: 8pt;
+	font-weight: bold;
+	text-align: left;
+	margin: 0px;
+	padding: 0px;
 }
+
+/** filter table */
+
+table.xcube-filter select {
+	/*background-color: #3a5989;
+	color: #ffffff;*/
+	font-size: 8pt; 
+}
+
+table.xcube-filter td {
+	font-size: 8pt;
+}
+
+table.xcube-filter table.xcube-leafsel {
+	/*border: 1px solid #C0C0C0;*/
+}
+table.xcube-filter a {
+	color: #606060;
+}
+
+table.xcube-leafsel a {
+	color: #606060;
+}
+
 div.xcube-leafsel-box {
 	color: #000000;
 	position: absolute;
@@ -149,8 +272,10 @@ div.xcube-leafsel-box {
 	border-right: 1px solid #808080;
 	border-left: 1px solid #808080;
 }
+
 div.xcube-leafsel-box td {
 	font-size: 8pt;
+	text-align: left;
 }
 div.xcube-leafsel-box td.selected {
 	font-weight: bold;
@@ -158,8 +283,217 @@ div.xcube-leafsel-box td.selected {
 div.xcube-leafsel-box td.xcube_tree_actionnode {
 	cursor: pointer;
 }
-div.xcube-leafsel-box a:hover {
-	background-color: #2020A0;
+div.xcube-leafsel-box a.xwc_node {
+	margin: 0px;
+	padding: 0px;
+	color: #000000;
+	text-decoration: none;
+	white-space: nowrap;
+}
+div.xcube-leafsel-box a.xwc_node:hover {
+	background-color: #3a6989;
 	color: #ffffff;
 	text-decoration: none;
+}
+tr.xcube-h0 {
+}
+tr.xcube-h0 td {
+	font-weight: bold;
+	color: #FFFFFF;
+}
+tr td.xcube-v1, tr td.xcube-v2, tr td.xcube-v3 {
+	width: 80px;
+}
+
+tr.xcube-h0 th.xcube-v0 {
+	background-color: #0072E0;
+}
+tr.xcube-h0 th.xcube-v1 {
+	background-color: #0058AE;
+	text-align: right;
+	color: #FFFFFF;
+}
+tr.xcube-h0 th.xcube-v1 a {
+	color: #FFFFFF;
+	text-align: left;
+}
+tr.xcube-h0 th.xcube-v2 {
+	background-color: #0058AE;
+	text-align: right;
+	color: #FFFFFF;
+}
+tr.xcube-h0 th.xcube-v2 a {
+	color: #FFFFFF;
+	text-align: left;
+}
+tr.xcube-h0 th.xcube-v3 {
+	background-color: #339AFF;
+	text-align: center;
+	color: #FFFFFF;
+}
+tr.xcube-h1 {
+}
+tr.xcube-h1 td {
+	font-weight: bold;
+	font-size: 12px;
+}
+tr.xcube-h1 td.xcube-v0 {
+	background-color: #85C3FF;
+}
+tr.xcube-h1 td.xcube-v1 {
+	background-color: #6BB6FF;
+	text-align: right;
+}
+tr.xcube-h1 td.xcube-v2 {
+	background-color: #6BB6FF;
+	text-align: right;
+}
+tr.xcube-h1 td.xcube-v3 {
+	background-color: #A2D1FF;
+	text-align: right;
+}
+tr.xcube-h2 {
+}
+tr.xcube-h2 td {
+	font-weight: bold;
+}
+tr.xcube-h2 td.xcube-v0 {
+	background-color: #B7DCFF;
+}
+tr.xcube-h2 td.xcube-v0 .xcube-title {
+	padding-left: 20px;
+	display: block;
+}
+tr.xcube-h2 td.xcube-v1 {
+	background-color: #9DCFFF;
+	text-align: right;
+}
+tr.xcube-h2 td.xcube-v2 {
+	background-color: #9DCFFF;
+	text-align: right;
+}
+tr.xcube-h2 td.xcube-v3 {
+	background-color: #C7E4FF;
+	text-align: right;
+}
+tr.xcube-h3 {
+}
+tr.xcube-h3 td {
+	
+}
+tr.xcube-h3 td.xcube-v0 {
+	background-color: #e1e1e1;
+}
+tr.xcube-h3 td.xcube-v0 .xcube-title {
+	padding-left: 40px;
+}
+tr.xcube-h3 td.xcube-v1 {
+	background-color: #D5D5D5;
+	text-align: right;
+}
+tr.xcube-h3 td.xcube-v2 {
+	background-color: #D5D5D5;
+	text-align: right;
+}
+tr.xcube-h3 td.xcube-v3 {
+	background-color: #FFFFFF;
+	text-align: right;
+}
+
+.xcube-sum {
+}
+.xcube-sum td {
+	font-weight: bold;
+	font-size: 12px;
+	color: #FFFFFF;
+	line-height: 15px;
+}
+tr.xcube-sum td.xcube-v0 {
+	background-color: #339AFF;
+}
+tr.xcube-sum td.xcube-v0 a{
+	color: #FFFFFF;
+}
+tr.xcube-sum td.xcube-v1 {
+	background-color: #0985FF;
+	text-align: right;
+}
+tr.xcube-sum td.xcube-v2 {
+	background-color: #0985FF;
+	text-align: right;
+}
+tr.xcube-sum td.xcube-v3 {
+	background-color: #339AFF;
+	text-align: right;
+}
+
+.xcube-total  {
+}
+.xcube-total td {
+	font-weight: bold;
+	font-size: 13px;
+	color: #FFFFFF;
+	line-height: 16px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+tr.xcube-total td.xcube-v0 {
+	background-color: #0072E0;
+}
+tr.xcube-total td.xcube-v1 {
+	background-color: #0058AE;
+	text-align: right;
+}
+tr.xcube-total td.xcube-v2 {
+	background-color: #0058AE;
+	text-align: right;
+}
+tr.xcube-total td.xcube-v3 {
+	background-color: #0072E0;
+	text-align: right;
+}
+.xcube-v2-p1{
+	background-image: url(../images/tab-pattern1.png);
+}
+.xcube-v2-vline{
+	border-left: 1px solid #0058AE;
+}
+.xcube-v1-vline{
+	border-left: 2px solid #FFFFFF;
+}
+.xcube-tbl td.xcube-white{
+	background-color: #FFFFFF;
+	width: 5px;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+}
+.xcube-tbl .xcube-section td.xcube-v0, .xcube-section td.xcube-v1, .xcube-section td.xcube-v2, .xcube-section td.xcube-v3 {
+	border-bottom: 1px solid #0058AE;
+	border-top: 2px solid #0058AE;
+}
+.xcube-row-first th.xcube-v0, .xcube-row-first th.xcube-v1, .xcube-row-first th.xcube-v2, .xcube-row-first th.xcube-v3 {
+	border-top: 1px solid #0058AE;
+}
+.xcube-row-last td.xcube-v0, .xcube-row-last td.xcube-v1, .xcube-row-last td.xcube-v2, .xcube-row-last td.xcube-v3 {
+	border-bottom: 1px solid #0058AE;
+}
+.xcube-section .xcube-v0 {
+	padding-top: 5px;
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+}
+.xcube-section .xcube-v0 .xcube-title {
+	background-color: #0985FF;
+	color: #FFFFFF;
+	display: block;
+	padding-top: 3px;
+	padding-bottom: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+	font-size: 12px;
+	line-height: 15px;
+	border-top-right-radius: 6px;
 }

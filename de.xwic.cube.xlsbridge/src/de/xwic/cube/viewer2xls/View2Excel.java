@@ -10,7 +10,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 
 import de.xwic.cube.webui.util.TableCell;
-import de.xwic.cube.webui.util.TableRenderer;
+import de.xwic.cube.webui.util.Table;
 import de.xwic.cube.webui.viewer.CubeViewer;
 
 /**
@@ -34,7 +34,7 @@ public class View2Excel {
 			percentageStyle.setDataFormat((short)10);
 		}
 		
-		TableRenderer table = viewer.renderTable();
+		Table table = viewer.renderTable();
 		
 		if (addRows) {
 			sheet.shiftRows(row.getRowNum() + 1, sheet.getLastRowNum(), table.getRowCount());

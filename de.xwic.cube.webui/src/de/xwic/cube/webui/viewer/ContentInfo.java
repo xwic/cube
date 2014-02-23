@@ -16,9 +16,12 @@ public class ContentInfo {
 	private List<IDimensionElement> elements = new ArrayList<IDimensionElement>();
 	private Object userData = null;
 	private ICubeDataProvider cubeDataProvider = null;
-	private int level = 0;
+	private int level = Integer.MIN_VALUE;
 	private boolean clickable = false;
 	private String extraClickInfo = null;
+	private int row = 0;
+	private int col = 0;
+	private String group;
 	
 	
 	public ContentInfo(ICubeDataProvider cubeDataProvider) {
@@ -118,5 +121,29 @@ public class ContentInfo {
 	public void setExtraClickInfo(String extraClickInfo) {
 		this.extraClickInfo = extraClickInfo;
 	}
+
+	public int getRow() {
+		return row;
+	}
+
+	public void setRow(int row) {
+		this.row = row;
+	}
+
+	public int getCol() {
+		return col;
+	}
+
+	public void setCol(int col) {
+		this.col = col;
+	}
+	
+	void setGroup(String group) {
+		this.group = group;
+	}
+	public String getGroup(){
+		return this.group;
+	}
+	
 	
 }

@@ -1,7 +1,7 @@
 <table>
 #foreach($dim in $control.dimensions)
 	<tr>
-		<td>#if($dim.title != "") $dim.title #else $dim.key #end</td>
+		<td>#if($dim.title) $dim.title #else $dim.key #end</td>
 		<td>$insert.control("sel_$dim.key")</td>
 	</tr>
 #end

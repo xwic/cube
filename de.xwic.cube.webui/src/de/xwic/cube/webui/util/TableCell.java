@@ -3,17 +3,26 @@
  */
 package de.xwic.cube.webui.util;
 
+import de.xwic.cube.webui.viewer.ContentInfo;
+
 /**
  * @author Florian Lippisch
  */
 public class TableCell {
-
-	private String content = null;
-	private String cssClass = null;
-	private String action = null;
-	private String actionParam = null;
-	private int colSpan = 1;
 	
+	private String content = "";
+	private String cssClass = "";
+	private String action = "";
+	private String actionParam = "";
+	private int colSpan = 1;
+	private int level;
+	private ContentInfo data;
+	private boolean title;
+	private int index = 0;
+	private TableRow parent;
+	public String elementId;
+	private boolean expandable;
+	private String group;
 	/**
 	 * @param content
 	 */
@@ -101,4 +110,64 @@ public class TableCell {
 		this.actionParam = actionParam;
 	}
 	
+	public void setLevel(int level) {
+		this.level = level;	
+	}
+	public int getLevel() {
+		return level;
+	}
+	
+	public void setData(ContentInfo data) {
+		this.data = data;
+	}
+	public ContentInfo getData() {
+		return data;
+	}
+
+	public void setTitle(boolean b) {
+		this.title = b;
+	}
+
+	public boolean isTitle() {
+		return this.title;
+	}
+	
+	public int getIndex() {
+		return index;
+	}
+	
+	void setIndex(int index) {
+		this.index = index;
+	}
+	
+	public TableRow getParent() {
+		return parent;
+	}
+	
+	void setParent(TableRow parent) {
+		this.parent = parent;
+	}
+	
+	public void setElementId(String elementId) {
+		this.elementId = elementId;
+	}
+	
+	public String getElementId() {
+		return elementId;
+	}
+	
+	public void setExpandable(boolean expandable) {
+		this.expandable = expandable;
+	}
+	public boolean isExpandable() {
+		return expandable;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+	
+	public String getGroup(){
+		return this.group;
+	}
 }

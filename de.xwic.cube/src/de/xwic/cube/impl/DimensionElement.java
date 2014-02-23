@@ -316,6 +316,9 @@ public class DimensionElement extends Identifyable implements IDimensionElement,
 	 * @see de.xwic.cube.IDimensionElement#getIndex()
 	 */
 	public int getIndex() {
+		if(parent == null){
+			return 0;
+		}
 		return parent.elements.indexOf(this);
 	}
 	
