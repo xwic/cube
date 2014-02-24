@@ -7,7 +7,7 @@
 		#set($rowLevel = $row.level + 1)
 		<tr class="xcube-h$rowLevel">
 		#foreach($cell in $row)
-			#set($level = 4-($table.maxColLevel - $cell.level))
+			#set($level =$cell.level)
 			#if($cell.expandable)
 			<th width="220" class="xcube-v$level $!cell.group" ><span class="xcube-title" ><a class=\"xcube-action-collapse" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >
 				$cell.content
@@ -27,7 +27,7 @@
 		#set($rowLevel = $row.level + 1)
 		<tr class="xcube-h$rowLevel">
 		#foreach($cell in $row)
-			#set($level = 4-($table.maxColLevel - $cell.level))
+			#set($level = $cell.level + 1)
 			#if($cell.expandable)
 			<td width="220" class="xcube-v$level $!cell.group" >
 				<span class="xcube-title" >
