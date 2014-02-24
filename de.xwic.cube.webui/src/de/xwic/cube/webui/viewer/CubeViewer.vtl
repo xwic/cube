@@ -1,4 +1,5 @@
-<table class="xcube-tbl">
+<div style="width: 1200px; height: 480px">
+<table id="$control.controlID" class="xcube-tbl" >
 	 
 	#set($table = $control.table)
 	<thead>
@@ -8,13 +9,13 @@
 		#foreach($cell in $row)
 			#set($level = 4-($table.maxColLevel - $cell.level))
 			#if($cell.expandable)
-			<th class="$level $!cell.group" style="border:1px solid black;"><span class="xcube-title" ><a class=\"xcube-action-collapse" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >
+			<th width="220" class="xcube-v$level $!cell.group" ><span class="xcube-title" ><a class=\"xcube-action-collapse" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >
 				$cell.content
 			</a></span></th>
 			#elseif($cell.title)
-			<th class="$level $!cell.group" style="border:1px solid black;"><span class="xcube-title" >$cell.content</span></th>
+			<th width="220" class="xcube-v$level $!cell.group" ><span class="xcube-title" >$cell.content</span></th>
 			#else
-			<td class="$level $!cell.group" style="border:1px solid black;">$cell.content</td>
+			<th width="220" class="xcube-v$level $!cell.group" >$cell.content</th>
 			#end 
 			
 		#end
@@ -28,23 +29,23 @@
 		#foreach($cell in $row)
 			#set($level = 4-($table.maxColLevel - $cell.level))
 			#if($cell.expandable)
-			<th class="$level $!cell.group" style="border:1px solid black;">
+			<td width="220" class="xcube-v$level $!cell.group" >
 				<span class="xcube-title" >
 					<a class="xcube-action-collapse" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >$cell.content</a>
 				</span>
-			</th>
+			</td>
 			#elseif($cell.title)
-			<th class="$level $!cell.group" style="border:1px solid black;">
+			<td width="220" class="xcube-v$level $!cell.group" >
 				<span class="xcube-title" >$cell.content</span>
-			</th>
+			</td>
 			#elseif($cell.actionParam)
-			<td class="$level $!cell.group" style="border:1px solid black;">
+			<td width="220" class="xcube-v$level $!cell.group" >
 				<span class="xcube-title" >
 					<a class="xcube-action-click" href="$control.createActionURL('click', $cell.actionParam)" >$cell.content</a>
 				</span>
 			</td>
 			#else
-			<td class="$level $!cell.group" style="border:1px solid black;">$cell.content</td>
+			<td width="220" class="xcube-v$level $!cell.group" >$cell.content</td>
 			#end 
 			
 		#end
@@ -52,3 +53,5 @@
 	#end
 	</tbody>
 </table>
+
+</div>

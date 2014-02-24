@@ -8,11 +8,10 @@ import java.util.StringTokenizer;
 
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
-import de.jwic.base.ImageRef;
+import de.jwic.base.JavaScriptSupport;
 import de.jwic.base.RenderContext;
 import de.jwic.base.UserAgentInfo;
 import de.jwic.renderer.self.ISelfRenderingControl;
-import de.jwic.renderer.self.SelfRenderer;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.webui.util.Table;
 import de.xwic.cube.webui.util.TableCell;
@@ -20,9 +19,9 @@ import de.xwic.cube.webui.util.TableCell;
 /**
  * @author Florian Lippisch
  */
-public class CubeViewer extends Control implements ISelfRenderingControl {
+@JavaScriptSupport
+public class CubeViewer extends Control {
 
-	private final static ImageRef IMG_SPACER = new ImageRef("/jwic/gfx/clear.gif", 14, 8);
 	
 	public enum Align { BEGIN, END };
 	
@@ -41,8 +40,6 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 	 */
 	public CubeViewer(IControlContainer container, String name) {
 		super(container, name);
-
-//		setRendererId(SelfRenderer.RENDERER_ID);
 		
 		model = new CubeViewerModel(getSessionContext().getLocale());
 		model.addCubeViewerModelListener(new CubeViewerModelAdapter() {
@@ -98,35 +95,6 @@ public class CubeViewer extends Control implements ISelfRenderingControl {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.jwic.renderer.self.ISelfRenderingControl#render(de.jwic.base.RenderContext)
-	 */
-	public void render(RenderContext renderContext) {
-		
-		if (model.getCube() == null) {
-			// render empty block
-			renderWarning(renderContext, "No Cube Defined");
-			return;
-		}
-		if (model.getMeasure() == null) {
-			// render empty block
-			renderWarning(renderContext, "No Measure Defined");
-			return;
-		}
-
-		PrintWriter out = renderContext.getWriter();
-
-//		long start = System.currentTimeMillis();
-		Table tbl = renderTable();
-		tbl.render(out);
-//		long time = System.currentTimeMillis() - start;
-//		log.debug("Rendering Time for " + getName() + ": " + time);
-		
-		//out.println("<span class=\"x-cube-info\">cube: " + model.getCube().getKey() + ", measure: " + model.getMeasure().getKey() + "</span>");
-		
-		
-	}
-
 	/**
 	 * @return
 	 */

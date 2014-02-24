@@ -41,6 +41,9 @@ public class TableCell {
 	 * @return the content
 	 */
 	public String getContent() {
+		if(content == null || content.equals("")){
+			return "&nbsp;";
+		}
 		return content;
 	}
 
