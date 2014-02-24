@@ -3,8 +3,10 @@
 	## add your custom META, SCRIPT or LINK tags here
 	<link rel="stylesheet" type="text/css" href="sample.css">
 	<link rel="stylesheet" type="text/css" href="$contextPath/xwiccube/xwiccube.css">
+	<link rel="stylesheet" type="text/css" href="$contextPath/_resources/Fixed-Header-Table-master/css/defaultTheme.css">
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/json2.js"></SCRIPT>
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/xwiccube.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/jquery.fixedheadertable.js"></SCRIPT>
 
 #parse("jwic/include.body.vtl")
 

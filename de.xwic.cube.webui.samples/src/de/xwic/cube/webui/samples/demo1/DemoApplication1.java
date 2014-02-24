@@ -77,6 +77,8 @@ public class DemoApplication1 extends Application {
 		navigationProvider.setShowRoot(true);
 		navigationProvider.setClickable(true);
 //		navigationProvider.setIndention(1);
+		model.addRowNavigationProvider(navigationProvider);
+
 		model.addColumnNavigationProvider(navigationProvider);
 		
 		// create filter
