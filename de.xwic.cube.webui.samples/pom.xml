@@ -19,9 +19,8 @@
 		<!-- Related projects -->
         <dependency>
             <groupId>de.xwic.cube</groupId>
-            <artifactId>cube-webui</artifactId>
+            <artifactId>cube-webui-core</artifactId>
             <version>5.2-SNAPSHOT</version>
-			<classifier>classes</classifier>
         </dependency>
 
 		<!-- jWic dependencies -->

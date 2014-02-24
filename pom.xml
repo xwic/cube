@@ -404,6 +404,8 @@
         <module>de.xwic.cube</module>
 
         <module>de.xwic.cube.xlsbridge</module>
+		
+        <module>de.xwic.cube.webui.core</module>
         <module>de.xwic.cube.webui</module>
 
         <module>de.xwic.cube.webui.samples</module>

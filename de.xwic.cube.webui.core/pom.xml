@@ -7,23 +7,18 @@
         <version>5.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>Cube::WebUI</name>
+    <name>Cube::WebUI::Core</name>
 
     <groupId>de.xwic.cube</groupId>
-    <artifactId>cube-webui</artifactId>
+    <artifactId>cube-webui-core</artifactId>
     <version>5.2-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
 		<!-- Related projects -->
         <dependency>
             <groupId>de.xwic.cube</groupId>
             <artifactId>cube-core</artifactId>
-            <version>5.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.xwic.cube</groupId>
-            <artifactId>cube-webui-core</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
 		
@@ -42,21 +37,17 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
         </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
 		</dependency>
-
+	
         <dependency>
         	<groupId>com.google.code.gson</groupId>
         	<artifactId>gson</artifactId>
         	<version>2.2.4</version>
         </dependency>
-        
+
 		<!-- Test dependencies -->
         <dependency>
             <!-- Common Public License 1.0 -->
