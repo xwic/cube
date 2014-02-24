@@ -136,6 +136,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.8.1</version>
+					<configuration>
+						<skip>true</skip>
+					</configuration>						
                 </plugin>
 
                 <plugin>
@@ -274,6 +277,26 @@
 
             </plugins>
         </pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.5.1</version>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<serverId>sonatype-nexus-staging</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+				</configuration>
+			</plugin>
+		</plugins>
     </build>
 
     <dependencyManagement>
@@ -358,18 +381,13 @@
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-core</artifactId>
-				<version>5.2-SNAPSHOT</version>
+				<version>5.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-controls</artifactId>
-				<version>5.2-SNAPSHOT</version>
+				<version>5.2.0</version>
 			</dependency>
-			<!-- <dependency>
-				<groupId>de.xwic.jwic</groupId>
-				<artifactId>jwic-compatibility</artifactId>
-				<version>5.2-SNAPSHOT</version>
-			</dependency> -->
 			
             <dependency>
                 <!-- Common Public License 1.0 -->
@@ -407,7 +425,7 @@
 			<id>update-samples</id>
 			<properties>
 				<jwicUpdateApplication>de.xwic.cube.webui.samples</jwicUpdateApplication>
-				<jwicUpdateVersion>5.2-SNAPSHOT</jwicUpdateVersion>
+				<jwicUpdateVersion>5.2.0</jwicUpdateVersion>
 				<cubeUpdateVersion>5.2-SNAPSHOT</cubeUpdateVersion>
 			</properties>
 		</profile>
