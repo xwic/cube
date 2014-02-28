@@ -381,12 +381,13 @@
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-core</artifactId>
-				<version>5.2.0</version>
+				<version>5.2.1</version>
 			</dependency>
+
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-controls</artifactId>
-				<version>5.2.0</version>
+				<version>5.2.1</version>
 			</dependency>
 			
             <dependency>
@@ -427,8 +428,8 @@
 			<id>update-samples</id>
 			<properties>
 				<jwicUpdateApplication>de.xwic.cube.webui.samples</jwicUpdateApplication>
-				<jwicUpdateVersion>5.2.0</jwicUpdateVersion>
-				<cubeUpdateVersion>5.2-SNAPSHOT</cubeUpdateVersion>
+				<jwicUpdateVersion>5.2.1</jwicUpdateVersion>
+				<cubeUpdateVersion>5.2.0-SNAPSHOT</cubeUpdateVersion>
 			</properties>
 		</profile>
         <profile>
