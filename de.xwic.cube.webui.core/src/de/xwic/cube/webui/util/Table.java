@@ -265,11 +265,6 @@ public class Table implements Iterable<TableRow>{
 	 * @return
 	 */
 	public List<TableRow> getHeadRows() {
-		List<TableRow> headRows = this.headRows;
-		if(!this.expandDown){
-			headRows = new ArrayList<TableRow>(this.headRows);
-			Collections.reverse(headRows);
-		}
 		return headRows;
 	}
 

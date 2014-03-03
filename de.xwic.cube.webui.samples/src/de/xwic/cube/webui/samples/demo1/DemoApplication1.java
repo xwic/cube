@@ -5,9 +5,12 @@ import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.Page;
 import de.jwic.controls.Button;
+import de.jwic.controls.CheckBox;
 import de.jwic.controls.ToolBar;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.jwic.events.ValueChangedEvent;
+import de.jwic.events.ValueChangedListener;
 import de.xwic.cube.*;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
@@ -30,6 +33,10 @@ public class DemoApplication1 extends Application {
 
 	
 	private CubeViewerModel model;
+	private CheckBox expandLeft;
+	private CheckBox expandDown;
+	private Button expandAll;
+	private Button collapseAll;
 
 	@Override
 	public Control createRootControl(IControlContainer container) {
@@ -42,8 +49,41 @@ public class DemoApplication1 extends Application {
 		ICube cube = createCube();
 		
 		
-		CubeViewer viewer = new CubeViewer(page, "viewer");
 		
+		final CubeViewer viewer = new CubeViewer(page, "viewer");
+		this.expandLeft = new CheckBox(page, "expandLeft");
+		this.expandLeft.setChecked(!viewer.isExpandRight());
+		expandLeft.addValueChangedListener(new ValueChangedListener() {			
+			@Override
+			public void valueChanged(ValueChangedEvent event) {
+				viewer.setExpandRight(!expandLeft.isChecked());
+			}
+		});
+		this.expandDown = new CheckBox(page, "expandRight");
+		
+		this.expandDown.setChecked(!viewer.isExpandUp());
+		this.expandDown.addValueChangedListener(new ValueChangedListener() {
+			@Override
+			public void valueChanged(ValueChangedEvent event) {
+				viewer.setExpandUp(!expandDown.isChecked());
+			}
+		});
+		
+		this.expandAll = new Button(page,"expandAll");
+		this.expandAll.addSelectionListener(new SelectionListener() {
+			@Override
+			public void objectSelected(SelectionEvent arg0) {
+				viewer.getModel().expandAll();
+			}
+		});
+		this.collapseAll = new Button(page,"collapseAll");
+		collapseAll.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void objectSelected(SelectionEvent arg0) {
+				viewer.getModel().collapseAll();
+			}
+		});
 		viewer.setColumnWidth(60);
 		model = viewer.getModel();
 		model.setCube(cube);

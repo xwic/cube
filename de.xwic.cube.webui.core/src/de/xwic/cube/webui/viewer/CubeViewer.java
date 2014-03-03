@@ -10,11 +10,11 @@ import java.util.StringTokenizer;
 
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
+import de.jwic.base.IncludeJsOption;
 import de.jwic.base.JavaScriptSupport;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.webui.util.Table;
 import de.xwic.cube.webui.util.TableCell;
-import de.xwic.cube.webui.util.TableRow;
 
 /**
  * @author Florian Lippisch
@@ -35,6 +35,7 @@ public class CubeViewer extends Control {
 	private boolean emptyCellsClickable = false;
 	private boolean expandLeft = true;
 	private boolean expandDown = true;
+	private boolean fixedHeaders = true;
 	
 	/**
 	 * @param container
@@ -50,6 +51,14 @@ public class CubeViewer extends Control {
 			}
 			public void cubeUpdated(CubeViewerModelEvent event) {
 				onCubeUpdated(event);
+			}
+			@Override
+			public void nodeCollapse(CubeViewerModelEvent event) {
+				requireRedraw();
+			}
+			@Override
+			public void nodeExpand(CubeViewerModelEvent event) {
+				requireRedraw();
 			}
 		});
 	}
@@ -462,6 +471,21 @@ public class CubeViewer extends Control {
 		this.expandDown = !up;
 		this.expandLeft = !right;
 		this.requireRedraw();
+	}
+	
+	public boolean isExpandUp() {
+		return !expandDown;
+	}
+	public boolean isExpandRight() {
+		return !expandLeft;
+	}
+	
+	public void setFixedHeaders(boolean fixedColumn) {
+		this.fixedHeaders = fixedColumn;
+	}
+	@IncludeJsOption
+	public boolean isFixedHeaders() {
+		return fixedHeaders;
 	}
 	
 }

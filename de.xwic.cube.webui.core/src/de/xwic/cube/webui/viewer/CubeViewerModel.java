@@ -241,7 +241,6 @@ public class CubeViewerModel implements Serializable {
 		fireEvent(EventType.NODE_COLLAPSE, new CubeViewerModelEvent(this, elementId));
 	}
 
-
 	/**
 	 * @param dimension
 	 */
@@ -285,17 +284,42 @@ public class CubeViewerModel implements Serializable {
 
 	/**
 	 * Expands the element and all its child elements.
-	 * @param dimGEO
+	 * @param dimensionElement
 	 */
 	public void expandAll(IDimensionElement de) {
-
 		expand(de.getID());
 		for (IDimensionElement child : de.getDimensionElements()) {
 			expandAll(child);
 		}
+	}
+	
+	/**
+	 * @param de
+	 */
+	public void collapseAll(IDimensionElement de){
+		collapse(de.getID());
+		for (IDimensionElement child : de.getDimensionElements()) {
+			collapseAll(child);
+		}
+	}
+	
+	/**
+	 * Expand every dimension
+	 */
+	public void expandAll(){
+		for(IDimension d : this.cube.getDimensions()){
+			this.expandAll(d);
+		}
+	}
+	/**
+	 * Collapse every dimension
+	 */
+	public void collapseAll(){
+		for(IDimension d : this.cube.getDimensions()){
+			this.collapseAll(d);
+		}
 		
 	}
-
 	/**
 	 * @return the baseQuery
 	 */

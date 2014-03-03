@@ -2,24 +2,31 @@
 $insert.control("toolbar")
 <table >
   <tr>
-    <td width="50%">
+    <td width="33%">
     	Filter:
     </td>
-    <td width="50%">
+    <td width="33%">
     	Writer:
+    </td>
+    <td>
+    	Settings:
     </td>
    </tr>
   <tr>
-    <td width="50%" style="border: 1px solid #888" valign="top">
+    <td width="33%" style="border: 1px solid #888" valign="top">
     	$insert.control("filter")
     </td>
-    <td width="50%" style="border: 1px solid #888" valign="top">
+    <td width="33%" style="border: 1px solid #888" valign="top">
     	$insert.control("writer")
     </td>
-   </tr>
-   <tr>
-   	<td colspan="2"  style="border: 1px solid #888">
-		$insert.control("viewer")
+    <td width="33%">
+   		<span>Expand Right $insert.control("expandLeft")</span><br>
+   		<span>Expand Up $insert.control("expandRight")</span><br>
+   		<span>Expand All $insert.control("expandAll")</span><br>
+   		<span>Collapse All $insert.control("collapseAll")</span>
    	</td>
    </tr>
+   
+  
 </table>
+	$insert.control("viewer")
