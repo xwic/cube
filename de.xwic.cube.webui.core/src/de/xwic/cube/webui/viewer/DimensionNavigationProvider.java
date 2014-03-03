@@ -523,6 +523,7 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		if (!navInitialized) {
 			createNavigationElements();
 		}
+		
 		return rootNavElements;
 	}
 
@@ -740,5 +741,5 @@ public class DimensionNavigationProvider implements INavigationProvider {
 		}
 		navInitialized = false;
 	}
-
+	
 }

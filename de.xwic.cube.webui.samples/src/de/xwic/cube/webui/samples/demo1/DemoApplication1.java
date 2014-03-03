@@ -43,6 +43,7 @@ public class DemoApplication1 extends Application {
 		
 		
 		CubeViewer viewer = new CubeViewer(page, "viewer");
+		
 		viewer.setColumnWidth(60);
 		model = viewer.getModel();
 		model.setCube(cube);
@@ -61,38 +62,51 @@ public class DemoApplication1 extends Application {
 		IDimension dimTime = cube.getDataPool().getDimension("Time");
 		IDimension dimOT = cube.getDataPool().getDimension("OrderType");
 		
-		DimensionNavigationProvider navigationProvider = new DimensionNavigationProvider(model, dimOT);
-		navigationProvider.setClickable(true);
-		model.addColumnNavigationProvider(navigationProvider);
+		DimensionNavigationProvider otNavigationProvider = new DimensionNavigationProvider(model, dimOT);
+		otNavigationProvider.setClickable(true);
+//		otNavigationProvider.setHideTotals(true);
+//		otNavigationProvider.setHideEmptyElements(true);
+//		otNavigationProvider.setShowRoot(true);
 		
-		navigationProvider = new DimensionNavigationProvider(model, dimGEO);
-		navigationProvider.setHideEmptyElements(true);
-		navigationProvider.setShowRoot(true);
-		navigationProvider.setClickable(true);
+		model.addColumnNavigationProvider(otNavigationProvider);
 		
-		model.addRowNavigationProvider(navigationProvider);
+		DimensionNavigationProvider geoNavigationProvider = new DimensionNavigationProvider(model, dimGEO);
+		geoNavigationProvider.setHideEmptyElements(true);
 		
-		navigationProvider = new DimensionNavigationProvider(model, dimTime);
-		navigationProvider.setHideEmptyElements(false);
-		navigationProvider.setShowRoot(true);
-		navigationProvider.setClickable(true);
+		geoNavigationProvider.setShowRoot(true);
+		geoNavigationProvider.setClickable(true);
+		model.addRowNavigationProvider(geoNavigationProvider);
+		
+		DimensionNavigationProvider timeNavigationProvider = new DimensionNavigationProvider(model, dimTime);
+//		timeNavigationProvider.setHideEmptyElements(true);
+		timeNavigationProvider.setShowRoot(true);
+		timeNavigationProvider.setClickable(true);
 //		navigationProvider.setIndention(1);
-		model.addRowNavigationProvider(navigationProvider);
+//		model.addRowNavigationProvider(navigationProvider);
 
-		model.addColumnNavigationProvider(navigationProvider);
+		model.addColumnNavigationProvider(timeNavigationProvider);
 		
 		// create filter
 		final CubeFilter filter = new CubeFilter(page, "filter", model);
+		
 		filter.setSelectMeasure(true);
 		filter.addDimension(dimOT);
+		otNavigationProvider.setFilter(filter);
+		
+		
 		DimensionElementSelector dimSelector = filter.addDimension(dimGEO);
 		dimSelector.setDimensionElement(dimGEO.getDimensionElement("Americas"));
+		geoNavigationProvider.setFilter(filter);
+		
 		dimSelector.setSelectLeafsOnly(true);
 		filter.addDimension(dimTime).setMultiSelection(true);
+		timeNavigationProvider.setFilter(filter);
+		
 		
 		FilterGroupProfile profile = new FilterGroupProfile("Test Profile 1", "{'root.filter':{'Time':['2009/Q1'],'GEO':['Americas'],'OrderType':['COO']}}");
 		List<FilterGroupProfile> profiles = new ArrayList<FilterGroupProfile>();
 		profiles.add(profile);
+		
 		final FilterGroup filterGroup = new FilterGroup();
 		filterGroup.setFilterProfies(profiles);
 		

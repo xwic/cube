@@ -29,6 +29,7 @@ public class ClassicDimensionSelectorControl extends ControlContainer {
 		this.dimension = dimension;
 		
 		lbDim = new ListBox(this,"listBox");
+		lbDim.setConfirmMsg("");
 		lbDim.setCssClass("xcube-cb");
 		lbDim.setChangeNotification(true);
 		

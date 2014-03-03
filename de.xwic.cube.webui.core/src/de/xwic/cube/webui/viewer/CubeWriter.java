@@ -42,6 +42,7 @@ public class CubeWriter extends ControlContainer {
 		this.model = model;
 		
 		lbcMeasures = new ListBox(this, "lbcMeasure");
+		lbcMeasures.setConfirmMsg("");
 		inpValue = new InputBox(this, "inpValue");
 		
 		Button btWrite = new Button(this, "btWrite");

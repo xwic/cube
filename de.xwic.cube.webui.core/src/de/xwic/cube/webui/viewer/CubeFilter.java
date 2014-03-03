@@ -29,7 +29,7 @@ import de.xwic.cube.webui.controls.filter.IFilter;
 /**
  * @author Florian Lippisch
  */
-public class CubeFilter extends ControlContainer implements IFilter{
+public class CubeFilter extends ControlContainer implements IFilter, IDimensionFilter{
 
 	private static final long serialVersionUID = 1L;
 	private final CubeViewerModel model;
@@ -62,6 +62,7 @@ public class CubeFilter extends ControlContainer implements IFilter{
 		model.addCubeViewerModelListener(new CubeViewerModelAdapter() {
 			public void filterUpdated(CubeViewerModelEvent event) {
 				onFilterUpdate(event);
+				
 			}
 		});
 		
@@ -125,6 +126,7 @@ public class CubeFilter extends ControlContainer implements IFilter{
 			public void elementSelected(ElementSelectedEvent event) {
 				if(!isInGroup())//not in group
 					filterSelection(dsc);
+				
 			}
 		});
 		dimCtrlMap.put(dimension.getKey(), dsc);
@@ -149,13 +151,14 @@ public class CubeFilter extends ControlContainer implements IFilter{
 	 */
 	protected void filterSelection(DimensionElementSelector selector) {
 		List<IDimensionElement> elements = selector.getDimensionElements();
-		handleSingleSelect(elements.get(0));
+		handleSingleSelect(selector.getControlID(),elements.get(0));
+		
 	}
 
 	/**
 	 * @param element
 	 */
-	private void handleSingleSelect(IDimensionElement element){
+	private void handleSingleSelect(String selectorKey, IDimensionElement element){
 		model.applyFilter(element);
 	}
 	
@@ -269,6 +272,26 @@ public class CubeFilter extends ControlContainer implements IFilter{
 	public void setInGroup(boolean inGroup) {
 		this.inGroup = inGroup;
 	}
+	private final List<String> elements = new ArrayList<String>();
+	@Override
+	public boolean accept(IDimensionElement element) {
+		elements.clear();
+		
+		for(DimensionElementSelector elm : this.dimCtrlMap.values()){
+			for(IDimensionElement selectedElm : elm.getDimensionElements()){
+				buildElementsList(selectedElm, elements);
+			}
+		}
+		return elements.contains(element.getKey());
+	}
 	
+	private void buildElementsList(IDimensionElement element, List<String> elements){
+		elements.add(element.getKey());
+		if(element.getParent()!=null)
+			elements.add(element.getParent().getKey());
+		for(IDimensionElement elm : element.getDimensionElements()){
+			buildElementsList(elm, elements);
+		}
+	}
 	
 }

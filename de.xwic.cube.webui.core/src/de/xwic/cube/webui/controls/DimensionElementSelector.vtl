@@ -17,7 +17,7 @@
 	#set($class = $class + " multiple")
 #end
 #set($enablement = $control.enabled)
-<table id="showTree_container" cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass" id="xcubeLeafselTbl">
+<table id="showTree_container" cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass showTree_container">
  <tr>
  <!--  #if($control.showDimensionTitle) -->
   <td>
@@ -52,7 +52,7 @@
  </tr>
 </table>
 
-<div id="tree-container" class="xcube-leafsel-box" style="display: none;">
+<div id="tree-container" class="xcube-leafsel-box tree-container" style="display: none;">
 	<span id="tree-loading">Loading...</span>
 	<div id="tree-content" class="xcube-tree">
 		<ul id="tree" class="${class}"></ul>

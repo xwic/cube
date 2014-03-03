@@ -133,6 +133,8 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			
 			//show the container
 			container.show();
+			//hide the other container
+			$('.tree-container').not(container).hide();
 			//hide on outside click
 			doc.one('click',function(){
 				container.hide();

@@ -451,7 +451,7 @@
 
         $tbody.appendTo($fixedColumn)
           .css({
-            'margin-top': -1,
+//            'margin-top': -1,
             'height': fixedBodyHeight + tableProps.border
           });
 

@@ -1,21 +1,30 @@
-<div style="width: 1200px; height: 480px">
-<table id="$control.controlID" class="xcube-tbl" >
+<div style="width: 1200px; height:500px;" class="ui-helper-clearfix">
+<table width="100%" id="$control.controlID" class="xcube-tbl" >
 	 
 	#set($table = $control.table)
 	<thead>
 	#foreach($row in $table.headRows) 
-		#set($rowLevel = $row.level + 1)
-		<tr class="xcube-h$rowLevel">
+		#set($rowLevel = $row.level)
+		<tr class="xcube-h$rowLevel xcube-h0$foreach.count">
 		#foreach($cell in $row)
-			#set($level =$cell.level)
+			#set($level = $cell.level)
+			#if($table.maxColLevel < 4 && $level != 0)
+				#set($level = $level + 2)
+			#end
 			#if($cell.expandable)
-			<th width="220" class="xcube-v$level $!cell.group" ><span class="xcube-title" ><a class=\"xcube-action-collapse" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >
-				$cell.content
-			</a></span></th>
+			#set($action = "xcube-action-expand")
+			#if($cell.expanded)
+				#set($action = "xcube-action-collapse")
+			#end
+			<th class="xcube-v$level $!cell.group" >
+				<span class="xcube-title" >
+					<a class="$action" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >$cell.content</a>
+				</span>
+			</th>
 			#elseif($cell.title)
-			<th width="220" class="xcube-v$level $!cell.group" ><span class="xcube-title" >$cell.content</span></th>
+			<th class="xcube-v$level $!cell.group" ><span class="xcube-title">$cell.content</span></th>
 			#else
-			<th width="220" class="xcube-v$level $!cell.group" >$cell.content</th>
+			<th class="xcube-v$level $!cell.group" >$cell.content</th>
 			#end 
 			
 		#end
@@ -24,28 +33,33 @@
 	</thead>
 	<tbody>
 	#foreach($row in $table) 
-		#set($rowLevel = $row.level + 1)
+		#set($rowLevel = $row.level+ 1)
 		<tr class="xcube-h$rowLevel">
 		#foreach($cell in $row)
-			#set($level = $cell.level + 1)
+			#set($level = $cell.level)
+			#if($table.maxColLevel < 4 && $level != 0)
+				#set($level = $level + 2)
+			#end
 			#if($cell.expandable)
-			<td width="220" class="xcube-v$level $!cell.group" >
+			#set($action = "xcube-action-expand")
+			#if($cell.expanded)
+				#set($action = "xcube-action-collapse")
+			#end
+			<td class="xcube-v$level $!cell.group" >
 				<span class="xcube-title" >
-					<a class="xcube-action-collapse" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >$cell.content</a>
+					<a class="$action" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >$cell.content</a>
 				</span>
 			</td>
 			#elseif($cell.title)
-			<td width="220" class="xcube-v$level $!cell.group" >
+			<td class="xcube-v$level $!cell.group" >
 				<span class="xcube-title" >$cell.content</span>
 			</td>
 			#elseif($cell.actionParam)
-			<td width="220" class="xcube-v$level $!cell.group" >
-				<span class="xcube-title" >
-					<a class="xcube-action-click" href="$control.createActionURL('click', $cell.actionParam)" >$cell.content</a>
-				</span>
+			<td class="xcube-v$level $!cell.group" onclick="$control.createActionURL('click', $cell.actionParam)" >
+				$cell.content
 			</td>
 			#else
-			<td width="220" class="xcube-v$level $!cell.group" >$cell.content</td>
+			<td class="xcube-v$level $!cell.group" >$cell.content</td>
 			#end 
 			
 		#end

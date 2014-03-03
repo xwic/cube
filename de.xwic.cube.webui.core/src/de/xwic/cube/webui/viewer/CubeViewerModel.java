@@ -28,6 +28,8 @@ import de.xwic.cube.Key;
  */
 public class CubeViewerModel implements Serializable {
 
+	private static final long serialVersionUID = -4690472802163880499L;
+
 	private enum EventType { FILTER_UPDATE, CUBE_UPDATED, CELL_SELECTION, NODE_EXPAND, NODE_COLLAPSE }; 
 	private ICube cube = null;
 

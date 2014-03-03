@@ -5,11 +5,11 @@ package de.xwic.cube.webui.util;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import de.jwic.base.Control;
-import de.jwic.controls.tableviewer.ITableRenderer;
 
 /**
  * Utility class to render a HTML table.
@@ -17,8 +17,6 @@ import de.jwic.controls.tableviewer.ITableRenderer;
  * @author Florian Lippisch
  */
 public class Table implements Iterable<TableRow>{
-
-	private Control baseControl = null;
 
 	private List<Object> columnData = new ArrayList<Object>();
 	private List<Object> rowData = new ArrayList<Object>();
@@ -29,27 +27,26 @@ public class Table implements Iterable<TableRow>{
 
 	private final List<TableRow> headRows = new ArrayList<TableRow>();
 	
-	private String cssClass = "";
-
-	private boolean enableJSHoverMode = false;
-
 	private int rowCount;
 	private int colCount;
 
 	private int maxRowLevel = 0;
 	private int maxColLevel = 0;
+
+	private boolean expandDown;
+
+	private boolean expandLeft;
 	
 	
-	public Table() {
-		super();
-	}
 
 	/**
 	 * @param baseControl
 	 */
-	public Table(Control baseControl) {
+	public Table() {
 		super();
-		this.baseControl = baseControl;
+		this.expandDown = true;
+		this.expandLeft = false;
+		
 	}
 	/**
 	 * @param i
@@ -68,6 +65,7 @@ public class Table implements Iterable<TableRow>{
 			}
 
 			TableRow row = new TableRow();
+			row.setParent(this);
 			row.addAllCells(cells);
 			rows.add(row);
 			rowData.add(null);
@@ -165,36 +163,6 @@ public class Table implements Iterable<TableRow>{
 	}
 
 	/**
-	 * @return the cssClass
-	 */
-	public String getCssClass() {
-		return cssClass;
-	}
-
-	/**
-	 * @param cssClass
-	 *            the cssClass to set
-	 */
-	public void setCssClass(String cssClass) {
-		this.cssClass = cssClass;
-	}
-
-	/**
-	 * @return the enableJSHoverMode
-	 */
-	public boolean isEnableJSHoverMode() {
-		return enableJSHoverMode;
-	}
-
-	/**
-	 * @param enableJSHoverMode
-	 *            the enableJSHoverMode to set
-	 */
-	public void setEnableJSHoverMode(boolean enableJSHoverMode) {
-		this.enableJSHoverMode = enableJSHoverMode;
-	}
-
-	/**
 	 * @return the rowCount
 	 */
 	public int getRowCount() {
@@ -209,96 +177,72 @@ public class Table implements Iterable<TableRow>{
 	}
 
 	public List<TableRow> getRows() {
+		List<TableRow> rows = this.rows;
+		if(expandDown){
+			rows = new ArrayList<TableRow>(this.rows);
+			Collections.reverse(rows);
+		}
 		return rows;
 	}
 
-	public void render(PrintWriter out) {
-		out.println("<TABLE cellspacing=0 cellpadding=0 class=\"" + cssClass
-				+ "\">");
-		for (TableRow row : rows) {
-			if (enableJSHoverMode) {
-				out.println("<TR onMouseOver=\"this.className='hover';\" onMouseOut=\"this.className=''\">");
-			} else {
-				out.println("<TR>");
-			}
-			int skip = 0;
-			int col = 0;
-			for (TableCell cell : row) {
-				if (skip > 0) {
-					skip--;
-				} else {
-					out.print("<TD");
-					String extraClasses = null;
-					if (cell.getAction() != null && baseControl != null) {
-						extraClasses = "x-clickable";
-						out.print(" onClick=\"");
-						out.print(baseControl.createActionURL(cell.getAction(),
-								cell.getActionParam()));
-						out.print("\"");
-						System.out.println(cell.getAction());
-					}
-					if (cell.getCssClass() != null || extraClasses != null) {
-						out.print(" class=\""
-								+ (cell.getCssClass() != null ? cell
-										.getCssClass() : "")
-								+ (extraClasses != null ? " " + extraClasses
-										: "") + "\"");
-					}
-					if (cell.getColSpan() > 1) {
-						out.print(" colspan=\"" + cell.getColSpan() + "\"");
-					} else {
-						Integer cWidth = colWidth.get(col);
-						if (cWidth != null) {
-							out.print(" width=\"" + cWidth + "\"");
-						}
-					}
-					out.print(">");
-					String content = cell.getContent();
-					out.print(content != null && content.length() > 0 ? content
-							: "&nbsp;");
-					out.print("</TD>");
-					skip = cell.getColSpan() - 1;
-				}
-				col++;
-			}
-			out.println("</TR>");
-		}
-		out.println("</TABLE>");
-
-	}
-
+	/**
+	 * @return
+	 */
 	public int getMaxRowLevel() {
 		return maxRowLevel;
 	}
 
+	/**
+	 * @param maxRowLevel
+	 */
 	public void setMaxRowLevel(int maxRowLevel) {
 		this.maxRowLevel = maxRowLevel;
 	}
 
+	/**
+	 * @return
+	 */
 	public int getMaxColLevel() {
 		return maxColLevel;
 	}
 
+	/**
+	 * @param maxColLevel
+	 */
 	public void setMaxColLevel(int maxColLevel) {
 		this.maxColLevel = maxColLevel;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Iterable#iterator()
+	 */
 	@Override
 	public Iterator<TableRow> iterator() {
-		return this.rows.iterator();
+		return getRows().iterator();
 	}
 	
+	/**
+	 * @param row
+	 */
 	public void addRow(TableRow row){
 		this.rows.add(row);
 		row.setIndex(rows.size()-1);
 		row.setParent(this);
 	}
+	/**
+	 * @param row
+	 * @param at
+	 */
 	public void addRowAt(TableRow row, int at){
 		this.rows.add(at, row);
 		row.setIndex(at);
 		row.setParent(this);
 	}
 
+	/**
+	 * @param rowCount
+	 * @param colCount
+	 */
 	public void initHead(int rowCount, int colCount) {
 		rowData.clear();
 		for (int i = 0; i < rowCount; i++) {
@@ -308,14 +252,47 @@ public class Table implements Iterable<TableRow>{
 			}
 
 			TableRow row = new TableRow();
+			row.setParent(this);
 			row.addAllCells(cells);
 			headRows.add(row);
 			rowData.add(null);
 		}
 
 	}
-
+	
+	
+	/**
+	 * @return
+	 */
 	public List<TableRow> getHeadRows() {
+		List<TableRow> headRows = this.headRows;
+		if(!this.expandDown){
+			headRows = new ArrayList<TableRow>(this.headRows);
+			Collections.reverse(headRows);
+		}
 		return headRows;
+	}
+
+	/**
+	 * @param down
+	 * @param left
+	 */
+	public void setExpandDirections(boolean down, boolean left) {
+		this.expandDown = down;
+		this.expandLeft = left;
+	}
+	
+	/**
+	 * @return
+	 */
+	boolean isExpandDown() {
+		return expandDown;
+	}
+	
+	/**
+	 * @return
+	 */
+	boolean isExpandLeft() {
+		return expandLeft;
 	}
 }

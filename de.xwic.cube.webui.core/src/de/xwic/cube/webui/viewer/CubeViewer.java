@@ -3,18 +3,18 @@
  */
 package de.xwic.cube.webui.viewer;
 
-import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.JavaScriptSupport;
-import de.jwic.base.RenderContext;
-import de.jwic.base.UserAgentInfo;
-import de.jwic.renderer.self.ISelfRenderingControl;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.webui.util.Table;
 import de.xwic.cube.webui.util.TableCell;
+import de.xwic.cube.webui.util.TableRow;
 
 /**
  * @author Florian Lippisch
@@ -33,6 +33,8 @@ public class CubeViewer extends Control {
 	private int leftNavMinWidth = 250;
 	private int columnWidth = 0; // default
 	private boolean emptyCellsClickable = false;
+	private boolean expandLeft = true;
+	private boolean expandDown = true;
 	
 	/**
 	 * @param container
@@ -99,14 +101,7 @@ public class CubeViewer extends Control {
 	 * @return
 	 */
 	public Table renderTable() {
-		Table tbl = new Table(this);
-		tbl.setCssClass("xcube-tbl");
-		
-		UserAgentInfo userAgent = getSessionContext().getUserAgent();
-		if (userAgent.isIE() && userAgent.getVersion().equals("6.0")) {
-			tbl.setEnableJSHoverMode(true);
-		}
-
+		Table tbl = new Table();
 		// render header...
 		
 		if (model.getColumnProvider().size() == 0 && model.getRowProvider().size() == 0) {
@@ -147,20 +142,27 @@ public class CubeViewer extends Control {
 		
 		// render Header
 		int startCol = rowDepth;
-		for (INavigationProvider navProvider : model.getColumnProvider()) {
+
+		List<INavigationProvider> columnProvider = model.getColumnProvider();
+		if(!expandLeft){
+			columnProvider = new ArrayList<INavigationProvider>(model.getColumnProvider());
+			Collections.reverse(columnProvider);
+		}
+		for (INavigationProvider navProvider : columnProvider) {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.cells += startCol;
-			renderNavigation(tbl, navProvider.getIndention(), startCol, navProvider, size, true,"");
+			renderNavigation(tbl, navProvider.getIndention(), startCol, navProvider, size, true,"",0);
 			startCol += (size.cells - startCol);
 		}		
 		
 		// render rows
 		int startRow = colHeight;
-		for (INavigationProvider navProvider : model.getRowProvider()) {
+		List<INavigationProvider> rowProvider = model.getRowProvider();
+		for (INavigationProvider navProvider : rowProvider) {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.depth = rowDepth;
 			if (size.cells > 0) {
-				renderNavigation(tbl, startRow, navProvider.getIndention(), navProvider, size, false,"");
+				renderNavigation(tbl, startRow, navProvider.getIndention(), navProvider, size, false,"",0);
 			}
 			startRow += size.cells;
 		}		
@@ -169,6 +171,7 @@ public class CubeViewer extends Control {
 		for (int row = 0; row < rowCount; row++) {
 			int rowIdx = row + colHeight;
 			ContentInfo ciRow = (ContentInfo) tbl.getRowData(rowIdx);
+			
 			for (int col = 0; col < colCount; col++) {
 				int colIdx = col + rowDepth;
 				ContentInfo ciCol = (ContentInfo) tbl.getColumnData(colIdx);
@@ -182,16 +185,17 @@ public class CubeViewer extends Control {
 					String content = dataProvider.getCellData(model, ciRow, ciCol);
 					empty = content == null || content.length() == 0;
 					cell.setContent(content);
+					if (ciRow.isClickable() && ciCol.isClickable() && (!empty || emptyCellsClickable)) {
+						cell.setAction("click");
+						cell.setActionParam(buildActionParameter(ciRow, ciCol));
+					}
+					if(cell.getLevel() == 0)
+						cell.setLevel(ciCol.getLevel());
+					
 				} else {
-					cell.setContent("NoCI");
+					cell.setContent("");
 				}
-				if (ciRow.isClickable() && ciCol.isClickable() && (!empty || emptyCellsClickable)) {
-					cell.setAction("click");
-					cell.setActionParam(buildActionParameter(ciRow, ciCol));
-				}
-//				cell.setGroup(ciCol.getGroup());
-				cell.setLevel(ciCol.getLevel());
-				cell.getParent().setLevel(ciRow.getLevel());
+				
 				
 			}
 		}
@@ -234,37 +238,37 @@ public class CubeViewer extends Control {
 	 * @param size
 	 * @param b
 	 */
-	private NavigationSize renderNavigation(Table tbl, int startRow, int startCol, INavigationElementProvider parentElement, NavigationSize totalSize, boolean horizontal,String group) {
+	private NavigationSize renderNavigation(Table tbl, int startRow, int startCol, INavigationElementProvider parentElement, NavigationSize totalSize, boolean horizontal,String group, int level) {
 		
 		NavigationSize size = new NavigationSize();
 		int row = startRow;
 		int col = startCol;
 		
 		int totalItems = 0;
-		int level = horizontal ? startRow : startCol;
 		
 		for (INavigationElement elm : parentElement.getNavigationElements()) {
 			boolean expanded = model.isExpanded(elm.getElementId());
-
-			int titleRow = row;
+			int titleRow =  row;
 			int titleCol = col;
+			
 			int items = 1;
 			ContentInfo contentInfo = elm.getContentInfo();
-			contentInfo.setGroup(group);
 			contentInfo.setLevel(level);
+			
 			if (expanded) {
 				Align align = horizontal ? columnTotalAlign : rowTotalAlign;
 				int startIndent = !elm.hideTotal() && (align == Align.BEGIN) ? 1 : 0;
 				NavigationSize subSize;
 				if (horizontal) {
-					subSize = renderNavigation(tbl, row + 1, col + startIndent, elm, totalSize, horizontal,group+" "+elm.getTitle());
+					subSize = renderNavigation(tbl, row + 1, col + startIndent, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1);
 				} else {
-					subSize = renderNavigation(tbl, row + startIndent, col, elm, totalSize, horizontal,group+" "+elm.getTitle());
+					subSize = renderNavigation(tbl, row + startIndent, col, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1);
 				}
 				if (size.depth < subSize.depth) {
 					size.depth = subSize.depth;
 				}
 				items = subSize.cells;
+				
 				if (!elm.hideTotal()) {
 					items++;
 					// render "sub-total" text
@@ -285,23 +289,37 @@ public class CubeViewer extends Control {
 					tbl.setRowData(row, contentInfo);
 				}
 			}
-			TableCell cell = tbl.getCell(titleRow, titleCol);
-			
 			// render navigation element cell
 			totalItems += items;
 			if (horizontal) {
-				tbl.setMaxColLevel(Math.max(tbl.getMaxColLevel(), level));
+				tbl.setMaxColLevel(Math.max(tbl.getMaxColLevel(), horizontal ? startRow : startCol));
 				col += items;
 			} else {
 				tbl.setMaxRowLevel(Math.max(tbl.getMaxRowLevel(), level));
 				row += items;
 			}
+
+			TableCell cell = tbl.getCell(titleRow, titleCol);
 			cell.setContent(elm.getTitle());
 			cell.setExpandable(elm.isExpandable());
 			cell.setTitle(true);
 			cell.setElementId(elm.getElementId());
-			cell.setLevel(level);
 			cell.setGroup(group);
+			cell.setExpanded(expanded);
+			if(!horizontal)
+				cell.getParent().setLevel(level);
+			else{
+				cell.setLevel(level);
+				for(int i=0;i<tbl.getHeadRows().size() - row;i++){
+					tbl.getCell(i+row, titleCol).setLevel(level);
+				}
+				if(level > 0 && expanded){
+					for(int i=titleCol ;i < tbl.getColCount();i++){
+						tbl.getCell(row, i).setLevel(level);
+					}
+					
+				}
+			}
 			
 		}
 		
@@ -316,7 +334,7 @@ public class CubeViewer extends Control {
 	 */
 	public void actionExpand(String elementId) {
 		model.expand(elementId);
-		requireRedraw(); // TODO to be replaced by listeners mechanism...
+		requireRedraw();
 	}
 	
 	/**
@@ -325,7 +343,7 @@ public class CubeViewer extends Control {
 	 */
 	public void actionCollapse(String elementId) {
 		model.collapse(elementId);
-		requireRedraw(); // TODO to be replaced by listener mechanism.
+		requireRedraw();
 	}
 	
 	public void actionToggleExpand(String elementId){
@@ -334,7 +352,6 @@ public class CubeViewer extends Control {
 		}else{
 			model.expand(elementId);
 		}
-		System.out.println(elementId);
 		this.requireRedraw();
 	}
 	
@@ -347,14 +364,6 @@ public class CubeViewer extends Control {
 			return model.getValueFormat().format(value);
 		}
 		return "<i>na</i>";
-	}
-
-	/**
-	 * @param renderContext
-	 * @param string
-	 */
-	private void renderWarning(RenderContext renderContext, String msg) {
-		renderContext.getWriter().println(msg);
 	}
 
 	/**
@@ -428,12 +437,31 @@ public class CubeViewer extends Control {
 	}
 	
 	public Table getTable(){
+		
 		try{
-			return renderTable();
+			Table renderTable = renderTable();
+			renderTable.setExpandDirections(this.expandDown, this.expandLeft);
+			return renderTable;
 		}catch(Throwable t){
 			log.error(t.getMessage(),t);
 			return null;
 		}
 	}
 
+	public void setExpandRight(boolean right){
+		this.expandLeft = !right;
+		this.requireRedraw();
+	}
+	
+	public void setExpandUp(boolean up){
+		this.expandDown = !up;
+		this.requireRedraw();
+	}
+	
+	public void setExpandUpRight(boolean up, boolean right){
+		this.expandDown = !up;
+		this.expandLeft = !right;
+		this.requireRedraw();
+	}
+	
 }

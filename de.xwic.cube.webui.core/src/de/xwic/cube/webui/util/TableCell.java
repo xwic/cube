@@ -11,7 +11,6 @@ import de.xwic.cube.webui.viewer.ContentInfo;
 public class TableCell {
 	
 	private String content = "";
-	private String cssClass = "";
 	private String action = "";
 	private String actionParam = "";
 	private int colSpan = 1;
@@ -23,10 +22,11 @@ public class TableCell {
 	public String elementId;
 	private boolean expandable;
 	private String group;
+	private boolean expanded;
 	/**
 	 * @param content
 	 */
-	public TableCell() {
+	TableCell() {
 		super();
 	}
 
@@ -52,21 +52,6 @@ public class TableCell {
 	 */
 	public TableCell setContent(String content) {
 		this.content = content;
-		return this;
-	}
-
-	/**
-	 * @return the cssClass
-	 */
-	public String getCssClass() {
-		return cssClass;
-	}
-
-	/**
-	 * @param cssClass the cssClass to set
-	 */
-	public TableCell setCssClass(String cssClass) {
-		this.cssClass = cssClass;
 		return this;
 	}
 
@@ -113,64 +98,126 @@ public class TableCell {
 		this.actionParam = actionParam;
 	}
 	
+	/**
+	 * @param level
+	 */
 	public void setLevel(int level) {
 		this.level = level;	
 	}
+	/**
+	 * @return
+	 */
 	public int getLevel() {
 		return level;
 	}
 	
+	/**
+	 * @param data
+	 */
 	public void setData(ContentInfo data) {
 		this.data = data;
 	}
+	/**
+	 * @return
+	 */
 	public ContentInfo getData() {
 		return data;
 	}
 
+	/**
+	 * @param b
+	 */
 	public void setTitle(boolean b) {
 		this.title = b;
 	}
 
+	/**
+	 * @return
+	 */
 	public boolean isTitle() {
 		return this.title;
 	}
 	
+	/**
+	 * @return
+	 */
 	public int getIndex() {
 		return index;
 	}
 	
+	/**
+	 * @param index
+	 */
 	void setIndex(int index) {
 		this.index = index;
 	}
 	
+	/**
+	 * @return
+	 */
 	public TableRow getParent() {
 		return parent;
 	}
 	
+	/**
+	 * @param parent
+	 */
 	void setParent(TableRow parent) {
 		this.parent = parent;
 	}
 	
+	/**
+	 * @param elementId
+	 */
 	public void setElementId(String elementId) {
 		this.elementId = elementId;
 	}
 	
+	/**
+	 * @return
+	 */
 	public String getElementId() {
 		return elementId;
 	}
 	
+	/**
+	 * @param expandable
+	 */
 	public void setExpandable(boolean expandable) {
 		this.expandable = expandable;
 	}
+	/**
+	 * @return
+	 */
 	public boolean isExpandable() {
 		return expandable;
 	}
 
+	/**
+	 * @param group
+	 */
 	public void setGroup(String group) {
 		this.group = group;
 	}
 	
+	/**
+	 * @return
+	 */
 	public String getGroup(){
 		return this.group;
+	}
+	
+	/**
+	 * @param expanded
+	 */
+	public void setExpanded(boolean expanded) {
+		this.expanded = expanded;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isExpanded() {
+		return expanded;
 	}
 }
