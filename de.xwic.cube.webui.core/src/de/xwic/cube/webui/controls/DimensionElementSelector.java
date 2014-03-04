@@ -38,6 +38,8 @@ import de.xwic.cube.webui.viewer.IDimensionFilter;
 @JavaScriptSupport
 public class DimensionElementSelector extends HTMLElement implements IResourceControl {
 
+	private static final long serialVersionUID = 1L;
+
 	private IDimension dimension;
 	private List<IDimensionElement> dimensionElements = new ArrayList<IDimensionElement>();
 	private List<IDimensionElement> flatList = new ArrayList<IDimensionElement>();
@@ -57,6 +59,8 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		}
 	}
 	private final IDimensionFilter filter;
+
+	private List<IDimensionElement> userCredentials;
 
 	/**
 	 * 
@@ -214,13 +218,20 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	public List<String> getDimensionElementsPaths() {
 
 		List<String> selectedPaths = new ArrayList<String>();
-		for (Iterator<IDimensionElement> iterator = dimensionElements.iterator(); iterator.hasNext();) {
+		List<IDimensionElement> selectionList;
+		if (dimensionElements != null && dimensionElements.size() >= 1 && dimensionElements.get(0) instanceof IDimension && userCredentials != null){
+			selectionList = userCredentials;
+		}else{
+			selectionList = dimensionElements;
+		}
+
+		for (Iterator<IDimensionElement> iterator = selectionList.iterator(); iterator.hasNext();) {
 			IDimensionElement elem = (IDimensionElement) iterator.next();
-			String path = elem.getPath();
+			String path  =elem.getPath();
 			if(path == null || path.isEmpty()){
 				continue;
 			}
-			selectedPaths.add(elem.getPath());
+			selectedPaths.add(path);
 		}
 		return selectedPaths;
 	}
@@ -546,8 +557,25 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		return this.defaultTitle;
 	}
 	
+	@IncludeJsOption
 	public String getDefaultMultipleTitle() {
 		return defaultMultipleTitle;
 	}
+	
+	/**
+	 * @param userCredentials
+	 */
+	public void setUserCredentials(List<IDimensionElement> userCredentials) {
+		this.userCredentials = userCredentials;
+	}
+	
+	/**
+	 * @return
+	 */
+	public List<IDimensionElement> getUserCredentials() {
+		return userCredentials;
+	}
+	
+	
 	
 }
