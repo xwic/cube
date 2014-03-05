@@ -23,6 +23,7 @@ import de.jwic.controls.ListBox;
 import de.jwic.controls.ToolBar;
 import de.jwic.controls.ToolBarGroup;
 import de.jwic.controls.Window;
+import de.jwic.data.ISelectElement;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 
@@ -263,8 +264,11 @@ public class FilterGroup  {
 			
 			@Override
 			public void objectSelected(SelectionEvent arg0) {
-				String key = listBox.getSelectedElement().getKey();
-				load(key);
+				ISelectElement selectedElement = listBox.getSelectedElement();
+				if(selectedElement != null){
+					String key = selectedElement.getKey();
+					load(key);
+				}
 			}
 		});
 		
