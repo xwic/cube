@@ -2,6 +2,7 @@
 .classpath
 .project
 .settings/
+bin/
 
 # Intellij
 .idea/
@@ -19,4 +20,6 @@ target-test/
 #project specific
 logs/
 *.log
+*.log.*
 sessions/
+

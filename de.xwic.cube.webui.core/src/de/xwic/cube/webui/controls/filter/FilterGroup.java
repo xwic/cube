@@ -204,10 +204,13 @@ public class FilterGroup  {
 			public void objectSelected(SelectionEvent arg0) {
 				final String filterName = windowContent.getFilterName().getText();
 				final String filter = save();
-				filterProfiles.put(filterName, filter);
 				final FilterGroupProfile fgp = new FilterGroupProfile(filterName, filter);
-				for(IFilterGroupListener fgl : listeners){
-					fgl.saveFilterProfile(fgp);
+				try{
+					for(IFilterGroupListener fgl : listeners){
+						fgl.saveFilterProfile(fgp);
+					}
+					filterProfiles.put(filterName, filter);
+				}catch(Exception ex){
 				}
 				window.setVisible(false);
 				windowContent.getFilterName().setText("");
@@ -233,7 +236,7 @@ public class FilterGroup  {
 				window.setVisible(true);
 			}
 		});
-		return save;
+		return ok;
 	}
 	
 	/**
