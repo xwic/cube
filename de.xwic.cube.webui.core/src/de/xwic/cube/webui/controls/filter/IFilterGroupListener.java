@@ -14,6 +14,6 @@ public interface IFilterGroupListener {
 	 * @param profile
 	 * @throws Exception  - if something went wrong in the save process
 	 */
-	public void saveFilterProfile(FilterGroupProfile profile) throws Exception;
+	public void saveFilterProfile(FilterGroupProfile profile) throws FilterGroupException;
 	
 }
