@@ -686,8 +686,15 @@ public class CubeFlexCalc extends Cube implements ICube, Externalizable, ICubeCa
 	 * @see de.xwic.cube.ICubeCacheControl#buildCacheFromStats(java.io.InputStream)
 	 */
 	public synchronized void buildCacheFromStats(InputStream stream) throws IOException {
+		buildCacheFromStats(stream, true);
+	}
+
+	public synchronized void buildCacheFromStats(InputStream stream, boolean clearCache)
+			throws IOException {
+		if (clearCache) {
+			cache.clear();			
+		}
 		
-		cache.clear();
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 		String line = in.readLine(); // skip header

@@ -478,8 +478,15 @@ public class CubeIndexed extends Cube implements ICube, Externalizable, ICubeCac
 	 * @see de.xwic.cube.ICubeCacheControl#buildCacheFromStats(java.io.InputStream)
 	 */
 	public synchronized void buildCacheFromStats(InputStream stream) throws IOException {
-		
-		cache.clear();
+		buildCacheFromStats(stream, true);
+	}
+
+	public synchronized void buildCacheFromStats(InputStream stream, boolean clearCache)
+			throws IOException {
+		if (clearCache) {
+			cache.clear();			
+		}
+
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 		String line = in.readLine(); // skip header
