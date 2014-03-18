@@ -24,18 +24,21 @@ public class CubeViewer extends Control {
 
 	
 	public enum Align { BEGIN, END };
+	public enum ColumnExpand{LEFT, RIGHT};
+	public enum RowExpand{UP, DOWN};
 	
 	private static final long serialVersionUID = 2L;
-	private CubeViewerModel model;
+	private final CubeViewerModel model;
 	
 	private Align columnTotalAlign = Align.BEGIN;
 	private Align rowTotalAlign = Align.END;
 	private int leftNavMinWidth = 250;
 	private int columnWidth = 0; // default
 	private boolean emptyCellsClickable = false;
-	private boolean expandLeft = true;
-	private boolean expandDown = true;
+	private ColumnExpand columnExpand = ColumnExpand.RIGHT;
+	private RowExpand rowExpand = RowExpand.DOWN;
 	private boolean fixedHeaders = true;
+	
 	
 	/**
 	 * @param container
@@ -46,9 +49,11 @@ public class CubeViewer extends Control {
 		
 		model = new CubeViewerModel(getSessionContext().getLocale());
 		model.addCubeViewerModelListener(new CubeViewerModelAdapter() {
+			@Override
 			public void filterUpdated(CubeViewerModelEvent event) {
 				onFilterUpdated(event);				
 			}
+			@Override
 			public void cubeUpdated(CubeViewerModelEvent event) {
 				onCubeUpdated(event);
 			}
@@ -153,7 +158,7 @@ public class CubeViewer extends Control {
 		int startCol = rowDepth;
 
 		List<INavigationProvider> columnProvider = model.getColumnProvider();
-		if(!expandLeft){
+		if(columnExpand == ColumnExpand.RIGHT){
 			columnProvider = new ArrayList<INavigationProvider>(model.getColumnProvider());
 			Collections.reverse(columnProvider);
 		}
@@ -445,11 +450,13 @@ public class CubeViewer extends Control {
 		this.emptyCellsClickable = emptyCellsClickable;
 	}
 	
+	
+	
 	public Table getTable(){
 		
 		try{
 			Table renderTable = renderTable();
-			renderTable.setExpandDirections(this.expandDown, this.expandLeft);
+			renderTable.setExpandDirections(this.rowExpand == RowExpand.DOWN, this.columnExpand == ColumnExpand.RIGHT);
 			return renderTable;
 		}catch(Throwable t){
 			log.error(t.getMessage(),t);
@@ -457,35 +464,50 @@ public class CubeViewer extends Control {
 		}
 	}
 
-	public void setExpandRight(boolean right){
-		this.expandLeft = !right;
-		this.requireRedraw();
-	}
 	
-	public void setExpandUp(boolean up){
-		this.expandDown = !up;
-		this.requireRedraw();
-	}
 	
-	public void setExpandUpRight(boolean up, boolean right){
-		this.expandDown = !up;
-		this.expandLeft = !right;
-		this.requireRedraw();
-	}
-	
-	public boolean isExpandUp() {
-		return !expandDown;
-	}
-	public boolean isExpandRight() {
-		return !expandLeft;
-	}
-	
+	/**
+	 * @param fixedColumn
+	 */
 	public void setFixedHeaders(boolean fixedColumn) {
 		this.fixedHeaders = fixedColumn;
 	}
+	/**
+	 * @return
+	 */
 	@IncludeJsOption
 	public boolean isFixedHeaders() {
 		return fixedHeaders;
 	}
+
+	/**
+	 * @return
+	 */
+	public ColumnExpand getColumnExpand() {
+		return columnExpand;
+	}
+
+	/**
+	 * @param columnExpand
+	 */
+	public void setColumnExpand(ColumnExpand columnExpand) {
+		this.columnExpand = columnExpand;
+	}
+
+	/**
+	 * @return
+	 */
+	public RowExpand getRowExpand() {
+		return rowExpand;
+	}
+
+	/**
+	 * @param rowExpand
+	 */
+	public void setRowExpand(RowExpand rowExpand) {
+		this.rowExpand = rowExpand;
+	}
+	
+	
 	
 }

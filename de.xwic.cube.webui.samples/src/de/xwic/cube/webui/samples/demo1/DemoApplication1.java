@@ -1,5 +1,10 @@
 package de.xwic.cube.webui.samples.demo1;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import de.jwic.base.Application;
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
@@ -11,19 +16,29 @@ import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.jwic.events.ValueChangedEvent;
 import de.jwic.events.ValueChangedListener;
-import de.xwic.cube.*;
+import de.xwic.cube.DataPoolManagerFactory;
+import de.xwic.cube.ICube;
+import de.xwic.cube.IDataPool;
+import de.xwic.cube.IDataPoolManager;
+import de.xwic.cube.IDimension;
+import de.xwic.cube.IDimensionElement;
+import de.xwic.cube.IMeasure;
+import de.xwic.cube.Key;
 import de.xwic.cube.formatter.PercentageValueFormatProvider;
 import de.xwic.cube.functions.DifferenceFunction;
 import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.cube.webui.controls.DimensionElementSelector;
 import de.xwic.cube.webui.controls.filter.FilterGroup;
 import de.xwic.cube.webui.controls.filter.FilterGroupProfile;
-import de.xwic.cube.webui.viewer.*;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import de.xwic.cube.webui.viewer.CubeFilter;
+import de.xwic.cube.webui.viewer.CubeViewer;
+import de.xwic.cube.webui.viewer.CubeViewer.ColumnExpand;
+import de.xwic.cube.webui.viewer.CubeViewer.RowExpand;
+import de.xwic.cube.webui.viewer.CubeViewerModel;
+import de.xwic.cube.webui.viewer.CubeViewerModelAdapter;
+import de.xwic.cube.webui.viewer.CubeViewerModelEvent;
+import de.xwic.cube.webui.viewer.CubeWriter;
+import de.xwic.cube.webui.viewer.DimensionNavigationProvider;
 
 /**
  * Sample Application.
@@ -52,20 +67,29 @@ public class DemoApplication1 extends Application {
 		
 		final CubeViewer viewer = new CubeViewer(page, "viewer");
 		this.expandLeft = new CheckBox(page, "expandLeft");
-		this.expandLeft.setChecked(!viewer.isExpandRight());
+		this.expandLeft.setChecked(viewer.getColumnExpand()==ColumnExpand.LEFT);
 		expandLeft.addValueChangedListener(new ValueChangedListener() {			
 			@Override
 			public void valueChanged(ValueChangedEvent event) {
-				viewer.setExpandRight(!expandLeft.isChecked());
+				if(expandLeft.isChecked()){
+					viewer.setColumnExpand(ColumnExpand.LEFT);
+				}else{
+					viewer.setColumnExpand(ColumnExpand.RIGHT);
+				}
 			}
 		});
 		this.expandDown = new CheckBox(page, "expandRight");
 		
-		this.expandDown.setChecked(!viewer.isExpandUp());
+		this.expandDown.setChecked(viewer.getRowExpand() == RowExpand.DOWN);
 		this.expandDown.addValueChangedListener(new ValueChangedListener() {
 			@Override
 			public void valueChanged(ValueChangedEvent event) {
-				viewer.setExpandUp(!expandDown.isChecked());
+				boolean checked = expandDown.isChecked();
+				if(checked){
+					viewer.setRowExpand(RowExpand.DOWN);
+				}else{
+					viewer.setRowExpand(RowExpand.UP);
+				}
 			}
 		});
 		
