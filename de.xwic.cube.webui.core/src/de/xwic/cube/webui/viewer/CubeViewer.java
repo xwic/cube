@@ -492,6 +492,7 @@ public class CubeViewer extends Control {
 	 */
 	public void setColumnExpand(ColumnExpand columnExpand) {
 		this.columnExpand = columnExpand;
+		this.requireRedraw();
 	}
 
 	/**
@@ -506,6 +507,7 @@ public class CubeViewer extends Control {
 	 */
 	public void setRowExpand(RowExpand rowExpand) {
 		this.rowExpand = rowExpand;
+		this.requireRedraw();
 	}
 	
 	
