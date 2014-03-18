@@ -40,7 +40,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 
 	private static final long serialVersionUID = 1L;
 
-	private IDimension dimension;
+	private final IDimension dimension;
 	private List<IDimensionElement> dimensionElements = new ArrayList<IDimensionElement>();
 	private List<IDimensionElement> flatList = new ArrayList<IDimensionElement>();
 	private boolean selectLeafsOnly = false;
@@ -104,6 +104,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	public DimensionElementSelector(IControlContainer container, String name, IDimension dimension,
 			IDimensionFilter filter, boolean multiSelection) {
 		super(container, name);
+		
 		this.dimension = dimension;
 		this.filter = filter;
 		this.isMultiSelection = multiSelection;
@@ -226,7 +227,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		}
 
 		for (Iterator<IDimensionElement> iterator = selectionList.iterator(); iterator.hasNext();) {
-			IDimensionElement elem = (IDimensionElement) iterator.next();
+			IDimensionElement elem = iterator.next();
 			String path  =elem.getPath();
 			if(path == null || path.isEmpty()){
 				continue;
@@ -383,6 +384,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 * @seede.jwic.base.IResourceControl#attachResource(javax.servlet.http.
 	 * HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@Override
 	public void attachResource(HttpServletRequest req, HttpServletResponse res) throws IOException {
 
 		log.debug("Data Requested..");
@@ -392,7 +394,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		// get paths of selected elements
 		List<String> selectedPaths = new ArrayList<String>();
 		for (Iterator<IDimensionElement> iterator = dimensionElements.iterator(); iterator.hasNext();) {
-			IDimensionElement elem = (IDimensionElement) iterator.next();
+			IDimensionElement elem = iterator.next();
 			selectedPaths.add(elem.getPath());
 		}
 		// build object tree and send it...
@@ -473,7 +475,7 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		dimensionElements = new ArrayList<IDimensionElement>();
 
 		for (Iterator<IDimensionElement> iterator = oldSelectedElems.iterator(); iterator.hasNext();) {
-			IDimensionElement element = (IDimensionElement) iterator.next();
+			IDimensionElement element = iterator.next();
 			if (element.isLeaf()) {
 				dimensionElements.add(element);
 			}

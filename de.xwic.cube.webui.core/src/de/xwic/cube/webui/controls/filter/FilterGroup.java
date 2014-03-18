@@ -15,12 +15,10 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.ImageRef;
 import de.jwic.controls.Button;
 import de.jwic.controls.ListBox;
-import de.jwic.controls.ToolBar;
 import de.jwic.controls.ToolBarGroup;
 import de.jwic.controls.Window;
 import de.jwic.data.ISelectElement;
@@ -211,6 +209,7 @@ public class FilterGroup  {
 					}
 					filterProfiles.put(filterName, filter);
 				}catch(Exception ex){
+					log.error(ex.getMessage(),ex);
 				}
 				window.setVisible(false);
 				windowContent.getFilterName().setText("");
