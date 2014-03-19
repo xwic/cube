@@ -266,7 +266,7 @@ public class CubeViewer extends Control {
 		
 		List<INavigationElement> navigationElements = parentElement.getNavigationElements();
 		if(horizontal){
-			if(columnExpand == ColumnExpand.LEFT ){
+			if(columnExpand == ColumnExpand.RIGHT ){
 				navigationElements = new ArrayList<INavigationElement>(parentElement.getNavigationElements());
 				Collections.reverse(navigationElements);
 			}
