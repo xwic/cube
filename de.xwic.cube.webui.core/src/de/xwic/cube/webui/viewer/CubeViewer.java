@@ -172,6 +172,10 @@ public class CubeViewer extends Control {
 		// render rows
 		int startRow = colHeight;
 		List<INavigationProvider> rowProvider = model.getRowProvider();
+		if(rowExpand == RowExpand.DOWN){
+			rowProvider = new ArrayList<INavigationProvider>(rowProvider);
+			Collections.reverse(rowProvider);
+		}
 		for (INavigationProvider navProvider : rowProvider) {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.depth = rowDepth;
@@ -260,7 +264,21 @@ public class CubeViewer extends Control {
 		
 		int totalItems = 0;
 		
-		for (INavigationElement elm : parentElement.getNavigationElements()) {
+		List<INavigationElement> navigationElements = parentElement.getNavigationElements();
+		if(horizontal){
+			if(columnExpand == ColumnExpand.LEFT ){
+				navigationElements = new ArrayList<INavigationElement>(navigationElements);
+				Collections.reverse(navigationElements);
+			}
+		}else{
+			if(rowExpand == RowExpand.UP){
+				navigationElements = new ArrayList<INavigationElement>(navigationElements);
+				Collections.reverse(navigationElements);
+			}
+		}
+		Collections.reverse(navigationElements);
+		for (INavigationElement elm : navigationElements) {
+			
 			boolean expanded = model.isExpanded(elm.getElementId());
 			int titleRow =  row;
 			int titleCol = col;
