@@ -3,13 +3,10 @@
  */
 package de.xwic.cube.webui.util;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import de.jwic.base.Control;
 
 /**
  * Utility class to render a HTML table.
@@ -18,8 +15,8 @@ import de.jwic.base.Control;
  */
 public class Table implements Iterable<TableRow>{
 
-	private List<Object> columnData = new ArrayList<Object>();
-	private List<Object> rowData = new ArrayList<Object>();
+	private final List<Object> columnData = new ArrayList<Object>();
+	private final List<Object> rowData = new ArrayList<Object>();
 
 	private final List<Integer> colWidth = new ArrayList<Integer>();
 

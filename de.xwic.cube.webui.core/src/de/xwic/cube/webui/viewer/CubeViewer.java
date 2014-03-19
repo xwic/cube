@@ -267,16 +267,15 @@ public class CubeViewer extends Control {
 		List<INavigationElement> navigationElements = parentElement.getNavigationElements();
 		if(horizontal){
 			if(columnExpand == ColumnExpand.LEFT ){
-				navigationElements = new ArrayList<INavigationElement>(navigationElements);
+				navigationElements = new ArrayList<INavigationElement>(parentElement.getNavigationElements());
 				Collections.reverse(navigationElements);
 			}
 		}else{
-			if(rowExpand == RowExpand.UP){
-				navigationElements = new ArrayList<INavigationElement>(navigationElements);
+			if(rowExpand == RowExpand.DOWN){
+				navigationElements = new ArrayList<INavigationElement>(parentElement.getNavigationElements());
 				Collections.reverse(navigationElements);
 			}
 		}
-		Collections.reverse(navigationElements);
 		for (INavigationElement elm : navigationElements) {
 			
 			boolean expanded = model.isExpanded(elm.getElementId());

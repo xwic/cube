@@ -39,6 +39,7 @@ import de.xwic.cube.webui.viewer.CubeViewerModelAdapter;
 import de.xwic.cube.webui.viewer.CubeViewerModelEvent;
 import de.xwic.cube.webui.viewer.CubeWriter;
 import de.xwic.cube.webui.viewer.DimensionNavigationProvider;
+import de.xwic.cube.webui.viewer.TotalNavigationProvider;
 
 /**
  * Sample Application.
@@ -128,18 +129,21 @@ public class DemoApplication1 extends Application {
 		
 		DimensionNavigationProvider otNavigationProvider = new DimensionNavigationProvider(model, dimOT);
 		otNavigationProvider.setClickable(true);
-//		otNavigationProvider.setHideTotals(true);
+		otNavigationProvider.setIndention(1);
 //		otNavigationProvider.setHideEmptyElements(true);
 //		otNavigationProvider.setShowRoot(true);
 		
-		model.addColumnNavigationProvider(otNavigationProvider);
+		model.addRowNavigationProvider(otNavigationProvider);
 		
 		DimensionNavigationProvider geoNavigationProvider = new DimensionNavigationProvider(model, dimGEO);
 		geoNavigationProvider.setHideEmptyElements(true);
 		
 		geoNavigationProvider.setShowRoot(true);
 		geoNavigationProvider.setClickable(true);
+		geoNavigationProvider.setIndention(1);
 		model.addRowNavigationProvider(geoNavigationProvider);
+		
+		model.addRowNavigationProvider(new TotalNavigationProvider());
 		
 		DimensionNavigationProvider timeNavigationProvider = new DimensionNavigationProvider(model, dimTime);
 //		timeNavigationProvider.setHideEmptyElements(true);
