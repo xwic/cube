@@ -1,5 +1,12 @@
 package de.xwic.cube.webui.controls.filter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * @author bogdanpandia
  *
@@ -58,7 +65,28 @@ public class FilterGroupProfile {
 	}
 	
 	
+	public static List<FilterGroupProfile> deserialize(String jsonSerialization) throws JSONException{
+		List<FilterGroupProfile> profiles = new ArrayList<FilterGroupProfile>();
+		JSONArray array = new JSONArray(jsonSerialization);
+		for(int i=0;i<array.length();i++){
+			JSONObject o = array.getJSONObject(i);
+			String name = o.getString("name");
+			String profile = o.getString("profile");
+			profiles.add(new FilterGroupProfile(name, profile));
+		}
+		return profiles;
+	}
 	
+	public static String serialize(List<FilterGroupProfile> groups) throws JSONException{
+		JSONArray object = new JSONArray();
+		for(FilterGroupProfile group : groups){
+			JSONObject o = new JSONObject();
+			o.put("name", group.getName());
+			o.put("profile", group.getProfile());
+			object.put(o);
+		}
+		return object.toString();
+	}
 	
 	
 	

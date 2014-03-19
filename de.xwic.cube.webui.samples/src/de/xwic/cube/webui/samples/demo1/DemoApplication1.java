@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.json.JSONException;
+
 import de.jwic.base.Application;
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
@@ -171,11 +173,16 @@ public class DemoApplication1 extends Application {
 		timeNavigationProvider.setFilter(filter);
 		
 		
-		FilterGroupProfile profile = new FilterGroupProfile("Test Profile 1", "{'root.filter':{'Time':['2009/Q1'],'GEO':['Americas'],'OrderType':['COO']}}");
-		List<FilterGroupProfile> profiles = new ArrayList<FilterGroupProfile>();
-		profiles.add(profile);
+		List<FilterGroupProfile> profiles;
+		try {
+			profiles = FilterGroupProfile.deserialize("[{\"name\":\"Test Profile 1\",\"profile\":\"{'root.filter':{'Time':['2009/Q1'],'GEO':['Americas'],'OrderType':['COO']}}\"},{\"name\":\"asd3\",\"profile\":\"{'root.filter':{'Time':['2009/Q3'],'GEO':['Americas'],'OrderType':['COO']}}\"},{\"name\":\"asd2\",\"profile\":\"{'root.filter':{'Time':['2009/Q2'],'GEO':['Americas'],'OrderType':['COO']}}\"}]");
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+			profiles = new ArrayList<FilterGroupProfile>();
+		}
 		
 		final FilterGroup filterGroup = new FilterGroup();
+		
 		filterGroup.setFilterProfies(profiles);
 		
 		filterGroup.addFilter(filter);
@@ -191,7 +198,12 @@ public class DemoApplication1 extends Application {
 			@Override
 			public void objectSelected(SelectionEvent arg0) {
 				filterGroup.applyAllFilters();
-				System.out.println(filterGroup.save());
+				try {
+					System.out.println(FilterGroupProfile.serialize(filterGroup.getFilterProfiles()));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		

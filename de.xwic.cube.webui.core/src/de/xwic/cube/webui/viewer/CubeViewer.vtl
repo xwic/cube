@@ -7,9 +7,10 @@
 		<tr class="xcube-h$rowLevel xcube-h0$foreach.count">
 		#foreach($cell in $row)
 			#set($level = $cell.level)
-			#if($table.maxColLevel < 4 && $level != 0)
-				#set($level = $level + 2)
+			#if($table.maxColLevel < 5 && $level != 0)
+				#set($level = 4 - ($table.maxColLevel -$level)) 
 			#end
+		
 			#if($cell.expandable)
 			#set($action = "xcube-action-expand")
 			#if($cell.expanded)
@@ -36,8 +37,8 @@
 		<tr class="xcube-h$rowLevel">
 		#foreach($cell in $row)
 			#set($level = $cell.level)
-			#if($table.maxColLevel < 4 && $level != 0)
-				#set($level = $level + 2)
+			#if($table.maxColLevel < 5 && $level != 0)
+				#set($level = 5 - $level)
 			#end
 			#if($cell.expandable)
 			#set($action = "xcube-action-expand")

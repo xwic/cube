@@ -3,6 +3,7 @@
  */
 package de.xwic.cube.webui.controls.filter;
 
+import java.awt.peer.LightweightPeer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ public class FilterGroup  {
 	private final Map<String, String> filterProfiles;
 	private final List<IFilterGroupListener> listeners;
 	private LoadProfileControl loadProfileControl;
+	private ListBox listBox;
 	
 	
 	/**
@@ -117,8 +119,9 @@ public class FilterGroup  {
 	/**
 	 * @return
 	 */
-	public String save(){
+	private String saveInternal(){
 		JSONObject object = new JSONObject();
+		
 		for(FilterState filter : this.filters.values()){
 			IFilter f = filter.filter;
 			try {
@@ -133,14 +136,14 @@ public class FilterGroup  {
 	/**
 	 * @param s
 	 */
-	public void load(String s){
+	private void loadInternal(String s){
 		try {
 			JSONObject object = new JSONObject(s);
 			Iterator<String> keys = object.keys();
 			while (keys.hasNext()) {
 				String string = keys.next();
 				FilterState filterState =  filters.get(string);
-				IFilter filter=  filterState.filter;
+				IFilter filter = filterState.filter;
 				filter.load(object.getString(string));
 			}
 		} catch (JSONException e) {
@@ -148,15 +151,32 @@ public class FilterGroup  {
 		}
 		
 	}
+	
+	
 	/**
 	 * Load filterProfiles
 	 * @param filterProfiles
 	 */
 	public void setFilterProfies(List<FilterGroupProfile> profiles){
 		this.filterProfiles.clear();
+		if(listBox!=null){
+			listBox.clear();
+		}
 		for(FilterGroupProfile fgp : profiles){
 			this.filterProfiles.put(fgp.getName(), fgp.getProfile());
+			if(listBox!=null){
+				listBox.addElement(fgp.getName(), fgp.getProfile());
+			}
 		}
+		
+	}
+	
+	public List<FilterGroupProfile> getFilterProfiles(){
+		List<FilterGroupProfile> profiles = new ArrayList<FilterGroupProfile>();
+		for(Entry<String, String> profs : this.filterProfiles.entrySet()){
+			profiles.add(new FilterGroupProfile(profs.getKey(), profs.getValue()));
+		}
+		return profiles;
 	}
 	
 	/**
@@ -201,7 +221,7 @@ public class FilterGroup  {
 			@Override
 			public void objectSelected(SelectionEvent arg0) {
 				final String filterName = windowContent.getFilterName().getText();
-				final String filter = save();
+				final String filter = saveInternal();
 				final FilterGroupProfile fgp = new FilterGroupProfile(filterName, filter);
 				try{
 					for(IFilterGroupListener fgl : listeners){
@@ -255,7 +275,7 @@ public class FilterGroup  {
 	public Button createLoadButton(ToolBarGroup toolBarGroup, String loadButtonText, ImageRef loadButtonImage){
 		loadProfileControl = new LoadProfileControl(toolBarGroup);
 		Button load = loadProfileControl.getLoadButton();
-		final ListBox listBox = loadProfileControl.getProfileListBox();
+		listBox = loadProfileControl.getProfileListBox();//setup the initial stuff if any
 		for(Entry<String, String> filter : this.filterProfiles.entrySet()){
 			listBox.addElement(filter.getKey(), filter.getValue());
 		}
@@ -269,7 +289,7 @@ public class FilterGroup  {
 				ISelectElement selectedElement = listBox.getSelectedElement();
 				if(selectedElement != null){
 					String key = selectedElement.getKey();
-					load(key);
+					loadInternal(key);
 				}
 			}
 		});
