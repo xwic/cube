@@ -456,7 +456,7 @@ public class CubeViewer extends Control {
 		
 		try{
 			Table renderTable = renderTable();
-			renderTable.setExpandDirections(this.rowExpand == RowExpand.DOWN, this.columnExpand == ColumnExpand.RIGHT);
+			renderTable.setExpandDirections(this.rowExpand == RowExpand.DOWN, this.columnExpand == ColumnExpand.LEFT);
 			return renderTable;
 		}catch(Throwable t){
 			log.error(t.getMessage(),t);
