@@ -37,7 +37,7 @@ public class CubeViewer extends Control {
 	private boolean emptyCellsClickable = false;
 	private ColumnExpand columnExpand = ColumnExpand.RIGHT;
 	private RowExpand rowExpand = RowExpand.DOWN;
-	private boolean fixedHeaders = true;
+	private boolean fixedHeaders = false;
 	
 	
 	/**
@@ -131,7 +131,7 @@ public class CubeViewer extends Control {
 		int colCount = 0;
 		for (INavigationProvider navProvider : model.getColumnProvider()) {
 			NavigationSize size = navProvider.getNavigationSize();
-			int depth = size.depth + navProvider.getIndention();
+			int depth = size.depth+ navProvider.getIndention();
 			if (depth > colHeight) {
 				colHeight = depth;
 			}
@@ -165,7 +165,7 @@ public class CubeViewer extends Control {
 		for (INavigationProvider navProvider : columnProvider) {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.cells += startCol;
-			renderNavigation(tbl, navProvider.getIndention(), startCol, navProvider, size, true,"",0);
+			renderNavigation(tbl, 0, startCol, navProvider, size, true,"",navProvider.getIndention());
 			startCol += (size.cells - startCol);
 		}		
 		
@@ -176,7 +176,7 @@ public class CubeViewer extends Control {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.depth = rowDepth;
 			if (size.cells > 0) {
-				renderNavigation(tbl, startRow, navProvider.getIndention(), navProvider, size, false,"",0);
+				renderNavigation(tbl, startRow, 0, navProvider, size, false,"",navProvider.getIndention());
 			}
 			startRow += size.cells;
 		}		
