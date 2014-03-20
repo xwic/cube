@@ -3,7 +3,6 @@
  */
 package de.xwic.cube.webui.controls.filter;
 
-import java.awt.peer.LightweightPeer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,6 +30,9 @@ import de.jwic.events.SelectionListener;
  *
  */
 public class FilterGroup  {
+	private static final String PLEASE_SELECT_A_FILTER = "Please select a filter";
+	private static final String PLEASE_SELECT_A_FILTER_KEY = "__EMPTY__";
+
 	private final Log log = LogFactory.getLog(FilterGroup.class);
 	private final Map<String,FilterState> filters;
 	private final Map<String, String> filterProfiles;
@@ -146,6 +148,7 @@ public class FilterGroup  {
 				IFilter filter = filterState.filter;
 				filter.load(object.getString(string));
 			}
+			applyAllFilters();
 		} catch (JSONException e) {
 			log.error(e);
 		}
@@ -161,11 +164,12 @@ public class FilterGroup  {
 		this.filterProfiles.clear();
 		if(listBox!=null){
 			listBox.clear();
+			listBox.addElement(PLEASE_SELECT_A_FILTER, PLEASE_SELECT_A_FILTER_KEY);
 		}
 		for(FilterGroupProfile fgp : profiles){
 			this.filterProfiles.put(fgp.getName(), fgp.getProfile());
 			if(listBox!=null){
-				listBox.addElement(fgp.getName(), fgp.getProfile());
+				listBox.addElement(fgp.getName(), fgp.getName());
 			}
 		}
 		
@@ -224,17 +228,18 @@ public class FilterGroup  {
 				final String filter = saveInternal();
 				final FilterGroupProfile fgp = new FilterGroupProfile(filterName, filter);
 				try{
+					filterProfiles.put(filterName, filter);
 					for(IFilterGroupListener fgl : listeners){
 						fgl.saveFilterProfile(fgp);
 					}
-					filterProfiles.put(filterName, filter);
 				}catch(Exception ex){
 					log.error(ex.getMessage(),ex);
+					filterProfiles.remove(filterName);
 				}
 				window.setVisible(false);
 				windowContent.getFilterName().setText("");
 				if(loadProfileControl!=null){
-					loadProfileControl.getProfileListBox().addElement(fgp.getName(), fgp.getProfile());
+					loadProfileControl.getProfileListBox().addElement(fgp.getName(), fgp.getName());
 				}
 			}
 		});
@@ -277,7 +282,7 @@ public class FilterGroup  {
 		Button load = loadProfileControl.getLoadButton();
 		listBox = loadProfileControl.getProfileListBox();//setup the initial stuff if any
 		for(Entry<String, String> filter : this.filterProfiles.entrySet()){
-			listBox.addElement(filter.getKey(), filter.getValue());
+			listBox.addElement(filter.getKey(), filter.getKey());
 		}
 		
 		load.setTitle(loadButtonText);
@@ -289,7 +294,9 @@ public class FilterGroup  {
 				ISelectElement selectedElement = listBox.getSelectedElement();
 				if(selectedElement != null){
 					String key = selectedElement.getKey();
-					loadInternal(key);
+					if(!PLEASE_SELECT_A_FILTER_KEY.equals(key)){
+						loadInternal(filterProfiles.get(key));
+					}
 				}
 			}
 		});

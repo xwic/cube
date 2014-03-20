@@ -1,6 +1,7 @@
 package de.xwic.cube.webui.controls.filter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -11,7 +12,7 @@ import org.json.JSONObject;
  * @author bogdanpandia
  *
  */
-public class FilterGroupProfile {
+public class FilterGroupProfile implements Comparable<FilterGroupProfile>{
 	private final String name;
 	private final String profile;
 	
@@ -74,6 +75,7 @@ public class FilterGroupProfile {
 			String profile = o.getString("profile");
 			profiles.add(new FilterGroupProfile(name, profile));
 		}
+		Collections.sort(profiles);
 		return profiles;
 	}
 	
@@ -85,7 +87,13 @@ public class FilterGroupProfile {
 			o.put("profile", group.getProfile());
 			object.put(o);
 		}
-		return object.toString();
+		String string = object.toString();
+		return string;
+	}
+
+	@Override
+	public int compareTo(FilterGroupProfile o) {
+		return this.getName().compareTo(o.getName());
 	}
 	
 	
