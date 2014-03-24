@@ -10,9 +10,9 @@ import de.xwic.cube.webui.viewer.ContentInfo;
  */
 public class TableCell {
 	
-	private String content = "";
-	private String action = "";
-	private String actionParam = "";
+	private String content;
+	private String action;
+	private String actionParam;
 	private int colSpan = 1;
 	private int level;
 	private ContentInfo data;
