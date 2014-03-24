@@ -19,8 +19,10 @@
 #set($enablement = $control.enabled)
 <table id="showTree_container" cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass showTree_container">
  <tr>
+ 
  <!--  #if($control.showDimensionTitle) -->
-  <td>
+  <td class="db-filter-label">
+    <div class="db-filter-selector">
   	<!-- #if($control.dimension.title) -->
   		$control.dimension.title
 	<!-- #else -->
@@ -28,27 +30,37 @@
 	<!-- #end -->
   </td>
   <!-- #end -->
-  <td width="22" valign="middle">
-<!-- #if($prev) -->
-  	<a href="$control.createActionURL("prev", "")"><img title="$prev.key" src="$jwic.contextPath/xwiccube/images/resultset_previous.gif" border="0"></a>
-<!-- #else -->
-	<img src="$jwic.contextPath/xwiccube/images/resultset_previous_dis.gif" border="0">
-<!-- #end -->
+  
+  <td class="db-filter-value">
+    <div class="db-filter-selector">
+  
+  	  <div class="db-filter-arrow-left">
+		<!-- #if($prev) -->
+		  	<a href="$control.createActionURL("prev", "")"><img title="$prev.key" src="$jwic.contextPath/xwiccube/images/resultset_previous.gif" border="0"></a>
+		<!-- #else -->
+			<img src="$jwic.contextPath/xwiccube/images/resultset_previous_dis.gif" border="0">
+		<!-- #end -->
+	  </div>
+	  
+	  <div class="db-filter-selected">
+	  	<!-- #if($enablement) -->
+	  		<a id="showTree" href="javascript: void 0">$title</a>
+		<!-- #else -->
+			<div>$title</div>
+		<!-- #end -->	
+	  </div>
+	  
+	  <div class="db-filter-arrow-right">
+		<!-- #if($next) -->
+		  <a href="$control.createActionURL("next", "")"><img title="$next.key" src="$jwic.contextPath/xwiccube/images/resultset_next.gif" border="0"></a>
+		<!-- #else -->
+		  <img src="$jwic.contextPath/xwiccube/images/resultset_next_dis.gif" border="0">
+		<!-- #end -->
+	  </div>	
+
+	</div>
   </td>
-  <td valign="middle">
-  	<!-- #if($enablement) -->
-  		<a id="showTree" href="javascript: void 0">$title</a>
-	<!-- #else -->
-		<div>$title</div>
-	<!-- #end -->	
-  </td>
-<td width="22" valign="middle">
-<!-- #if($next) -->
-  <a href="$control.createActionURL("next", "")"><img title="$next.key" src="$jwic.contextPath/xwiccube/images/resultset_next.gif" border="0"></a>
-<!-- #else -->
-  <img src="$jwic.contextPath/xwiccube/images/resultset_next_dis.gif" border="0">
-<!-- #end -->
-</td>
+  	
  </tr>
 </table>
 
