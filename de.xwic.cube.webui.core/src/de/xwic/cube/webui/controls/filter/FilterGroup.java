@@ -205,7 +205,7 @@ public class FilterGroup  {
 		final Button save = toolBar.addButton();
 		//first container is the toolbar. the second one is the 'page'
 		final IControlContainer toolBarParent = toolBar.getContainer();
-		final Window window = new Window(toolBarParent,"popUp");
+		final Window window = new Window(toolBarParent);
 		window.setVisible(false);
 		window.setMaximizable(false);
 		window.setMinimizable(false);
