@@ -291,7 +291,7 @@ public class FilterGroup  {
 		}
 		
 		load.setTitle(loadButtonText);
-		load.setIconDisabled(loadButtonImage);
+		load.setIconEnabled(loadButtonImage);
 		load.addSelectionListener(new SelectionListener() {
 			
 			@Override
