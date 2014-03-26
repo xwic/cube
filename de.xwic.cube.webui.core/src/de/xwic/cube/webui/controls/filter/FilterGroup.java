@@ -30,7 +30,7 @@ import de.jwic.events.SelectionListener;
  *
  */
 public class FilterGroup  {
-	private static final String PLEASE_SELECT_A_FILTER = "Please select a filter";
+	private static final String PLEASE_SELECT_A_FILTER = "Default Filter";
 	private static final String PLEASE_SELECT_A_FILTER_KEY = "__EMPTY__";
 
 	private final Log log = LogFactory.getLog(FilterGroup.class);
@@ -173,6 +173,7 @@ public class FilterGroup  {
 			}
 		}
 		
+		
 	}
 	
 	public List<FilterGroupProfile> getFilterProfiles(){
@@ -191,7 +192,10 @@ public class FilterGroup  {
 			String state = fs.defaultState;
 			IFilter filter= fs.filter;
 			filter.load(state);
+			if(listBox!=null)
+				listBox.selectedByKey(PLEASE_SELECT_A_FILTER_KEY);
 		}
+		this.applyAllFilters();
 	}
 	
 	/**
@@ -281,6 +285,7 @@ public class FilterGroup  {
 		loadProfileControl = new LoadProfileControl(toolBarGroup);
 		Button load = loadProfileControl.getLoadButton();
 		listBox = loadProfileControl.getProfileListBox();//setup the initial stuff if any
+		listBox.addElement(PLEASE_SELECT_A_FILTER, PLEASE_SELECT_A_FILTER_KEY);
 		for(Entry<String, String> filter : this.filterProfiles.entrySet()){
 			listBox.addElement(filter.getKey(), filter.getKey());
 		}
@@ -296,6 +301,8 @@ public class FilterGroup  {
 					String key = selectedElement.getKey();
 					if(!PLEASE_SELECT_A_FILTER_KEY.equals(key)){
 						loadInternal(filterProfiles.get(key));
+					}else{
+						resetFilters();
 					}
 				}
 			}
