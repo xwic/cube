@@ -17,7 +17,7 @@
 				#set($action = "xcube-action-collapse")
 			#end
 			<th class="xcube-v$level $!cell.group" >
-				<span class="xcube-title" >
+				<span class="xcube-title " >
 					<a class="$action" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >$cell.content</a>
 				</span>
 			</th>
@@ -52,7 +52,7 @@
 			</td>
 			#elseif($cell.title)
 			<td class="xcube-v$level $!cell.group" >
-				<span class="xcube-title" >$cell.content</span>
+				<span class="xcube-title xcube-nochildren" >$cell.content</span>
 			</td>
 			#elseif($cell.actionParam)
 			<td class="xcube-v$level x-clickable $!cell.group" onclick="$control.createActionURL('click', $cell.actionParam)" >
