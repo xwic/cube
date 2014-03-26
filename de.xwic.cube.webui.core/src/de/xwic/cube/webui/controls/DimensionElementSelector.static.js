@@ -173,14 +173,13 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	buildTree = function buildTree(tree,nodeModel,control,data,options){
 		return reduce(data, function(acc, el){
 			var node = tmpl(control, "#node-template"),
-				newNode = new Node(el.title || el.key,el.key,nodeModel.path()+el.key+"/");
+				newNode = new Node(el.title || el.key, el.key, nodeModel.path()+el.key+"/");
 			bindNode(newNode, node, options, el);
 			//setup intial states
 			newNode.expanded(false);
 			newNode.state(Node.UNSELECTED);
 			
 			nodeModel.addChild(newNode);
-			
 			buildTree(node.find('#children') ,newNode, control, el.elements,options);
 			return acc.append(node);
 		},tree);
@@ -188,17 +187,17 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	
 
 	buildMultiSelectKey = function buildMultiSelectKey(node) {
-		var key = node.path(), multiSelectKey = (function makeKey(key, node) {
-			var path = node.path();
-			if (node.state() === Node.UNSELECTED) {
-				return key;
-			}
-			if (node.state() === Node.SELECTED) {
-				return key + path.substring(0, path.length - 1) + "##";
-			}
-			return reduce(node.children(), makeKey, key);
-
-		}(key, node));
+		var key = node.path(), 
+			multiSelectKey = (function makeKey(key, node) {
+				var path = node.path();
+				if (node.state() === Node.UNSELECTED) {
+					return key;
+				}
+				if (node.state() === Node.SELECTED) {
+					return key + path.substring(0, path.length - 1) + "##";
+				}
+				return reduce(node.children(), makeKey, key);
+			}(key, node));
 		return multiSelectKey.substring(0, multiSelectKey.length - 2);//trim off the ## bit at the end
 	};
 
@@ -256,7 +255,9 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			path = node.path();
 		
 		path = path.substring(0,path.length-1);
-		
+		if(paths.length === 0){
+			node.state(Node.SELECTED);
+		}
 		if($.inArray(path,paths) != -1){
 			node.expanded(true);
 			node.state(Node.SELECTED);
