@@ -16,6 +16,7 @@ public class TableRow implements Iterable<TableCell>{
 	private final List<TableCell> cells;
 	private int level;
 	private int index;
+	private boolean sum;
 	
 	private Table parent;
 	
@@ -153,4 +154,14 @@ public class TableRow implements Iterable<TableCell>{
 		}
 		return this.index;
 	}
+
+	public boolean isSum() {
+		return sum;
+	}
+
+	public void setSum(boolean sum) {
+		this.sum = sum;
+	}
+	
+	
 }

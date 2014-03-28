@@ -5,6 +5,7 @@
 	
 	#foreach($row in $table.headRows) 
 		#set($rowLevel = $row.level)
+		
 		<tr class="xcube-h$rowLevel xcube-h0$foreach.count">
 		#foreach($cell in $row)
 		
@@ -48,7 +49,16 @@
 	<tbody>
 	#foreach($row in $table) 
 		#set($rowLevel = $row.level+ 1)
-		<tr class="xcube-h$rowLevel">
+		#set($rowCSS = "xcube-h$rowLevel")
+		#if($row.isSum())
+			#if($row.level > 0)
+				#set($rowCSS = "xcube-sum")
+			#else
+				#set($rowCSS = "xcube-total")
+			#end
+		#end
+		
+		<tr class="$rowCSS">
 		#foreach($cell in $row)
 			#set($level = $cell.level)
 			

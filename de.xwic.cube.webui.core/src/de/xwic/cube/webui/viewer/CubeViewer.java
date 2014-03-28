@@ -339,6 +339,10 @@ public class CubeViewer extends Control {
 			cell.setExpanded(expanded);
 			if(!horizontal)
 				cell.getParent().setLevel(level);
+				if (parentElement instanceof TotalNavigationProvider) {
+					cell.getParent().setLevel(((TotalNavigationProvider) parentElement).getIndention());
+					cell.getParent().setSum(true);
+				}
 			else{
 				cell.setLevel(level);
 				for(int i=0;i<tbl.getHeadRows().size() - row;i++){
