@@ -9,14 +9,14 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import de.xwic.cube.webui.viewer.ContentInfo;
+import de.xwic.cube.webui.viewer.INavigationElementProvider;
+import de.xwic.cube.webui.viewer.INavigationProvider;
 
 /**
  * @author bogdan
  *
  */
 public class TableRow implements Iterable<TableCell>{
-	public enum TableRowTypes {NORMAL, SUM, EMPTY, SECTION};
-	
 	private final List<TableCell> cells;
 	private int level;
 	private int index;
@@ -160,7 +160,7 @@ public class TableRow implements Iterable<TableCell>{
 	}
 
 	public String getTableRowType() {
-		return (StringUtils.isEmpty(tableRowType))?TableRowTypes.NORMAL.name():tableRowType;
+		return (StringUtils.isEmpty(tableRowType))?INavigationProvider.NavigationProviderTypes.NORMAL.name():tableRowType;
 	}
 
 	public void setTableRowType(String tableRowType) {

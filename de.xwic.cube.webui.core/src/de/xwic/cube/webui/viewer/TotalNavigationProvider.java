@@ -77,6 +77,11 @@ public class TotalNavigationProvider implements INavigationProvider {
 		public List<INavigationElement> getNavigationElements() {
 			return null;
 		}
+
+		@Override
+		public NavigationProviderTypes getNavigationProviderType() {
+			return NavigationProviderTypes.TOTAL;
+		}
 		
 	}
 	
@@ -195,6 +200,11 @@ public class TotalNavigationProvider implements INavigationProvider {
 
 	public void setExtraClickInformation(String extraClickInformation) {
 		this.extraClickInformation = extraClickInformation;
+	}
+
+	@Override
+	public NavigationProviderTypes getNavigationProviderType() {
+		return NavigationProviderTypes.TOTAL;
 	}
 
 }

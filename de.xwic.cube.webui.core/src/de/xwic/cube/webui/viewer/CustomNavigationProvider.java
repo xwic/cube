@@ -63,4 +63,9 @@ public class CustomNavigationProvider implements INavigationProvider {
 		this.indention = indention;
 	}
 
+	@Override
+	public NavigationProviderTypes getNavigationProviderType() {
+		return NavigationProviderTypes.NORMAL;
+	}
+
 }

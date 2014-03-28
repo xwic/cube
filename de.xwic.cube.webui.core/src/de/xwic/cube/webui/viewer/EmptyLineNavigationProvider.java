@@ -1,5 +1,6 @@
 package de.xwic.cube.webui.viewer;
 
+
 public class EmptyLineNavigationProvider extends TotalNavigationProvider {
 	public EmptyLineNavigationProvider() {
 		setTitle("");
@@ -8,5 +9,11 @@ public class EmptyLineNavigationProvider extends TotalNavigationProvider {
 				return "";
 			}
 		});
+	}
+	
+
+	@Override
+	public NavigationProviderTypes getNavigationProviderType() {
+		return NavigationProviderTypes.EMPTY;
 	}
 }

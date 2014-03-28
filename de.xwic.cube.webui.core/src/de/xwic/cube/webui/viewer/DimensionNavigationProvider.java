@@ -277,6 +277,11 @@ public class DimensionNavigationProvider implements INavigationProvider {
 			this.fixedTitle = fixedTitle;
 		}
 
+		@Override
+		public NavigationProviderTypes getNavigationProviderType() {
+			return NavigationProviderTypes.NORMAL;
+		}
+
 	}
 
 	/**
@@ -740,6 +745,11 @@ public class DimensionNavigationProvider implements INavigationProvider {
 			this.dimensions.add(elm);
 		}
 		navInitialized = false;
+	}
+
+	@Override
+	public NavigationProviderTypes getNavigationProviderType() {
+		return NavigationProviderTypes.NORMAL;
 	}
 	
 }

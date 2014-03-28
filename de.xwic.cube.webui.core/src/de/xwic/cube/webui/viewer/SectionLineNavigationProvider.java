@@ -1,5 +1,6 @@
 package de.xwic.cube.webui.viewer;
 
+
 public class SectionLineNavigationProvider extends TotalNavigationProvider {
 	public SectionLineNavigationProvider() {
 		this("");
@@ -14,6 +15,9 @@ public class SectionLineNavigationProvider extends TotalNavigationProvider {
 			}
 		});
 	}
-	
-	
+
+	@Override
+	public NavigationProviderTypes getNavigationProviderType() {
+		return NavigationProviderTypes.SECTION;
+	}
 }

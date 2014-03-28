@@ -340,17 +340,11 @@ public class CubeViewer extends Control {
 			cell.setExpanded(expanded);
 			if(!horizontal) {
 				cell.getParent().setLevel(level);
-				if (parentElement instanceof TotalNavigationProvider) {
+				if (INavigationElementProvider.NavigationProviderTypes.TOTAL.equals(parentElement.getNavigationProviderType()) ||
+						INavigationElementProvider.NavigationProviderTypes.EMPTY.equals(parentElement.getNavigationProviderType())	||
+						INavigationElementProvider.NavigationProviderTypes.SECTION.equals(parentElement.getNavigationProviderType())) {
 					cell.getParent().setLevel(((TotalNavigationProvider) parentElement).getIndention());
-					cell.getParent().setTableRowType(TableRow.TableRowTypes.SUM.name());
-				}
-				if (parentElement instanceof EmptyLineNavigationProvider) {
-					cell.getParent().setLevel(((TotalNavigationProvider) parentElement).getIndention());
-					cell.getParent().setTableRowType(TableRow.TableRowTypes.EMPTY.name());
-				}
-				if (parentElement instanceof SectionLineNavigationProvider) {
-					cell.getParent().setLevel(((TotalNavigationProvider) parentElement).getIndention());
-					cell.getParent().setTableRowType(TableRow.TableRowTypes.SECTION.name());
+					cell.getParent().setTableRowType(parentElement.getNavigationProviderType().name());
 				}
 			} else{
 				cell.setLevel(level);
