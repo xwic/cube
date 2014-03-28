@@ -15,7 +15,6 @@ import de.jwic.base.JavaScriptSupport;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.webui.util.Table;
 import de.xwic.cube.webui.util.TableCell;
-import de.xwic.cube.webui.util.TableRow;
 
 /**
  * @author Florian Lippisch
@@ -342,7 +341,8 @@ public class CubeViewer extends Control {
 				cell.getParent().setLevel(level);
 				if (INavigationElementProvider.NavigationProviderTypes.TOTAL.equals(parentElement.getNavigationProviderType()) ||
 						INavigationElementProvider.NavigationProviderTypes.EMPTY.equals(parentElement.getNavigationProviderType())	||
-						INavigationElementProvider.NavigationProviderTypes.SECTION.equals(parentElement.getNavigationProviderType())) {
+						INavigationElementProvider.NavigationProviderTypes.SECTION.equals(parentElement.getNavigationProviderType()) ||
+						INavigationElementProvider.NavigationProviderTypes.TOTAL_TOP.equals(parentElement.getNavigationProviderType())) {
 					cell.getParent().setLevel(((TotalNavigationProvider) parentElement).getIndention());
 					cell.getParent().setTableRowType(parentElement.getNavigationProviderType().name());
 				}
@@ -495,6 +495,7 @@ public class CubeViewer extends Control {
 	 */
 	public void setFixedHeaders(boolean fixedColumn) {
 		this.fixedHeaders = fixedColumn;
+		this.requireRedraw();
 	}
 	/**
 	 * @return

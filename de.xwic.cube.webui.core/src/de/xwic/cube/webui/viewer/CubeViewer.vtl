@@ -1,4 +1,7 @@
-<table width="100%" id="$control.controlID" class="xcube-tbl" >
+#if($control.fixedHeaders)
+<div>
+#end
+<table style="width:100%" id="$control.controlID" class="xcube-tbl" >
 	 
 	#set($table = $control.table)
 	<thead>
@@ -64,6 +67,9 @@
 		#end		
 		#if($row.getTableRowType() eq "SECTION")
 			#set($rowCSS = "xcube-section")
+		#end
+		#if($row.getTableRowType() eq "TOTAL_TOP")
+			#set($rowCSS = "xcube-totaltop")
 		#end		
 		<tr class="$rowCSS">
 		#foreach($cell in $row)
@@ -101,3 +107,6 @@
 	#end
 	</tbody>
 </table>
+#if($control.fixedHeaders)
+</div>
+#end

@@ -3,16 +3,20 @@ Cube.CubeViewer = (function($,escape){
 		initialize : function (options){
 			var cStyle;
 			var cId;
-			var tblId ='#'+escape(options.controlID); 
+			var tblId ='#'+escape(options.controlID);
+			var table = $(tblId);
+			var parent = table.parent();
 			if(options.fixedHeaders){
-				$(tblId).fixedHeaderTable({ 
+				table.fixedHeaderTable({ 
 					footer: false, 
 					cloneHeadToFoot: false, 
-					fixedColumns: 1 
+					fixedColumns: 1,
+					height: "600px", 
+					width: parent.width()+"px"
 				});
-				
 			}
-			$(tblId).find("tr").mouseover(function() {
+			
+			table.find("tr").mouseover(function() {
 				$(this).addClass("hover");
 			}).mouseout(function() {
 				$(this).removeClass("hover");
