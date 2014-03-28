@@ -93,7 +93,7 @@ public class FilterGroupProfile implements Comparable<FilterGroupProfile>{
 
 	@Override
 	public int compareTo(FilterGroupProfile o) {
-		return this.getName().compareTo(o.getName());
+		return this.getName().toUpperCase().compareTo(o.getName().toUpperCase());
 	}
 	
 	

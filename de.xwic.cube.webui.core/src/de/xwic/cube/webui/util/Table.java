@@ -133,7 +133,7 @@ public class Table implements Iterable<TableRow>{
 	 * @param data
 	 */
 	public void setRowData(int row, Object data) {
-		if (rowData.size() < row) {
+		if (rowData.size() <= row) {
 			throw new IndexOutOfBoundsException("Row index out of range");
 		}
 		rowData.set(row, data);
