@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import de.xwic.cube.webui.viewer.ContentInfo;
 
 /**
@@ -13,9 +15,12 @@ import de.xwic.cube.webui.viewer.ContentInfo;
  *
  */
 public class TableRow implements Iterable<TableCell>{
+	public enum TableRowTypes {NORMAL, SUM, EMPTY, SECTION};
+	
 	private final List<TableCell> cells;
 	private int level;
 	private int index;
+	private String tableRowType;
 	
 	private Table parent;
 	
@@ -153,4 +158,16 @@ public class TableRow implements Iterable<TableCell>{
 		}
 		return this.index;
 	}
+
+	public String getTableRowType() {
+		return (StringUtils.isEmpty(tableRowType))?TableRowTypes.NORMAL.name():tableRowType;
+	}
+
+	public void setTableRowType(String tableRowType) {
+		this.tableRowType = tableRowType;
+	}
+
+
+	
+	
 }

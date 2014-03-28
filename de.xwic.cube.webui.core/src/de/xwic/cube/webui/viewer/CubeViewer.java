@@ -15,6 +15,7 @@ import de.jwic.base.JavaScriptSupport;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.webui.util.Table;
 import de.xwic.cube.webui.util.TableCell;
+import de.xwic.cube.webui.util.TableRow;
 
 /**
  * @author Florian Lippisch
@@ -337,9 +338,21 @@ public class CubeViewer extends Control {
 			cell.setElementId(elm.getElementId());
 			cell.setGroup(group);
 			cell.setExpanded(expanded);
-			if(!horizontal)
+			if(!horizontal) {
 				cell.getParent().setLevel(level);
-			else{
+				if (parentElement instanceof TotalNavigationProvider) {
+					cell.getParent().setLevel(((TotalNavigationProvider) parentElement).getIndention());
+					cell.getParent().setTableRowType(TableRow.TableRowTypes.SUM.name());
+				}
+				if (parentElement instanceof EmptyLineNavigationProvider) {
+					cell.getParent().setLevel(((TotalNavigationProvider) parentElement).getIndention());
+					cell.getParent().setTableRowType(TableRow.TableRowTypes.EMPTY.name());
+				}
+				if (parentElement instanceof SectionLineNavigationProvider) {
+					cell.getParent().setLevel(((TotalNavigationProvider) parentElement).getIndention());
+					cell.getParent().setTableRowType(TableRow.TableRowTypes.SECTION.name());
+				}
+			} else{
 				cell.setLevel(level);
 				for(int i=0;i<tbl.getHeadRows().size() - row;i++){
 					tbl.getCell(i+row, titleCol).setLevel(level);

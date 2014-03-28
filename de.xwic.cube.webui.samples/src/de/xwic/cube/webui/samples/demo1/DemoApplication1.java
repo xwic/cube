@@ -41,6 +41,8 @@ import de.xwic.cube.webui.viewer.CubeViewerModelAdapter;
 import de.xwic.cube.webui.viewer.CubeViewerModelEvent;
 import de.xwic.cube.webui.viewer.CubeWriter;
 import de.xwic.cube.webui.viewer.DimensionNavigationProvider;
+import de.xwic.cube.webui.viewer.EmptyLineNavigationProvider;
+import de.xwic.cube.webui.viewer.SectionLineNavigationProvider;
 import de.xwic.cube.webui.viewer.TotalNavigationProvider;
 
 /**
@@ -144,8 +146,22 @@ public class DemoApplication1 extends Application {
 		geoNavigationProvider.setClickable(true);
 		geoNavigationProvider.setIndention(1);
 		model.addRowNavigationProvider(geoNavigationProvider);
+
+		SectionLineNavigationProvider slnp = new SectionLineNavigationProvider();
+		slnp.setTitle("Totals will be here!");
+		model.addRowNavigationProvider(slnp);
+
+		TotalNavigationProvider tnp1 = new TotalNavigationProvider();
+		tnp1.setIndention(1);
+		tnp1.setTitle("Sum Total");
+		model.addRowNavigationProvider(tnp1);
 		
-		model.addRowNavigationProvider(new TotalNavigationProvider());
+		model.addRowNavigationProvider(new EmptyLineNavigationProvider());
+
+		TotalNavigationProvider tnp = new TotalNavigationProvider();
+		tnp.setIndention(0);
+		tnp.setTitle("Grand Total");
+		model.addRowNavigationProvider(tnp);
 		
 		DimensionNavigationProvider timeNavigationProvider = new DimensionNavigationProvider(model, dimTime);
 //		timeNavigationProvider.setHideEmptyElements(true);
