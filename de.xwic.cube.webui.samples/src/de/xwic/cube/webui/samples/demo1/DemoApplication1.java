@@ -147,7 +147,9 @@ public class DemoApplication1 extends Application {
 		geoNavigationProvider.setIndention(1);
 		model.addRowNavigationProvider(geoNavigationProvider);
 
-		model.addRowNavigationProvider(new SectionLineNavigationProvider());
+		SectionLineNavigationProvider slnp = new SectionLineNavigationProvider();
+		slnp.setTitle("Totals will be here!");
+		model.addRowNavigationProvider(slnp);
 
 		TotalNavigationProvider tnp1 = new TotalNavigationProvider();
 		tnp1.setIndention(1);
