@@ -50,12 +50,14 @@
 	#foreach($row in $table) 
 		#set($rowLevel = $row.level+ 1)
 		#set($rowCSS = "xcube-h$rowLevel")
+		#set($cellNoChildsCSS = "xcube-nochildren")
 		#if($row.isSum())
 			#if($row.level > 0)
 				#set($rowCSS = "xcube-sum")
 			#else
 				#set($rowCSS = "xcube-total")
 			#end
+			#set($cellNoChildsCSS = "")
 		#end
 		
 		<tr class="$rowCSS">
@@ -78,7 +80,7 @@
 				</span>
 			</td>
 			#elseif($cell.title)
-			<td class="xcube-v$level xcube-nochildren $!cell.group" >
+			<td class="xcube-v$level $cellNoChildsCSS $!cell.group" >
 				<span class="xcube-title" >$cell.content</span>
 			</td>
 			#elseif($cell.actionParam)
