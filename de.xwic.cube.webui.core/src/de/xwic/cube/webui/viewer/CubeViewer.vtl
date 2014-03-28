@@ -2,15 +2,29 @@
 	 
 	#set($table = $control.table)
 	<thead>
+	
 	#foreach($row in $table.headRows) 
 		#set($rowLevel = $row.level)
 		<tr class="xcube-h$rowLevel xcube-h0$foreach.count">
 		#foreach($cell in $row)
-			#set($level = $cell.level)
-			#if($table.maxColLevel < 5 && $level != 0)
-				#set($level = 4 - ($table.maxColLevel -$level)) 
-			#end
 		
+			## go through all lines and for the current column get the biggest level needed.
+			#set($level = 0)
+			#set($currentCell = $foreach.count)
+			#foreach($rowForLevel in $table.headRows) 
+				#foreach($cellForLevel in $rowForLevel)
+					#set($currentCellForLevel = $foreach.count)
+					#if($currentCellForLevel eq $currentCell)
+						#set($level = $cellForLevel.level)
+					#end
+				#end
+			#end
+			
+			## Assume only first column is header and deserves level0. Rest will go from 2 up.
+			#if($foreach.count > 1)
+				#set($level = $level+2)
+			#end
+			
 			#if($cell.expandable)
 			#set($action = "xcube-action-expand")
 			#if($cell.expanded)
@@ -37,9 +51,12 @@
 		<tr class="xcube-h$rowLevel">
 		#foreach($cell in $row)
 			#set($level = $cell.level)
-			#if($table.maxColLevel < 5 && $level != 0)
-				#set($level = 5 - $level)
+			
+			## Assume only first column is header and deserves level0. Rest will go from 1 up.
+			#if($foreach.count > 1)
+				#set($level = $level+1)
 			#end
+			
 			#if($cell.expandable)
 			#set($action = "xcube-action-expand")
 			#if($cell.expanded)
