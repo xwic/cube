@@ -51,7 +51,7 @@
 		#set($rowLevel = $row.level+ 1)
 		#set($rowCSS = "xcube-h$rowLevel")
 		#set($cellNoChildsCSS = "xcube-nochildren")
-		#if($row.isSum())
+		#if($row.getTableRowType() eq "SUM")
 			#if($row.level > 0)
 				#set($rowCSS = "xcube-sum")
 			#else
@@ -59,7 +59,12 @@
 			#end
 			#set($cellNoChildsCSS = "")
 		#end
-		
+		#if($row.getTableRowType() eq "EMPTY")
+			#set($rowCSS = "xcube-section")
+		#end		
+		#if($row.getTableRowType() eq "SECTION")
+			#set($rowCSS = "xcube-section")
+		#end		
 		<tr class="$rowCSS">
 		#foreach($cell in $row)
 			#set($level = $cell.level)
