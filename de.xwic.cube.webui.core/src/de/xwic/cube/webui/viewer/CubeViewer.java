@@ -39,6 +39,7 @@ public class CubeViewer extends Control {
 	private RowExpand rowExpand = RowExpand.DOWN;
 	private boolean fixedHeaders = false;
 	
+	private String cssTableStyle = "width:100%";
 	
 	/**
 	 * @param container
@@ -534,7 +535,20 @@ public class CubeViewer extends Control {
 		this.rowExpand = rowExpand;
 		this.requireRedraw();
 	}
-	
-	
+
+	/**
+	 * @return
+	 */
+	public String getCssTableStyle() {
+		return cssTableStyle;
+	}
+
+	/**
+	 * @param cssTableStyle
+	 */
+	public void setCssTableStyle(String cssTableStyle) {
+		this.cssTableStyle = cssTableStyle;
+		this.requireRedraw();
+	}
 	
 }
