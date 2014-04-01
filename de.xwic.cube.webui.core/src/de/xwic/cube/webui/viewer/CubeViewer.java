@@ -19,6 +19,10 @@ import de.xwic.cube.webui.util.TableCell;
 /**
  * @author Florian Lippisch
  */
+/**
+ * @author msoft_000
+ *
+ */
 @JavaScriptSupport
 public class CubeViewer extends Control {
 
@@ -40,6 +44,8 @@ public class CubeViewer extends Control {
 	private boolean fixedHeaders = false;
 	
 	private String cssTableStyle = "width:100%";
+	
+	private String cssTableClass = "";
 	
 	/**
 	 * @param container
@@ -549,6 +555,20 @@ public class CubeViewer extends Control {
 	public void setCssTableStyle(String cssTableStyle) {
 		this.cssTableStyle = cssTableStyle;
 		this.requireRedraw();
+	}
+
+	/**
+	 * @return
+	 */
+	public String getCssTableClass() {
+		return cssTableClass;
+	}
+
+	/**
+	 * @param cssTableClass
+	 */
+	public void setCssTableClass(String cssTableClass) {
+		this.cssTableClass = cssTableClass;
 	}
 	
 }
