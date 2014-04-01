@@ -23,7 +23,9 @@ Cube.CubeViewer = (function($,escape){
 			});
 		},
 		destroy: function(options){
-			
+			var tblId ='#'+escape(options.controlID);
+			var table = $(tblId);
+			table.fixedHeaderTable('destroy');
 		}
 	};
 }(jQuery,JWic.util.JQryEscape));
