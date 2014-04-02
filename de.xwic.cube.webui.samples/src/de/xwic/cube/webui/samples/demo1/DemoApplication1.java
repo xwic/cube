@@ -73,6 +73,7 @@ public class DemoApplication1 extends Application {
 		final CubeViewer viewer = new CubeViewer(page, "viewer");
 		this.expandLeft = new CheckBox(page, "expandLeft");
 		this.expandLeft.setChecked(viewer.getColumnExpand()==ColumnExpand.LEFT);
+		viewer.setFrozenColumnFixWidth(200);
 		expandLeft.addValueChangedListener(new ValueChangedListener() {			
 			@Override
 			public void valueChanged(ValueChangedEvent event) {

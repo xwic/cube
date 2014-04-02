@@ -47,6 +47,8 @@ public class CubeViewer extends Control {
 	
 	private String cssTableClass = "";
 	
+	private int frozenColumnFixWidth = 0;
+	
 	/**
 	 * @param container
 	 * @param name
@@ -573,5 +575,14 @@ public class CubeViewer extends Control {
 	public void setCssTableClass(String cssTableClass) {
 		this.cssTableClass = cssTableClass;
 	}
+
+	public int getFrozenColumnFixWidth() {
+		return frozenColumnFixWidth;
+	}
+
+	public void setFrozenColumnFixWidth(int frozenColumnFixWidth) {
+		this.frozenColumnFixWidth = frozenColumnFixWidth;
+	}
+	
 	
 }

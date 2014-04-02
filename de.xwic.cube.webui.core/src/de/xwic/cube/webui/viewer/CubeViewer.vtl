@@ -29,7 +29,9 @@
 				#set($level = $level+1)
 				#set($cellAdditionalDiv = "")
 			#else
-				#set($cellAdditionalDiv = "<div style='width: 240px;'></div>")
+				#if($control.getFrozenColumnFixWidth() > 0)
+					#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;'></div>")
+				#end
 			#end
 			
 			#if($cell.expandable)
@@ -68,7 +70,9 @@
 		#end
 		#if($row.getTableRowType() eq "EMPTY")
 			#set($rowCSS = "xcube-emptyrow")
-			#set($cellAdditionalDiv = "<div style='width: 240px;'></div>")
+			#if($control.getFrozenColumnFixWidth() > 0)
+				#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;'></div>")
+			#end
 		#end		
 		#if($row.getTableRowType() eq "SECTION")
 			#set($rowCSS = "xcube-section")
@@ -93,6 +97,7 @@
 			<td class="xcube-v$level $!cell.cssCellClass $!cell.group" >
 				<span class="xcube-title" >
 					<a class="$action" href="$control.createActionURL('toggleExpand', $cell.getElementId())" >$cell.content</a>
+					$!cellAdditionalDiv
 				</span>
 			</td>
 			#elseif($cell.title)
@@ -103,9 +108,13 @@
 			#elseif($cell.actionParam)
 			<td class="xcube-v$level x-clickable $!cell.cssCellClass $!cell.group" onclick="$control.createActionURL('click', $cell.actionParam)" >
 				$cell.content
+				$!cellAdditionalDiv
 			</td>
 			#else
-			<td class="xcube-v$level $!cell.cssCellClass $!cell.group" >$cell.content</td>
+			<td class="xcube-v$level $!cell.cssCellClass $!cell.group" >
+			$cell.content
+			$!cellAdditionalDiv
+			</td>
 			#end 
 			
 		#end
