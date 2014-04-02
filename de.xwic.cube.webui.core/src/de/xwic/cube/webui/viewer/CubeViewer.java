@@ -246,6 +246,16 @@ public class CubeViewer extends Control {
 			sb.append(de.getID());
 		}
 
+		//check if there is a grand total cell
+		if (sb.length() == 0 ){
+			if (ciRow.getExtraClickInfo() != null) {
+				sb.append(ciRow.getExtraClickInfo());
+			}
+			if (ciCol.getExtraClickInfo() != null) {
+				sb.append(ciCol.getExtraClickInfo());
+			}
+		}
+
 		if (ciRow.getExtraClickInfo() != null) {
 			sb.append(";")
 			  .append(ciRow.getExtraClickInfo());
