@@ -59,7 +59,6 @@
 		#set($rowLevel = $row.level+ 1)
 		#set($rowCSS = "xcube-h$rowLevel")
 		#set($cellNoChildsCSS = "xcube-nochildren")
-		#set($cellAdditionalDiv = "")
 		#if($row.getTableRowType() eq "TOTAL")
 			#if($row.level > 0)
 				#set($rowCSS = "xcube-sum")
@@ -70,9 +69,6 @@
 		#end
 		#if($row.getTableRowType() eq "EMPTY")
 			#set($rowCSS = "xcube-emptyrow")
-			#if($control.getFrozenColumnFixWidth() > 0)
-				#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;height:1px;'></div>")
-			#end
 		#end		
 		#if($row.getTableRowType() eq "SECTION")
 			#set($rowCSS = "xcube-section")
@@ -85,8 +81,13 @@
 			#set($level = $cell.level)
 			
 			## Assume only first column is header and deserves level0. Rest will go from 1 up.
+			#set($cellAdditionalDiv = "")
 			#if($foreach.count > 1)
 				#set($level = $level+1)
+			#else
+				#if($control.getFrozenColumnFixWidth() > 0)
+					#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;height:1px;'></div>")
+				#end
 			#end
 			
 			#if($cell.expandable)
