@@ -23,6 +23,8 @@ public class TotalNavigationProvider implements INavigationProvider {
 
 	private String extraClickInformation = null;
 	
+	private String cssCellClass = "";
+
 	private class TotalNavigationElement implements INavigationElement {
 
 		/* (non-Javadoc)
@@ -206,5 +208,11 @@ public class TotalNavigationProvider implements INavigationProvider {
 	public NavigationProviderTypes getNavigationProviderType() {
 		return NavigationProviderTypes.TOTAL;
 	}
+	public String getCssCellClass() {
+		return cssCellClass;
+	}
 
+	public void setCssCellClass(String cssCellClass) {
+		this.cssCellClass = cssCellClass;
+	}
 }

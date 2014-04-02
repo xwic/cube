@@ -21,4 +21,8 @@ public interface INavigationProvider extends INavigationElementProvider {
 	 */
 	public int getIndention();
 	
+	
+	public String getCssCellClass();
+
+	public void setCssCellClass(String cssCellClass);
 }

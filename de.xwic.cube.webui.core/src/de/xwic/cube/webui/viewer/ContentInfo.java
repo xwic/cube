@@ -22,7 +22,7 @@ public class ContentInfo {
 	private int row = 0;
 	private int col = 0;
 	private String group;
-	
+	private String cssCellClass = "";
 	
 	public ContentInfo(ICubeDataProvider cubeDataProvider) {
 		super();
@@ -145,5 +145,11 @@ public class ContentInfo {
 		return this.group;
 	}
 	
-	
+	public String getCssCellClass() {
+		return cssCellClass;
+	}
+
+	public void setCssCellClass(String cssCellClass) {
+		this.cssCellClass = cssCellClass;
+	}
 }

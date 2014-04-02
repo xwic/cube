@@ -47,6 +47,8 @@ public class CubeViewer extends Control {
 	
 	private String cssTableClass = "";
 	
+	private int frozenColumnFixWidth = 0;
+	
 	/**
 	 * @param container
 	 * @param name
@@ -172,7 +174,7 @@ public class CubeViewer extends Control {
 		for (INavigationProvider navProvider : columnProvider) {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.cells += startCol;
-			renderNavigation(tbl, 0, startCol, navProvider, size, true,"",navProvider.getIndention());
+			renderNavigation(tbl, 0, startCol, navProvider, size, true,"",navProvider.getIndention(), navProvider.getCssCellClass());
 			startCol += (size.cells - startCol);
 		}		
 		
@@ -187,7 +189,7 @@ public class CubeViewer extends Control {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.depth = rowDepth;
 			if (size.cells > 0) {
-				renderNavigation(tbl, startRow, 0, navProvider, size, false,"",navProvider.getIndention());
+				renderNavigation(tbl, startRow, 0, navProvider, size, false,"",navProvider.getIndention(), navProvider.getCssCellClass());
 			}
 			startRow += size.cells;
 		}		
@@ -201,6 +203,7 @@ public class CubeViewer extends Control {
 				int colIdx = col + rowDepth;
 				ContentInfo ciCol = (ContentInfo) tbl.getColumnData(colIdx);
 				TableCell cell = tbl.getCell(rowIdx, colIdx);
+				cell.setCssCellClass(ciCol.getCssCellClass());
 				boolean empty = true;
 				if (ciCol != null && ciRow != null) {
 					ICubeDataProvider dataProvider = ciRow.getCubeDataProvider().getPriority() > ciCol.getCubeDataProvider().getPriority() ?
@@ -243,6 +246,16 @@ public class CubeViewer extends Control {
 			sb.append(de.getID());
 		}
 
+		//check if there is a grand total cell
+		if (sb.length() == 0 ){
+			if (ciRow.getExtraClickInfo() != null) {
+				sb.append(ciRow.getExtraClickInfo());
+			}
+			if (ciCol.getExtraClickInfo() != null) {
+				sb.append(ciCol.getExtraClickInfo());
+			}
+		}
+
 		if (ciRow.getExtraClickInfo() != null) {
 			sb.append(";")
 			  .append(ciRow.getExtraClickInfo());
@@ -263,7 +276,7 @@ public class CubeViewer extends Control {
 	 * @param size
 	 * @param b
 	 */
-	private NavigationSize renderNavigation(Table tbl, int startRow, int startCol, INavigationElementProvider parentElement, NavigationSize totalSize, boolean horizontal,String group, int level) {
+	private NavigationSize renderNavigation(Table tbl, int startRow, int startCol, INavigationElementProvider parentElement, NavigationSize totalSize, boolean horizontal,String group, int level, String cssCellClass) {
 		
 		NavigationSize size = new NavigationSize();
 		int row = startRow;
@@ -292,15 +305,15 @@ public class CubeViewer extends Control {
 			int items = 1;
 			ContentInfo contentInfo = elm.getContentInfo();
 			contentInfo.setLevel(level);
-			
+			contentInfo.setCssCellClass(cssCellClass);
 			if (expanded) {
 				Align align = horizontal ? columnTotalAlign : rowTotalAlign;
 				int startIndent = !elm.hideTotal() && (align == Align.BEGIN) ? 1 : 0;
 				NavigationSize subSize;
 				if (horizontal) {
-					subSize = renderNavigation(tbl, row + 1, col + startIndent, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1);
+					subSize = renderNavigation(tbl, row + 1, col + startIndent, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1, cssCellClass);
 				} else {
-					subSize = renderNavigation(tbl, row + startIndent, col, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1);
+					subSize = renderNavigation(tbl, row + startIndent, col, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1, cssCellClass);
 				}
 				if (size.depth < subSize.depth) {
 					size.depth = subSize.depth;
@@ -344,6 +357,8 @@ public class CubeViewer extends Control {
 			cell.setElementId(elm.getElementId());
 			cell.setGroup(group);
 			cell.setExpanded(expanded);
+			cell.setCssCellClass(cssCellClass);
+			
 			if(!horizontal) {
 				cell.getParent().setLevel(level);
 				if (INavigationElementProvider.NavigationProviderTypes.TOTAL.equals(parentElement.getNavigationProviderType()) ||
@@ -570,5 +585,14 @@ public class CubeViewer extends Control {
 	public void setCssTableClass(String cssTableClass) {
 		this.cssTableClass = cssTableClass;
 	}
+
+	public int getFrozenColumnFixWidth() {
+		return frozenColumnFixWidth;
+	}
+
+	public void setFrozenColumnFixWidth(int frozenColumnFixWidth) {
+		this.frozenColumnFixWidth = frozenColumnFixWidth;
+	}
+	
 	
 }

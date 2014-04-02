@@ -50,6 +50,8 @@ public class DimensionNavigationProvider implements INavigationProvider {
 
 	private String extraClickInformation = null;
 
+	private String cssCellClass = "";
+
 	/**
 	 * Used to chain multiple dimensions in one navigation.
 	 * 
@@ -751,5 +753,14 @@ public class DimensionNavigationProvider implements INavigationProvider {
 	public NavigationProviderTypes getNavigationProviderType() {
 		return NavigationProviderTypes.NORMAL;
 	}
+
+	public String getCssCellClass() {
+		return cssCellClass;
+	}
+
+	public void setCssCellClass(String cssCellClass) {
+		this.cssCellClass = cssCellClass;
+	}
+	
 	
 }
