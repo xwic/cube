@@ -8,7 +8,7 @@
 	
 	#foreach($row in $table.headRows) 
 		#set($rowLevel = $row.level)
-		
+		#set($cellAdditionalDiv = "")
 		<tr class="xcube-h$rowLevel xcube-h0$foreach.count">
 		#foreach($cell in $row)
 		
@@ -27,6 +27,8 @@
 			## Assume only first column is header and deserves level0. Rest will go from 2 up.
 			#if($foreach.count > 1)
 				#set($level = $level+1)
+			#else
+				#set($cellAdditionalDiv = "<div style='width: 240px;'></div>")
 			#end
 			
 			#if($cell.expandable)
@@ -42,7 +44,7 @@
 			#elseif($cell.title)
 			<th class="xcube-v$level $!cell.group" ><span class="xcube-title">$cell.content</span></th>
 			#else
-			<th class="xcube-v$level $!cell.group" >$cell.content</th>
+			<th class="xcube-v$level $!cell.group" >$cell.content $!cellAdditionalDiv</th>
 			#end 
 			
 		#end
@@ -54,6 +56,7 @@
 		#set($rowLevel = $row.level+ 1)
 		#set($rowCSS = "xcube-h$rowLevel")
 		#set($cellNoChildsCSS = "xcube-nochildren")
+		#set($cellAdditionalDiv = "")
 		#if($row.getTableRowType() eq "TOTAL")
 			#if($row.level > 0)
 				#set($rowCSS = "xcube-sum")
@@ -64,6 +67,7 @@
 		#end
 		#if($row.getTableRowType() eq "EMPTY")
 			#set($rowCSS = "xcube-emptyrow")
+			#set($cellAdditionalDiv = "<div style='width: 240px;'></div>")
 		#end		
 		#if($row.getTableRowType() eq "SECTION")
 			#set($rowCSS = "xcube-section")
@@ -93,6 +97,7 @@
 			#elseif($cell.title)
 			<td class="xcube-v$level $cellNoChildsCSS $!cell.group" >
 				<span class="xcube-title" >$cell.content</span>
+				$!cellAdditionalDiv
 			</td>
 			#elseif($cell.actionParam)
 			<td class="xcube-v$level x-clickable $!cell.group" onclick="$control.createActionURL('click', $cell.actionParam)" >
