@@ -76,12 +76,21 @@ public class FilterGroup  {
 	}
 	
 	/**
+	 * Removes all the filters and resets the profiles default
+	 */
+	public void clearFilters(){
+		for(IFilter f: getFilters()){
+			this.removeFilter(f);
+		}
+		this.setFilterProfies(new ArrayList<FilterGroupProfile>());
+	}
+	
+	/**
 	 * @param filter
 	 */
 	public void removeFilter(IFilter filter){
 		filter.setInGroup(false);
-		
-		this.filters.remove(filter);
+		this.filters.remove(filter.getId());
 	}
 	
 	/**
@@ -174,6 +183,7 @@ public class FilterGroup  {
 			}
 		}
 		
+		listBox.requireRedraw();
 		
 	}
 	
