@@ -1,20 +1,43 @@
 Cube.CubeViewer = (function($,escape){
+	var COLUMN_WIDTH = 80,
+		FIRST_COLUMN_WIDTH = 266,
+		SCROLL_BAR_SIZE = 20;
+	
+	function sizeSetter(table){
+		table.fixedHeaderTable('destroy');
+		var x = ((table.find('tr').first().find('th').length -1 ) * COLUMN_WIDTH + FIRST_COLUMN_WIDTH+ SCROLL_BAR_SIZE);
+		x = x > table.parent().width() ? table.parent().width() : x;
+		table.fixedHeaderTable({ 
+			footer: false, 
+			cloneHeadToFoot: false, 
+			fixedColumns: 1,
+			height: "600px",
+			width: x+"px"
+		});
+	}
+	
 	return {
 		initialize : function (options){
-			var cStyle;
-			var cId;
-			var tblId ='#'+escape(options.controlID);
-			var table = $(tblId);
-			var parent = table.parent();
-			if(options.fixedHeaders){
-				table.fixedHeaderTable({ 
-					footer: false, 
-					cloneHeadToFoot: false, 
-					fixedColumns: 1,
-					height: "600px", 
-					width: parent.width()+"px"
-				});
+			var cStyle, cId,
+				tblId ='#'+escape(options.controlID),
+				table = $(tblId),
+				parent = table.parent();
+			
+			function setSize(){
+				sizeSetter(table);
 			}
+			if(options.fixedHeaders){
+				sizeSetter(table);
+				setTimeout(setSize, 0);
+				(function (){
+					var resizeTimer;
+					jQuery(window).resize(function() {
+					    clearTimeout(resizeTimer);
+					    resizeTimer = setTimeout(setSize, 50);//fancy resize callback to make the ui more responsive
+					});
+				}());
+			}
+			
 			
 			table.find("tr").mouseover(function() {
 				$(this).addClass("hover");
