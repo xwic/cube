@@ -201,6 +201,7 @@ public class CubeViewer extends Control {
 				int colIdx = col + rowDepth;
 				ContentInfo ciCol = (ContentInfo) tbl.getColumnData(colIdx);
 				TableCell cell = tbl.getCell(rowIdx, colIdx);
+				cell.setCssCellClass(ciCol.getCssCellClass());
 				boolean empty = true;
 				if (ciCol != null && ciRow != null) {
 					ICubeDataProvider dataProvider = ciRow.getCubeDataProvider().getPriority() > ciCol.getCubeDataProvider().getPriority() ?
@@ -292,7 +293,7 @@ public class CubeViewer extends Control {
 			int items = 1;
 			ContentInfo contentInfo = elm.getContentInfo();
 			contentInfo.setLevel(level);
-			
+			contentInfo.setCssCellClass(cssCellClass);
 			if (expanded) {
 				Align align = horizontal ? columnTotalAlign : rowTotalAlign;
 				int startIndent = !elm.hideTotal() && (align == Align.BEGIN) ? 1 : 0;
