@@ -30,7 +30,7 @@
 				#set($cellAdditionalDiv = "")
 			#else
 				#if($control.getFrozenColumnFixWidth() > 0)
-					#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;'></div>")
+					#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;;height:1px;'></div>")
 				#end
 			#end
 			
@@ -71,7 +71,7 @@
 		#if($row.getTableRowType() eq "EMPTY")
 			#set($rowCSS = "xcube-emptyrow")
 			#if($control.getFrozenColumnFixWidth() > 0)
-				#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;'></div>")
+				#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;height:1px;'></div>")
 			#end
 		#end		
 		#if($row.getTableRowType() eq "SECTION")
