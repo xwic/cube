@@ -170,6 +170,8 @@ public class DemoApplication1 extends Application {
 //		navigationProvider.setIndention(1);
 //		model.addRowNavigationProvider(navigationProvider);
 
+		timeNavigationProvider.setCssCellClass("TimeClassCSS");
+		
 		model.addColumnNavigationProvider(timeNavigationProvider);
 		
 		// create filter

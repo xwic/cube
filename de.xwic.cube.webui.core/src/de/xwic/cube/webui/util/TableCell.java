@@ -23,6 +23,8 @@ public class TableCell {
 	private boolean expandable;
 	private String group;
 	private boolean expanded;
+	
+	private String cssCellClass = "";
 	/**
 	 * @param content
 	 */
@@ -220,4 +222,20 @@ public class TableCell {
 	public boolean isExpanded() {
 		return expanded;
 	}
+
+	/**
+	 * @return
+	 */
+	public String getCssCellClass() {
+		return cssCellClass;
+	}
+
+	/**
+	 * @param cssCellClass
+	 */
+	public void setCssCellClass(String cssCellClass) {
+		this.cssCellClass = cssCellClass;
+	}
+	
+	
 }

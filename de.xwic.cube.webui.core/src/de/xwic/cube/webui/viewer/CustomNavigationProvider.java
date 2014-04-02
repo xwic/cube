@@ -18,7 +18,8 @@ public class CustomNavigationProvider implements INavigationProvider {
 
 	private List<INavigationElement> elements = new ArrayList<INavigationElement>();
 	private int indention = 0;
-	
+	private String cssCellClass = "";
+
 	/**
 	 * @param elements
 	 */
@@ -68,4 +69,11 @@ public class CustomNavigationProvider implements INavigationProvider {
 		return NavigationProviderTypes.NORMAL;
 	}
 
+	public String getCssCellClass() {
+		return cssCellClass;
+	}
+
+	public void setCssCellClass(String cssCellClass) {
+		this.cssCellClass = cssCellClass;
+	}
 }

@@ -172,7 +172,7 @@ public class CubeViewer extends Control {
 		for (INavigationProvider navProvider : columnProvider) {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.cells += startCol;
-			renderNavigation(tbl, 0, startCol, navProvider, size, true,"",navProvider.getIndention());
+			renderNavigation(tbl, 0, startCol, navProvider, size, true,"",navProvider.getIndention(), navProvider.getCssCellClass());
 			startCol += (size.cells - startCol);
 		}		
 		
@@ -187,7 +187,7 @@ public class CubeViewer extends Control {
 			NavigationSize size = navProvider.getNavigationSize();
 			size.depth = rowDepth;
 			if (size.cells > 0) {
-				renderNavigation(tbl, startRow, 0, navProvider, size, false,"",navProvider.getIndention());
+				renderNavigation(tbl, startRow, 0, navProvider, size, false,"",navProvider.getIndention(), navProvider.getCssCellClass());
 			}
 			startRow += size.cells;
 		}		
@@ -263,7 +263,7 @@ public class CubeViewer extends Control {
 	 * @param size
 	 * @param b
 	 */
-	private NavigationSize renderNavigation(Table tbl, int startRow, int startCol, INavigationElementProvider parentElement, NavigationSize totalSize, boolean horizontal,String group, int level) {
+	private NavigationSize renderNavigation(Table tbl, int startRow, int startCol, INavigationElementProvider parentElement, NavigationSize totalSize, boolean horizontal,String group, int level, String cssCellClass) {
 		
 		NavigationSize size = new NavigationSize();
 		int row = startRow;
@@ -298,9 +298,9 @@ public class CubeViewer extends Control {
 				int startIndent = !elm.hideTotal() && (align == Align.BEGIN) ? 1 : 0;
 				NavigationSize subSize;
 				if (horizontal) {
-					subSize = renderNavigation(tbl, row + 1, col + startIndent, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1);
+					subSize = renderNavigation(tbl, row + 1, col + startIndent, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1, cssCellClass);
 				} else {
-					subSize = renderNavigation(tbl, row + startIndent, col, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1);
+					subSize = renderNavigation(tbl, row + startIndent, col, elm, totalSize, horizontal, group+" "+elm.getTitle(),level+1, cssCellClass);
 				}
 				if (size.depth < subSize.depth) {
 					size.depth = subSize.depth;
@@ -344,6 +344,8 @@ public class CubeViewer extends Control {
 			cell.setElementId(elm.getElementId());
 			cell.setGroup(group);
 			cell.setExpanded(expanded);
+			cell.setCssCellClass(cssCellClass);
+			
 			if(!horizontal) {
 				cell.getParent().setLevel(level);
 				if (INavigationElementProvider.NavigationProviderTypes.TOTAL.equals(parentElement.getNavigationProviderType()) ||
