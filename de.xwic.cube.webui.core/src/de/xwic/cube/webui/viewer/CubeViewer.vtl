@@ -86,8 +86,10 @@
 				#set($level = $level+1)
 			#else
 				#if($control.getFrozenColumnFixWidth() > 0)
-					#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;height:1px;'></div>")
-					#set($cellNoChildsCSS = "")
+					#if($row.getTableRowType() eq "EMPTY")
+						#set($cellAdditionalDiv = "<div style='width: $control.getFrozenColumnFixWidth()px;height:1px;'></div>")
+						#set($cellNoChildsCSS = "")
+					#end
 				#end
 			#end
 			
