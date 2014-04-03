@@ -13,6 +13,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
@@ -307,18 +309,51 @@ public class CubeViewerModel implements Serializable {
 	 * Expand every dimension
 	 */
 	public void expandAll(){
-		for(IDimension d : this.cube.getDimensions()){
-			this.expandAll(d);
+		navProviderExpandCollapes(this.getRowProvider(), true);
+		navProviderExpandCollapes(this.getColumnProvider(), true);
+	}
+
+	/**
+	 * @param list 
+	 * 
+	 */
+	private void navProviderExpandCollapes(List<INavigationProvider> list, boolean expand) {
+		for(INavigationProvider p : list){
+			expandCollapesElements(expand, p.getNavigationElements());
+		}
+	}
+
+	/**
+	 * @param expand
+	 * @param provider
+	 */
+	private void expandCollapesElements(boolean expand, List<INavigationElement> elements) {
+		for (INavigationElement elm : elements) {
+			String id = elm.getElementId();
+			if(StringUtils.isEmpty(id)){
+				continue;
+			}
+			if(!id.contains(":")){
+				continue;
+			}
+			
+			if(!id.contains("]")){
+				continue;
+			}
+			if(expand){
+				this.expand(id);
+			}else{
+				this.collapse(id);
+			}
+			expandCollapesElements(expand, elm.getNavigationElements());
 		}
 	}
 	/**
 	 * Collapse every dimension
 	 */
 	public void collapseAll(){
-		for(IDimension d : this.cube.getDimensions()){
-			this.collapseAll(d);
-		}
-		
+		navProviderExpandCollapes(this.getRowProvider(), false);
+		navProviderExpandCollapes(this.getColumnProvider(), false);
 	}
 	/**
 	 * @return the baseQuery

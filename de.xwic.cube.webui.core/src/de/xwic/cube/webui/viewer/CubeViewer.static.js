@@ -42,7 +42,6 @@ Cube.CubeViewer = (function($,escape){
 							newWidth = win.width();
 				    	if(winWidth !== newWidth || winHeight !== newHeight){
 				    		clearTimeout(resizeTimer);
-						    
 				    		winWidth = newWidth;
 					    	winHeight = newHeight;
 					    	resizeTimer = setTimeout(setSize, 50);//fancy resize callback to make the ui more responsive
