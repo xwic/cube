@@ -182,8 +182,8 @@ public class FilterGroup  {
 				listBox.addElement(fgp.getName(), fgp.getName());
 			}
 		}
-		
-		listBox.requireRedraw();
+		if(listBox!=null)
+			listBox.requireRedraw();
 		
 	}
 	

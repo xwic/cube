@@ -8,7 +8,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		defineObservable = Cube.defineObservable,
 		load = JWic.resourceRequest,
 		fireAction = JWic.fireAction;
-	//Node Date Model
+	//Node Data Model
 	function Node(title, key, path){
 		var childListener,
 			eventListeners = [],
@@ -31,7 +31,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		};
 		//return a copy of the children of this node
 		this.children = function(){
-			return [].concat(children);
+			return children.concat();
 		};
 		//make this instance observable on the property changed event
 		//this adds a firePropertyChanged method on this object and an event system (if needed)
