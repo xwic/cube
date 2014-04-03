@@ -329,6 +329,9 @@ public class CubeViewerModel implements Serializable {
 	 */
 	private void expandCollapesElements(boolean expand, List<INavigationElement> elements) {
 		for (INavigationElement elm : elements) {
+			if(!elm.isExpandable()){
+				continue;
+			}
 			String id = elm.getElementId();
 			if(StringUtils.isEmpty(id)){
 				continue;
