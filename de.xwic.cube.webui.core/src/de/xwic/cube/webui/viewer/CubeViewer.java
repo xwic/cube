@@ -43,7 +43,7 @@ public class CubeViewer extends Control {
 	private RowExpand rowExpand = RowExpand.DOWN;
 	private boolean fixedHeaders = false;
 	
-	private String cssTableStyle = "width:100%";
+	private String cssTableStyle = "";// "width:100%";
 	
 	private String cssTableClass = "";
 	
