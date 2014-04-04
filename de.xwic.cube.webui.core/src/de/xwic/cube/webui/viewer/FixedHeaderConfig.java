@@ -21,8 +21,8 @@ public class FixedHeaderConfig {
 	private boolean cloneHeadToFoot = false;
 	private int columnWidth = 86;
 	private int firstColumnWidth = 276;
-	private int heightOffset = 300;
-	private int widthOffset = -15;
+	private int heightOffset = 380;
+	private int widthOffset = 10;
 	
 	/**
 	 * 
