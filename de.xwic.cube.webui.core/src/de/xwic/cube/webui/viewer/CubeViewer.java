@@ -377,11 +377,16 @@ public class CubeViewer extends Control {
 			} else{
 				cell.setLevel(level);
 				for(int i=0;i<tbl.getHeadRows().size() - row;i++){
-					tbl.getCell(i+row, titleCol).setLevel(level);
+					final TableCell cell2 = tbl.getCell(i+row, titleCol);
+					cell2.setLevel(level);
+					cell2.setCssCellClass(cssCellClass);
 				}
 				if(level > 0 && expanded){
 					for(int i=titleCol ;i < tbl.getColCount();i++){
-						tbl.getCell(row, i).setLevel(level);
+						final TableCell cell2 = tbl.getCell(row, i);
+						cell2.setLevel(level);
+						cell2.setCssCellClass(cssCellClass);
+
 					}
 					
 				}
