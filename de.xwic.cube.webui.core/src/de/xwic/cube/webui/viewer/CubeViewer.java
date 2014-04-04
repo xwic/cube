@@ -44,7 +44,7 @@ public class CubeViewer extends Control {
 	private boolean emptyCellsClickable = false;
 	private ColumnExpand columnExpand = ColumnExpand.RIGHT;
 	private RowExpand rowExpand = RowExpand.DOWN;
-	private final boolean fixedHeaders = false;
+	private boolean fixedHeaders = false;
 	
 	private String cssTableStyle = "";// "width:100%";
 	
@@ -521,7 +521,7 @@ public class CubeViewer extends Control {
 	 */
 	@IncludeJsOption
 	public boolean isFixedHeaders() {
-		return config != null;
+		return fixedHeaders;
 	}
 	
 	/**
@@ -529,6 +529,7 @@ public class CubeViewer extends Control {
 	 */
 	public void setConfig(FixedHeaderConfig config) {
 		this.config = config;
+		fixedHeaders = config != null;
 	}
 	
 	/**
@@ -541,10 +542,12 @@ public class CubeViewer extends Control {
 	@IncludeJsOption
 	public JSONObject getFixedHeaderConfig(){
 		try {
-			return config.toJSONObject();
+			if(config!=null){
+				return config.toJSONObject();
+			}
 		} catch (JSONException e) {
-			return new JSONObject();
 		}
+		return new JSONObject();
 	}
 
 	/**
