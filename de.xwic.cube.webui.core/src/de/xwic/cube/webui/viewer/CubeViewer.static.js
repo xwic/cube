@@ -1,12 +1,13 @@
 Cube.CubeViewer = (function($,escape){
-	var SCROLL_BAR_SIZE = 15,
+
+	var WIDTH_OF_THE_REST_OF_THE_WINDOW = 10;//aproximate width of everything else
 		HEIGHT_OF_THE_REST_OF_THE_WINDOW = 380; //aproximate height of everything else
 	
 	
 	function sizeSetter(table, config){
 		table.fixedHeaderTable('destroy');
-		var x = ((table.find('tr').first().find('th').length -1 ) * config.columnWidth + config.firstColumnWidth+ SCROLL_BAR_SIZE);
-		x = x > table.parent().width() ? table.parent().width()+SCROLL_BAR_SIZE : x;
+		var x = ((table.find('tr').first().find('th').length -1 ) * config.columnWidth + config.firstColumnWidth);
+		x = x > table.parent().width() - WIDTH_OF_THE_REST_OF_THE_WINDOW ? table.parent().width() - WIDTH_OF_THE_REST_OF_THE_WINDOW : x;
 		var y = parseInt(($(window).height()-HEIGHT_OF_THE_REST_OF_THE_WINDOW),10);
 		config.width = x + 'px';
 		config.height = y + 'px';
