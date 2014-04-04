@@ -22,7 +22,7 @@ public class FixedHeaderConfig {
 	private int columnWidth = 86;
 	private int firstColumnWidth = 276;
 	private int heightOffset = 300;
-	private int widthOffset = 10;
+	private int widthOffset = -15;
 	
 	/**
 	 * 
