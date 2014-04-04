@@ -1,22 +1,16 @@
 Cube.CubeViewer = (function($,escape){
-	var COLUMN_WIDTH = 86,
-		FIRST_COLUMN_WIDTH = 276,
-		SCROLL_BAR_SIZE = 15,
+	var SCROLL_BAR_SIZE = 15,
 		HEIGHT_OF_THE_REST_OF_THE_WINDOW = 380; //aproximate height of everything else
 	
 	
-	function sizeSetter(table){
+	function sizeSetter(table, config){
 		table.fixedHeaderTable('destroy');
-		var x = ((table.find('tr').first().find('th').length -1 ) * COLUMN_WIDTH + FIRST_COLUMN_WIDTH+ SCROLL_BAR_SIZE);
+		var x = ((table.find('tr').first().find('th').length -1 ) * config.columnWidth + config.firstColumnWidth+ SCROLL_BAR_SIZE);
 		x = x > table.parent().width() ? table.parent().width()+SCROLL_BAR_SIZE : x;
 		var y = parseInt(($(window).height()-HEIGHT_OF_THE_REST_OF_THE_WINDOW),10);
-		table.fixedHeaderTable({ 
-			footer: false, 
-			cloneHeadToFoot: false, 
-			fixedColumns: 1,
-			height: y+"px",
-			width: x+"px"
-		});
+		config.width = x + 'px';
+		config.height = y + 'px';
+		table.fixedHeaderTable(config);
 	}
 	
 	return {
@@ -27,10 +21,10 @@ Cube.CubeViewer = (function($,escape){
 				parent = table.parent();
 			
 			function setSize(){
-				sizeSetter(table);
+				sizeSetter(table, options.fixedHeaderConfig);
 			}
 			if(options.fixedHeaders){
-				sizeSetter(table);
+				sizeSetter(table, options.fixedHeaderConfig);
 				(function (){
 					var resizeTimer = 0,
 						win = $(window);

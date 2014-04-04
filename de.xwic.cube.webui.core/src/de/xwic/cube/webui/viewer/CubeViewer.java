@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IncludeJsOption;
@@ -41,13 +44,15 @@ public class CubeViewer extends Control {
 	private boolean emptyCellsClickable = false;
 	private ColumnExpand columnExpand = ColumnExpand.RIGHT;
 	private RowExpand rowExpand = RowExpand.DOWN;
-	private boolean fixedHeaders = false;
+	private final boolean fixedHeaders = false;
 	
 	private String cssTableStyle = "";// "width:100%";
 	
 	private String cssTableClass = "";
 	
 	private int frozenColumnFixWidth = 0;
+	
+	private FixedHeaderConfig config;
 	
 	/**
 	 * @param container
@@ -511,21 +516,35 @@ public class CubeViewer extends Control {
 		}
 	}
 
-	
-	
-	/**
-	 * @param fixedColumn
-	 */
-	public void setFixedHeaders(boolean fixedColumn) {
-		this.fixedHeaders = fixedColumn;
-		this.requireRedraw();
-	}
 	/**
 	 * @return
 	 */
 	@IncludeJsOption
 	public boolean isFixedHeaders() {
-		return fixedHeaders;
+		return config != null;
+	}
+	
+	/**
+	 * @param config
+	 */
+	public void setConfig(FixedHeaderConfig config) {
+		this.config = config;
+	}
+	
+	/**
+	 * @return
+	 */
+	public FixedHeaderConfig getConfig() {
+		return config;
+	}
+	
+	@IncludeJsOption
+	public JSONObject getFixedHeaderConfig(){
+		try {
+			return config.toJSONObject();
+		} catch (JSONException e) {
+			return new JSONObject();
+		}
 	}
 
 	/**
@@ -586,7 +605,7 @@ public class CubeViewer extends Control {
 	public void setCssTableClass(String cssTableClass) {
 		this.cssTableClass = cssTableClass;
 	}
-
+	
 	public int getFrozenColumnFixWidth() {
 		return frozenColumnFixWidth;
 	}
@@ -594,6 +613,8 @@ public class CubeViewer extends Control {
 	public void setFrozenColumnFixWidth(int frozenColumnFixWidth) {
 		this.frozenColumnFixWidth = frozenColumnFixWidth;
 	}
+	
+	
 	
 	
 }
