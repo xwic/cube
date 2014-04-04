@@ -21,6 +21,8 @@ public class FixedHeaderConfig {
 	private boolean cloneHeadToFoot = false;
 	private int columnWidth = 86;
 	private int firstColumnWidth = 276;
+	private int heightOffset = 300;
+	private int widthOffset = 10;
 	
 	/**
 	 * 
@@ -195,6 +197,34 @@ public class FixedHeaderConfig {
 	public void setFirstColumnWidth(int firstColumnWidth) {
 		this.firstColumnWidth = firstColumnWidth;
 	}
+	
+	/**
+	 * @return
+	 */
+	public int getHeightOffset() {
+		return heightOffset;
+	}
+	
+	/**
+	 * @param heightOffset
+	 */
+	public void setHeightOffset(int heightOffset) {
+		this.heightOffset = heightOffset;
+	}
+	
+	/**
+	 * @return
+	 */
+	public int getWidthOffset() {
+		return widthOffset;
+	}
+	
+	/**
+	 * @param widthOffset
+	 */
+	public void setWidthOffset(int widthOffset) {
+		this.widthOffset = widthOffset;
+	}
 
 	protected JSONObject toJSONObject() throws JSONException{
 		JSONObject object = new JSONObject();
@@ -209,7 +239,8 @@ public class FixedHeaderConfig {
 		object.put("cloneHeadToFoot", isCloneHeadToFoot());
 		object.put("columnWidth", getColumnWidth());
 		object.put("firstColumnWidth", getFirstColumnWidth());
-		
+		object.put("heightOffset", getHeightOffset());
+		object.put("widthOffset", getWidthOffset());
 		return object;
 	}
 
