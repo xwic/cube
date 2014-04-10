@@ -29,7 +29,6 @@ import de.xwic.cube.webui.util.TableCell;
 @JavaScriptSupport
 public class CubeViewer extends Control {
 
-	
 	public enum Align { BEGIN, END };
 	public enum ColumnExpand{LEFT, RIGHT};
 	public enum RowExpand{UP, DOWN};
@@ -53,7 +52,9 @@ public class CubeViewer extends Control {
 	private int frozenColumnFixWidth = 0;
 	
 	private FixedHeaderConfig config;
-	
+
+	private boolean addExtraclickToExpandId = false; 
+
 	/**
 	 * @param container
 	 * @param name
@@ -304,7 +305,12 @@ public class CubeViewer extends Control {
 		}
 		for (INavigationElement elm : navigationElements) {
 			
-			boolean expanded = model.isExpanded(elm.getElementId());
+			String elmIdForExpand = elm.getElementId();
+			if(addExtraclickToExpandId && elm.getContentInfo().getExtraClickInfo() != null) {
+				elmIdForExpand = elmIdForExpand+elm.getContentInfo().getExtraClickInfo(); 
+			}
+			
+			boolean expanded = model.isExpanded(elmIdForExpand);
 			int titleRow =  row;
 			int titleCol = col;
 			
@@ -360,7 +366,7 @@ public class CubeViewer extends Control {
 			cell.setContent(elm.getTitle());
 			cell.setExpandable(elm.isExpandable());
 			cell.setTitle(true);
-			cell.setElementId(elm.getElementId());
+			cell.setElementId(elmIdForExpand);
 			cell.setGroup(group);
 			cell.setExpanded(expanded);
 			cell.setCssCellClass(cssCellClass);
@@ -620,6 +626,14 @@ public class CubeViewer extends Control {
 
 	public void setFrozenColumnFixWidth(int frozenColumnFixWidth) {
 		this.frozenColumnFixWidth = frozenColumnFixWidth;
+	}
+
+	public boolean isAddExtraclickToExpandId() {
+		return addExtraclickToExpandId;
+	}
+
+	public void setAddExtraclickToExpandId(boolean addExtraclickToExpandId) {
+		this.addExtraclickToExpandId = addExtraclickToExpandId;
 	}
 	
 	
