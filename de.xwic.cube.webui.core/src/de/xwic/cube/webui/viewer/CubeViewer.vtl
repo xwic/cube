@@ -1,6 +1,5 @@
-#if($control.fixedHeaders)
-<div>
-#end
+<div style="overflow: hidden;">
+
 <table style="$control.getCssTableStyle()" id="$control.controlID" class="xcube-tbl $control.getCssTableClass()" >
 	 
 	#set($table = $control.table)
@@ -126,6 +125,4 @@
 	#end
 	</tbody>
 </table>
-#if($control.fixedHeaders)
 </div>
-#end
