@@ -19,7 +19,7 @@
     <description>
     </description>
 
-    <url>https://github.com/xwic</url>
+    <url>https://github.com/xwic/cube</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -30,8 +30,8 @@
     <scm>
         <connection>scm:git:https://github.com/xwic/cube.git</connection>
         <developerConnection>scm:git:https://github.com/xwic/cube.git</developerConnection>
-        <url>scm:git:https://github.com/xwic/cube.git</url>
-        <tag>eugen_Maven_Script</tag>
+        <url>https://github.com/xwic/cube</url>
+        <tag>master</tag>
     </scm>
     <developers>
         <developer>
@@ -85,9 +85,9 @@
         <compileTarget>1.6</compileTarget>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<jwicUpdateApplication></jwicUpdateApplication>
-		<jwicUpdateVersion></jwicUpdateVersion>		
-        <cubeUpdateVersion></cubeUpdateVersion>
+		<jwicUpdateApplication />
+		<jwicUpdateVersion />
+        <cubeUpdateVersion />
    		<mvnDependencyVersionxWicjWic>5.2.2</mvnDependencyVersionxWicjWic>
     </properties>
 
@@ -175,12 +175,36 @@
                 </plugin>
 
                 <plugin>
-                    <artifactId>maven-source-plugin</artifactId>
-					<version>2.2.1</version>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3.1</version>
+                    <inherited>true</inherited>
                     <executions>
                         <execution>
-                            <id>attach-sources</id>
-							<phase>prepare-package</phase>
+                            <id>package-test-jar</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+                
+                <plugin>
+                    <artifactId>maven-source-plugin</artifactId>
+					<version>2.1.2</version>
+					<inherited>true</inherited>
+                    <executions>
+                        <execution>
+							<id>package-jars</id>
+							<phase>package</phase>
                             <goals>
                                 <goal>jar</goal>
                                 <goal>test-jar</goal>
@@ -201,8 +225,8 @@
                     <inherited>true</inherited>
                     <executions>
                         <execution>
-                            <id>attach-javadocs</id>
-							<phase>prepare-package</phase>
+							<id>package-jars</id>
+							<phase>package</phase>
                             <goals>
                                 <goal>jar</goal>
                                 <goal>test-jar</goal>
@@ -231,29 +255,6 @@
                     </configuration>
                 </plugin>
 
-
-                <plugin>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.3.1</version>
-                    <inherited>true</inherited>
-                    <executions>
-                        <execution>
-                            <id>package-test-jar</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>test-jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            </manifest>
-                        </archive>
-                    </configuration>
-                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -297,6 +298,8 @@
 				<configuration>
 					<serverId>sonatype-nexus-staging</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					<autoDropAfterRelease>true</autoDropAfterRelease>					
 				</configuration>
 			</plugin>
 		</plugins>
@@ -361,25 +364,25 @@
                 <version>2.5</version>
             </dependency>
 			<dependency>
-				<groupId>net.sf.opencsv</groupId>
-				<artifactId>opencsv</artifactId>
-				<version>1.8</version>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi</artifactId>
-				<version>3.6</version>
+				<version>3.9</version>
 			</dependency>			
+			<dependency>
+                <groupId>de.java2html</groupId>
+                <artifactId>java2html</artifactId>
+                <version>5.0</version>
+            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>1.7.5</version>
             </dependency>
 			<dependency>
-                <groupId>de.java2html</groupId>
-                <artifactId>java2html</artifactId>
-                <version>5.0</version>
-            </dependency>
+				<groupId>net.sf.opencsv</groupId>
+				<artifactId>opencsv</artifactId>
+				<version>1.8</version>
+			</dependency>
 			
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
@@ -428,10 +431,16 @@
             </build>
         </profile>
 		<profile>
+			<id>hacky</id>
+			<properties>
+				<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+			</properties>
+		</profile>        
+		<profile>
 			<id>update-samples</id>
 			<properties>
 				<jwicUpdateApplication>de.xwic.cube.webui.samples</jwicUpdateApplication>
-				<jwicUpdateVersion>5.2.1</jwicUpdateVersion>
+				<jwicUpdateVersion>5.2.2</jwicUpdateVersion>
 				<cubeUpdateVersion>5.2.0-SNAPSHOT</cubeUpdateVersion>
 			</properties>
 		</profile>
