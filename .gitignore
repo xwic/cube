@@ -22,4 +22,5 @@ logs/
 *.log
 *.log.*
 sessions/
-
+*.datapool
+*.cube
