@@ -13,7 +13,7 @@
       -->
     <init-param>
       <param-name>log4j-init-file</param-name>
-      <param-value>WEB-INF/log4j.properties</param-value>
+      <param-value>/WEB-INF/log4j.properties</param-value>
     </init-param>
     <init-param>
       <param-name>setRootDir</param-name>

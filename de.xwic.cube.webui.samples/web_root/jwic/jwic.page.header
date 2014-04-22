@@ -15,5 +15,7 @@
 	
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/jwic_browser.js"></SCRIPT>
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/calendar/calendar_${page.getSessionContext().getLocale().getLanguage().toUpperCase()}.js"></SCRIPT>
-	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/jwic.js"></SCRIPT>
+
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/jwic_core.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/jwic_controls.js"></SCRIPT>
 	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/jwic.css">

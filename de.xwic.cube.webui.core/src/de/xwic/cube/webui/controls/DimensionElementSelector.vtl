@@ -1,0 +1,84 @@
+#set($currElm = $control.getDimensionElement())
+
+#if ($currElm.dimension == $currElm) 
+	#set($title = $control.defaultTitle) 
+#else 
+	#set($title = $currElm.titlePath) 
+#end
+
+#if($control.getDimensionElements().size() > 1)
+	#set($title = $control.defaultMultipleTitle)
+#end
+
+#set($prev = $control.prev)
+#set($next = $control.next)
+#set($class="tree")
+#if($control.multiSelection)
+	#set($class = $class + " multiple")
+#end
+#set($enablement = $control.enabled)
+<table id="showTree_container" cellspacing="0" cellpadding="0" width="$control.width" class="$control.cssClass showTree_container">
+ <tr>
+ 
+ <!--  #if($control.showDimensionTitle) -->
+  <td class="db-filter-label">
+    <div class="db-filter-selector">
+  	<!-- #if($control.dimension.title) -->
+  		$control.dimension.title
+	<!-- #else -->
+		$control.dimension.key
+	<!-- #end -->
+  </td>
+  <!-- #end -->
+  
+  <td class="db-filter-value">
+    <div class="db-filter-selector">
+  
+  	  <div class="db-filter-arrow-left">
+		<!-- #if($prev) -->
+		  	<a href="$control.createActionURL("prev", "")"><img title="$prev.key" src="$jwic.contextPath/xwiccube/images/resultset_previous.gif" border="0"></a>
+		<!-- #else -->
+			<img src="$jwic.contextPath/xwiccube/images/resultset_previous_dis.gif" border="0">
+		<!-- #end -->
+	  </div>
+	  
+	  <div class="db-filter-selected">
+	  	<!-- #if($enablement) -->
+	  		<a id="showTree" href="javascript: void 0">$title</a>
+		<!-- #else -->
+			<div>$title</div>
+		<!-- #end -->	
+	  </div>
+	  
+	  <div class="db-filter-arrow-right">
+		<!-- #if($next) -->
+		  <a href="$control.createActionURL("next", "")"><img title="$next.key" src="$jwic.contextPath/xwiccube/images/resultset_next.gif" border="0"></a>
+		<!-- #else -->
+		  <img src="$jwic.contextPath/xwiccube/images/resultset_next_dis.gif" border="0">
+		<!-- #end -->
+	  </div>	
+
+	</div>
+  </td>
+  	
+ </tr>
+</table>
+
+<div id="tree-container" class="xcube-leafsel-box tree-container" style="display: none;">
+	<span id="tree-loading">Loading...</span>
+	<div id="tree-content" class="xcube-tree">
+		<ul id="tree" class="${class}"></ul>
+	</div>
+	<!-- #if($control.multiSelection) -->
+	<div id="tree-multiselect" class="xcube-button"><button id="tree-submit">Submit</button></div>
+	<!-- #end -->
+</div>
+<!-- template for list item -->
+<li id="node-template" style="display:none;">
+	<a href="javascript:void(0);" id="expand"></a>
+	<!-- #if($control.multiSelection) -->
+	<a href="javascript:void(0);" id="select" class="check"></a>
+	<!-- #end --> 
+	<a href="javascript:void(0);" id="title"></a>
+	<ul id="children"></ul>
+</li>

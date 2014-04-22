@@ -1,0 +1,14 @@
+<table class="xcube-filter">
+#if($control.selectMeasure)
+	<tr>
+		<td>Measure</td>
+		<td>$insert.control("lbcMeasure")</td>
+	</tr>
+#end
+#foreach($dim in $control.dimensions)
+	<tr>
+		<td width="200">#if($dim.title) $dim.title #else $dim.key #end</td>
+		<td>$insert.control($control.getControlName($dim.key))</td>
+	</tr>
+#end
+</table>
