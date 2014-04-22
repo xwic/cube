@@ -142,7 +142,15 @@
 						<skip>true</skip>
 					</configuration>						
                 </plugin>
-
+		        
+		        <plugin>
+		          <groupId>org.apache.maven.plugins</groupId>
+		          <artifactId>maven-surefire-plugin</artifactId>
+		          <version>2.17</version>
+		          <configuration>					<testFailureIgnore>true</testFailureIgnore>
+		          </configuration>
+		        </plugin>
+		        
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
@@ -488,7 +496,6 @@
                 <version>2.16</version>
                 <configuration>
                     <showSuccess>false</showSuccess>
-                    <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>
 
