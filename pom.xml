@@ -88,6 +88,7 @@
 		<jwicUpdateApplication></jwicUpdateApplication>
 		<jwicUpdateVersion></jwicUpdateVersion>		
         <cubeUpdateVersion></cubeUpdateVersion>
+   		<mvnDependencyVersionxWicjWic>5.2.2</mvnDependencyVersionxWicjWic>
     </properties>
 
     <build>
@@ -383,13 +384,13 @@
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-core</artifactId>
-				<version>5.2.1</version>
+				<version>${mvnDependencyVersionxWicjWic}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-controls</artifactId>
-				<version>5.2.1</version>
+				<version>${mvnDependencyVersionxWicjWic}</version>
 			</dependency>
 			
             <dependency>
