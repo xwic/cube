@@ -488,6 +488,7 @@
                 <version>2.16</version>
                 <configuration>
                     <showSuccess>false</showSuccess>
+                    <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>
 
