@@ -6,7 +6,7 @@
         <version>5.2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>Cube::Core</name>
+    <name>CUBE::CORE</name>
 
     <groupId>de.xwic.cube</groupId>
     <artifactId>cube-core</artifactId>

@@ -6,7 +6,7 @@
         <version>5.2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>Cube::WebUI::Core</name>
+    <name>CUBE::WEB::CORE</name>
 
     <groupId>de.xwic.cube</groupId>
     <artifactId>cube-webui-core</artifactId>

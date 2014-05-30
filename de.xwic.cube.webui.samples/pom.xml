@@ -6,7 +6,7 @@
         <version>5.2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>Cube::WebUI::Samples</name>
+    <name>CUBE::WEB::SAMPLES</name>
 
     <groupId>de.xwic.cube</groupId>
     <artifactId>cube-webui-samples</artifactId>
