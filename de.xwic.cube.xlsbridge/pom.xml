@@ -3,14 +3,14 @@
     <parent>
         <groupId>de.xwic.cube</groupId>
         <artifactId>cube</artifactId>
-        <version>5.2.4</version>
+        <version>5.2.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>CUBE::XLSBRIDGE</name>
 
     <groupId>de.xwic.cube</groupId>
     <artifactId>cube-xlsbridge</artifactId>
-    <version>5.2.4</version>
+    <version>5.2.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -18,12 +18,12 @@
         <dependency>
             <groupId>de.xwic.cube</groupId>
             <artifactId>cube-core</artifactId>
-            <version>5.2.4</version>
+            <version>5.2.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.xwic.cube</groupId>
             <artifactId>cube-webui</artifactId>
-            <version>5.2.4</version>
+            <version>5.2.5-SNAPSHOT</version>
 			<classifier>classes</classifier>
         </dependency>
 
