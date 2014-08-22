@@ -3,14 +3,14 @@
     <parent>
         <groupId>de.xwic.cube</groupId>
         <artifactId>cube</artifactId>
-        <version>5.2.4-SNAPSHOT</version>
+        <version>5.2.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>CUBE::WEB::SAMPLES</name>
 
     <groupId>de.xwic.cube</groupId>
     <artifactId>cube-webui-samples</artifactId>
-    <version>5.2.4-SNAPSHOT</version>
+    <version>5.2.4</version>
     <packaging>war</packaging>
 
 
@@ -19,7 +19,7 @@
         <dependency>
             <groupId>de.xwic.cube</groupId>
             <artifactId>cube-webui-core</artifactId>
-            <version>5.2.4-SNAPSHOT</version>
+            <version>5.2.4</version>
         </dependency>
 
 		<!-- jWic dependencies -->
