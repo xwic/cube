@@ -70,8 +70,6 @@ Cube.CubeViewer = (function($, escape) {
 					leftScroll : $this.scrollLeft(),
 					topScroll : $this.scrollTop()
 				};
-				console.warn(scrollValues[options.controlID].leftScroll);
-				console.warn(scrollValues[options.controlID].topScroll);
 			});
 
 			table.find("tr").mouseover(function() {
