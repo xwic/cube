@@ -9,7 +9,7 @@ import java.util.List;
  * @author Florian Lippisch
  */
 public interface INavigationElementProvider {
-	public enum NavigationProviderTypes {NORMAL, TOTAL, EMPTY, SECTION, TOTAL_TOP};
+	public enum NavigationProviderTypes {NORMAL, TOTAL, EMPTY, SECTION, TOTAL_TOP, TOTAL_DARK_GREEN_ROW, TOTAL_LIGHT_GREEN_ROW};
 	
 
 	/**

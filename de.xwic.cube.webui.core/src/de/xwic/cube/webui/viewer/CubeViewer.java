@@ -376,7 +376,9 @@ public class CubeViewer extends Control {
 				if (INavigationElementProvider.NavigationProviderTypes.TOTAL.equals(parentElement.getNavigationProviderType()) ||
 						INavigationElementProvider.NavigationProviderTypes.EMPTY.equals(parentElement.getNavigationProviderType())	||
 						INavigationElementProvider.NavigationProviderTypes.SECTION.equals(parentElement.getNavigationProviderType()) ||
-						INavigationElementProvider.NavigationProviderTypes.TOTAL_TOP.equals(parentElement.getNavigationProviderType())) {
+						INavigationElementProvider.NavigationProviderTypes.TOTAL_TOP.equals(parentElement.getNavigationProviderType()) ||
+						INavigationElementProvider.NavigationProviderTypes.TOTAL_DARK_GREEN_ROW.equals(parentElement.getNavigationProviderType()) ||
+						INavigationElementProvider.NavigationProviderTypes.TOTAL_LIGHT_GREEN_ROW.equals(parentElement.getNavigationProviderType())) {
 					cell.getParent().setLevel(((TotalNavigationProvider) parentElement).getIndention());
 					cell.getParent().setTableRowType(parentElement.getNavigationProviderType().name());
 				}

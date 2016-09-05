@@ -66,6 +66,15 @@
 			#end
 			#set($cellNoChildsCSS = "")
 		#end
+
+		#if($row.getTableRowType() eq "TOTAL_DARK_GREEN_ROW")
+			#set($rowCSS = "xcube-total darkGreen")
+		#end
+
+		#if($row.getTableRowType() eq "TOTAL_LIGHT_GREEN_ROW")
+        	#set($rowCSS = "xcube-total lightGreen")
+        #end
+
 		#if($row.getTableRowType() eq "EMPTY")
 			#set($rowCSS = "xcube-emptyrow")
 		#end		
