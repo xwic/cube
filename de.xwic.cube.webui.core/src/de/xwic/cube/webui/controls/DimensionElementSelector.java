@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONWriter;
 
+import de.jwic.base.Field;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IResourceControl;
 import de.jwic.base.IncludeJsOption;
@@ -49,7 +51,11 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	private String defaultMultipleTitle = "- Multiple -";
 
 	private boolean showDimensionTitle = false;
-
+	
+	/**
+	 * If the selector should display a text field for filtering on key press when the content list is displayed
+	 */
+	private boolean showFilterField=false;
 	private Comparator<IDimensionElement> sortComparator = null;
 
 	private List<ElementSelectedListener> listeners;
@@ -108,7 +114,11 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		this.dimension = dimension;
 		this.filter = filter;
 		this.isMultiSelection = multiSelection;
-
+		Field searchField = new Field(this, "filter");
+		if (null == fields){
+			fields = new HashMap<String, Field>();
+		}
+		fields.put(searchField.getId(), searchField);
 		setCssClass("xcube-leafsel");
 
 		if (dimension == null) {
@@ -116,6 +126,22 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 		}
 
 		loadData();
+
+	}
+	
+	/**
+	 * Constructor
+	 * @param container
+	 * @param name
+	 * @param dimension
+	 * @param filter 
+	 * @param multiSelection
+	 * @param showFilterField if the search filter should be displayed
+	 */
+	public DimensionElementSelector(IControlContainer container, String name, IDimension dimension,
+			IDimensionFilter filter, boolean multiSelection, boolean showFilterField) {
+		this(container, name, dimension, filter, multiSelection);
+		this.showFilterField = showFilterField;
 
 	}
 
@@ -576,6 +602,22 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 */
 	public List<IDimensionElement> getUserCredentials() {
 		return userCredentials;
+	}
+
+	
+	/**
+	 * @return the showFilterField
+	 */
+	public boolean isShowFilterField() {
+		return showFilterField;
+	}
+
+	
+	/**
+	 * @param showFilterField the showFilterField to set
+	 */
+	public void setShowFilterField(boolean showFilterField) {
+		this.showFilterField = showFilterField;
 	}
 	
 	

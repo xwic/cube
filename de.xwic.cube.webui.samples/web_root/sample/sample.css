@@ -262,3 +262,9 @@
 	padding-right: 10px;
 	border-top: 1px solid #C8C9C7;
 }
+/*
+For IE to not display the x to clear the field in the input box
+*/
+input::-ms-clear {
+    display: none;
+}

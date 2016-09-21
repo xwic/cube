@@ -1,6 +1,6 @@
 Cube.DimensionElementSelector = (function($,util,Cube){
 	"use strict";
-	var buildHtml, buildTree, buildMultiSelectKey, bindNode, intialOpen,
+	var buildHtml, buildTree, buildMultiSelectKey, bindNode, intialOpen, applyFilter,
 		tmpl = Cube.tmpl,
 		map = util.map,
 		reduce = util.reduce,
@@ -153,6 +153,10 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 					var data = $.parseJSON(resp.responseText);
 					loaded = true;
 					loading.hide();
+					var filterField = JWic.$('search_' + options.controlId);
+					if (filterField){
+						filterField.parent().show();
+					}
 					buildTree(rootNode.find('#children'), nodeModel, control, data.elements, options);
 					intialOpen(nodeModel,options.dimensionElementsPaths);
 					tree.append(rootNode);
@@ -269,15 +273,114 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			intialOpen(i,paths);
 		});
 	};
+	
+	/**
+	 * Filters the displayed node titles over the specified input. The filtering works only of the first level of nodes
+	 */
+	applyFilter = function applyFilter(controlId) {
+		var filterField = JWic.$('search_' + controlId);
+		var val = jQuery.trim(filterField.val()).toLowerCase();
+		var clearFilter = JWic.$("cse_" + controlId);
+		if (val.length != 0) {
+			clearFilter.find(".j-listColSel-clearSearch").show();
+		} else {
+			clearFilter.find(".j-listColSel-clearSearch").hide();
+		}
+		
+		
+		var base = JWic.$('ctrl_'+controlId);
+		var visibleRows = [];
+	
+		//search for nodes that are matching the filter and store them in matchedRows
+		base.find('li a#title').each(function(i,item) {
+			var row = jQuery(item);
+			var title = row.text();
+			
+			//only the template node has empty text
+			if (title.length == 0){
+				return;
+			} 
+			
+			//always show the all element if exists
+			if ('- All -'=== title){
+				visibleRows.push($(row).parent()[0]);
+				return;
+			}
+			
+			//if the filter is cleared show all nodes
+			if (val.length == 0) {
+				visibleRows.push($(row).parent()[0]);
+			} else {
+				//if the filter value was found store the li dom element 
+				if (title && title.toLowerCase().indexOf(val) != -1) {
+					
+					if (visibleRows.indexOf($(row).parent()[0]) == -1){
+						visibleRows.push($(row).parent()[0]);
+						//console.log("Adding "+$(row).text().trim());
+					}
+					
+					//add all children on all levels into the visibility list
+					row.parent().find('li a#title').each(function(i,item) {
+						if (visibleRows.indexOf($(item).parent()[0]) == -1){
+							visibleRows.push($(item).parent()[0]);
+							//console.log("Adding "+$(item).text().trim());
+						}
+					});
+					
+					//add all ancestor parents into the visibility list
+					var parent = row.parent();
+					//stop on root li assuming that the order is respected
+					while (parent && parent.length && (parent.is('li') || parent.is('ul') )&& !(parent.hasClass('root') && parent.is('li'))){
+						//skip ul
+						if (parent.is('ul')){
+							parent= parent.parent();
+						}
+						if (visibleRows.indexOf(parent[0]) == -1){
+							visibleRows.push(parent[0]);
+							//console.log("Adding "+$(parent).text().trim());
+						}
+						parent = parent.parent()
+					}
+					
+				} 
+			}
+			
+		});
+		
+		//iterate again thru all nodes and show only the ones marked as visible
+		base.find('li a#title').each(function(i,item) {
+			var prnt = $(item).parent()[0];
+			if (visibleRows.indexOf(prnt) != -1){
+				$(prnt).show();
+			}else{
+				$(prnt).hide();
+			}
+		});
+	};
+	
 	//exports
 	return {
 		initialize : function(options){
 			var control = JWic.$('ctrl_'+options.controlId),
-				build = buildHtml(control,options);
+				build = buildHtml(control,options), searchFilter = applyFilter;
 			control.find("#showTree").on('click', build);
+			var filterField = JWic.$('search_' + options.controlId);
+			if (filterField){
+				filterField.on("keyup", function(e) { searchFilter(options.controlId);});
+				filterField.on("click", function(e) {e.stopPropagation();});
+				filterField.val('');
+				var clearFilter = JWic.$("cse_" + options.controlId);
+				clearFilter.on("click", function(e) {filterField.val('');e.stopPropagation(); searchFilter(options.controlId); clearFilter.find(".j-listColSel-clearSearch").hide();});
+				clearFilter.find(".j-listColSel-clearSearch").hide();
+			}
 		},
 		destroy : function(options){
 			JWic.$('ctrl_'+options.controlId).find("#showTree").unbind('click');
+			var filterField = JWic.$('search_' + options.controlId);
+			if (filterField){
+				filterField.unbind("click").unbind("keyup");
+				JWic.$("cse_" + options.controlId).find(".j-listColSel-clearSearch").unbind("click");
+			}
 		}
 	};
 }(jQuery,JWic.util,Cube));

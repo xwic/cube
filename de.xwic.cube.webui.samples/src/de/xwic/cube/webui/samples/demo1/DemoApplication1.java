@@ -179,16 +179,19 @@ public class DemoApplication1 extends Application {
 		final CubeFilter filter = new CubeFilter(page, "filter", model);
 		
 		filter.setSelectMeasure(true);
-		filter.addDimension(dimOT);
+		DimensionElementSelector dimSelector = filter.addDimension(dimOT);
+		dimSelector.setShowFilterField(true);
 		otNavigationProvider.setFilter(filter);
 		
 		
-		DimensionElementSelector dimSelector = filter.addDimension(dimGEO);
+		dimSelector = filter.addDimension(dimGEO);
 		dimSelector.setDimensionElement(dimGEO.getDimensionElement("Americas"));
 		geoNavigationProvider.setFilter(filter);
 		
 		dimSelector.setSelectLeafsOnly(true);
-		filter.addDimension(dimTime).setMultiSelection(true);
+		dimSelector = filter.addDimension(dimTime);
+		dimSelector.setMultiSelection(true);
+		dimSelector.setShowFilterField(true);
 		timeNavigationProvider.setFilter(filter);
 		
 		
