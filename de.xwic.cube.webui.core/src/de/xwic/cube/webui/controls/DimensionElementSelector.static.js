@@ -107,6 +107,8 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	Node.UNDEFINED = "undefined";
 	Node.UNSELECTED = "unchecked";
 
+	var filterPlaceholder = 'Filter';
+	
 	buildHtml = (function buildHtml(control,options){
 		var loaded = false,
 			controlId = options.controlId,
@@ -308,7 +310,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			}
 			
 			//if the filter is cleared show all nodes
-			if (val.length == 0) {
+			if (val.length == 0 || val === filterPlaceholder.toLowerCase()) {
 				visibleRows.push($(row).parent()[0]);
 			} else {
 				//if the filter value was found store the li dom element 
@@ -316,14 +318,12 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 					
 					if (visibleRows.indexOf($(row).parent()[0]) == -1){
 						visibleRows.push($(row).parent()[0]);
-						//console.log("Adding "+$(row).text().trim());
 					}
 					
 					//add all children on all levels into the visibility list
 					row.parent().find('li a#title').each(function(i,item) {
 						if (visibleRows.indexOf($(item).parent()[0]) == -1){
 							visibleRows.push($(item).parent()[0]);
-							//console.log("Adding "+$(item).text().trim());
 						}
 					});
 					
@@ -337,7 +337,6 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 						}
 						if (visibleRows.indexOf(parent[0]) == -1){
 							visibleRows.push(parent[0]);
-							//console.log("Adding "+$(parent).text().trim());
 						}
 						parent = parent.parent()
 					}
@@ -366,11 +365,42 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			control.find("#showTree").on('click', build);
 			var filterField = JWic.$('search_' + options.controlId);
 			if (filterField){
-				filterField.on("keyup", function(e) { searchFilter(options.controlId);});
+				filterField.on("keyup", function(e) { 
+					var val = this.value; 
+
+					if (val.length == 0){
+						control.find('li a#title').parent().show();
+						control.find('#node-template').hide();
+					} else if (val.length > 2){
+						searchFilter(options.controlId);
+					}
+				});
 				filterField.on("click", function(e) {e.stopPropagation();});
-				filterField.val('');
+				
+				/** On IE 11 the placeholder does not work so we have to simulate with focus/blur handlers*/
+				filterField.on("focus", function(e) {
+					if (this.value == filterPlaceholder){
+						this.value = '';	
+					}
+				});
+				
+				filterField.on("blur", function(e) {
+					if (this.value == ''){
+						this.value = filterPlaceholder;	
+					}
+				});
+				
+				filterField.val(filterPlaceholder);
+				
 				var clearFilter = JWic.$("cse_" + options.controlId);
-				clearFilter.on("click", function(e) {filterField.val('');e.stopPropagation(); searchFilter(options.controlId); clearFilter.find(".j-listColSel-clearSearch").hide();});
+				clearFilter.on("click", function(e) {
+					filterField.val(filterPlaceholder);
+					e.stopPropagation(); 
+					
+					 control.find('li a#title').parent().show();
+					 control.find('#node-template').hide();
+					 clearFilter.find(".j-listColSel-clearSearch").hide();
+					});
 				clearFilter.find(".j-listColSel-clearSearch").hide();
 			}
 		},
@@ -378,7 +408,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			JWic.$('ctrl_'+options.controlId).find("#showTree").unbind('click');
 			var filterField = JWic.$('search_' + options.controlId);
 			if (filterField){
-				filterField.unbind("click").unbind("keyup");
+				filterField.unbind("click").unbind("keyup").unbind('focus').unbind('blur');
 				JWic.$("cse_" + options.controlId).find(".j-listColSel-clearSearch").unbind("click");
 			}
 		}
