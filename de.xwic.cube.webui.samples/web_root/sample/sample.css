@@ -265,6 +265,6 @@
 /*
 For IE to not display the x to clear the field in the input box
 */
-input::-ms-clear {
+input[type=text]::-ms-clear {
     display: none;
 }

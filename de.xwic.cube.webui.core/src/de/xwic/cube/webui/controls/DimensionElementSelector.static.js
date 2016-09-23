@@ -1,6 +1,6 @@
 Cube.DimensionElementSelector = (function($,util,Cube){
 	"use strict";
-	var buildHtml, buildTree, buildMultiSelectKey, bindNode, intialOpen, applyFilter,
+	var buildHtml, buildTree, buildMultiSelectKey, bindNode, intialOpen, applyFilter, clearFilter, refreshTreeStates,
 		tmpl = Cube.tmpl,
 		map = util.map,
 		reduce = util.reduce,
@@ -17,6 +17,8 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		//define public properties
 		defineProp(this,"expanded");
 		defineProp(this,"state");
+		defineProp(this,"matchFilter");
+		this.matchFilter(true);
 		//the key (read-only)
 		this.key = function(){
 			return key;
@@ -29,6 +31,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		this.path = function(){
 			return path;
 		};
+		
 		//return a copy of the children of this node
 		this.children = function(){
 			return children.concat();
@@ -41,9 +44,13 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		//this will trigger a silent child prop change to this prop
 		this.on('propertyChanged',function(prop,val){
 			if(prop === 'state'){
+				//console.log('path:'+this.path()+'state:'+ this.state()+'visible:'+this.matchFilter());
 				if(this.state() === Node.SELECTED || this.state() === Node.UNSELECTED){
 					map(children,function(c){
-						c.state(val);//set state but don't fire event if state is UNDEFINED
+						//change state only if the child matches the filter(is visible)
+						if (c.matchFilter()){
+							c.state(val);//set state but don't fire event if state is UNDEFINED
+						}
 					});
 				}
 			}
@@ -56,7 +63,8 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 				child = this;
 			if(propName === 'state'){
 				childrenStatesSame = !reduce(children, function(acc, c){
-					return acc || (c.state() !== child.state());
+					//take into account only the filtered(visible) children
+					return acc || (c.matchFilter() && c.state() !== child.state());
 				},false);
 				if(childrenStatesSame){
 					that.state(child.state());
@@ -106,8 +114,9 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	Node.SELECTED = "checked";
 	Node.UNDEFINED = "undefined";
 	Node.UNSELECTED = "unchecked";
-
+	var nodeMap = {};
 	var filterPlaceholder = 'Filter';
+	var minSizeToTriggerFiltering = 2;
 	
 	buildHtml = (function buildHtml(control,options){
 		var loaded = false,
@@ -123,6 +132,11 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		//its sort of a special case
 		rootNode.addClass("root").find('#expand').remove();
 		rootNode.find("#select").addClass("root-check");
+		
+		//clear the node map
+		nodeMap = {};
+		//store the root into the node map for fast retrieval
+		nodeMap[nodeModel.path()] = nodeModel;
 		
 		bindNode(nodeModel,rootNode, options, {});
 		nodeModel.state(Node.UNSELECTED);
@@ -184,6 +198,8 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			//setup intial states
 			newNode.expanded(false);
 			newNode.state(Node.UNSELECTED);
+			//add node to the map
+			nodeMap[newNode.path()]=newNode;
 			
 			nodeModel.addChild(newNode);
 			buildTree(node.find('#children') ,newNode, control, el.elements,options);
@@ -212,6 +228,9 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			title = uiNode.find("#title"),
 			expand = uiNode.find('#expand'),
 			children = uiNode.find('#children');
+		
+		//add a custom attribute to the li dom element to store the node key to be found in the node map when needed 
+		uiNode.attr('nodePath',node.path());
 		
 		node.on('propertyChanged', function(propName,val, oldVal) {
 			
@@ -277,9 +296,63 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	};
 	
 	/**
+	 * Clears the the filter if displayed and show all items
+	 */
+	clearFilter = function clearFilter(options){
+		var clearIcon = JWic.$("cse_" + options.controlId);
+		var control = JWic.$('ctrl_'+options.controlId);
+		if (clearIcon){
+			//show all items
+			control.find('li a#title').parent().show();
+			//hide the template
+			control.find('#node-template').hide();
+			//hide the icon
+			clearIcon.find(".j-listColSel-clearSearch").hide();
+			
+			//mark all nodes visible
+			$.each( nodeMap, function( key, value ) {
+				  value.matchFilter(true);
+			});
+			
+			//reevaluate one leaf node of each parent to trigger parent state refresh
+			//start from root
+			refreshTreeStates(nodeMap[""]);
+		}
+	};
+	
+	/**
+	 * reevaluate one leaf node of each parent to trigger parent state refresh
+	 */
+	refreshTreeStates = function refreshTreeStates(node){
+		
+		if (node && node.matchFilter() && node.children().length > 0){
+			var children = node.children();
+			var refreshed = false;
+			for(var i=0; i<children.length; i++){
+				//if one of the leaf children triggered refresh don't do it again 
+				refreshed = refreshed || refreshTreeStates(children[i]);
+			}
+			return false;
+		}else{
+			//node is not visible or is not leaf
+			if (!node.matchFilter()){
+				return false;
+			}else{
+				//leaf node
+				var crtState = node.state();
+				//change and restore the state to trigger refreshing the parents
+				node.toggle();
+				node.state(crtState);
+				return true;
+			}
+		}
+	};
+	
+	/**
 	 * Filters the displayed node titles over the specified input. The filtering works only of the first level of nodes
 	 */
-	applyFilter = function applyFilter(controlId) {
+	applyFilter = function applyFilter(options) {
+		var controlId = options.controlId;
 		var filterField = JWic.$('search_' + controlId);
 		var val = jQuery.trim(filterField.val()).toLowerCase();
 		var clearFilter = JWic.$("cse_" + controlId);
@@ -289,10 +362,10 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			clearFilter.find(".j-listColSel-clearSearch").hide();
 		}
 		
-		
 		var base = JWic.$('ctrl_'+controlId);
-		var visibleRows = [];
-	
+		//var visibleRows = [];
+		var visibleRows = {};
+		
 		//search for nodes that are matching the filter and store them in matchedRows
 		base.find('li a#title').each(function(i,item) {
 			var row = jQuery(item);
@@ -304,26 +377,32 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			} 
 			
 			//always show the all element if exists
-			if ('- All -'=== title){
-				visibleRows.push($(row).parent()[0]);
+			if (options.defaultTitle=== title){
+				//visibleRows.push($(row).parent()[0]);
+				visibleRows[$(row).parent().attr('nodePath')]=$(row).parent()[0];
 				return;
 			}
 			
 			//if the filter is cleared show all nodes
 			if (val.length == 0 || val === filterPlaceholder.toLowerCase()) {
-				visibleRows.push($(row).parent()[0]);
+				//visibleRows.push($(row).parent()[0]);
+				visibleRows[$(row).parent().attr('nodePath')]=$(row).parent()[0];
 			} else {
 				//if the filter value was found store the li dom element 
 				if (title && title.toLowerCase().indexOf(val) != -1) {
 					
-					if (visibleRows.indexOf($(row).parent()[0]) == -1){
-						visibleRows.push($(row).parent()[0]);
+					//if (visibleRows.indexOf($(row).parent()[0]) == -1){
+					if (!visibleRows[$(row).parent().attr('nodePath')]){
+						//visibleRows.push($(row).parent()[0]);
+						visibleRows[$(row).parent().attr('nodePath')]=$(row).parent()[0];
 					}
 					
 					//add all children on all levels into the visibility list
 					row.parent().find('li a#title').each(function(i,item) {
-						if (visibleRows.indexOf($(item).parent()[0]) == -1){
-							visibleRows.push($(item).parent()[0]);
+						if (!visibleRows[$(item).parent().attr('nodePath')]){
+						//if (visibleRows.indexOf($(item).parent()[0]) == -1){
+							//visibleRows.push($(item).parent()[0]);
+							visibleRows[$(item).parent().attr('nodePath')]=$(item).parent()[0];
 						}
 					});
 					
@@ -335,8 +414,10 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 						if (parent.is('ul')){
 							parent= parent.parent();
 						}
-						if (visibleRows.indexOf(parent[0]) == -1){
-							visibleRows.push(parent[0]);
+						if (!visibleRows[parent.attr('nodePath')]){
+						//if (visibleRows.indexOf(parent[0]) == -1){
+							//visibleRows.push(parent[0]);
+							visibleRows[parent.attr('nodePath')]=parent[0];
 						}
 						parent = parent.parent()
 					}
@@ -349,30 +430,51 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		//iterate again thru all nodes and show only the ones marked as visible
 		base.find('li a#title').each(function(i,item) {
 			var prnt = $(item).parent()[0];
-			if (visibleRows.indexOf(prnt) != -1){
+			var nodePath = $(item).parent().attr('nodePath');
+			var node = nodeMap[nodePath];
+			if (!node){
+				return;
+			}
+			if (visibleRows[$(item).parent().attr('nodePath')]){
+			//if (visibleRows.indexOf(prnt) != -1){
+				//this are matching the filter
+				node.matchFilter(true);
 				$(prnt).show();
 			}else{
+				node.matchFilter(false);
 				$(prnt).hide();
 			}
 		});
+		
+		//reevaluate one leaf node of each parent to trigger parent state refresh
+		//start from root
+		refreshTreeStates(nodeMap[""]);
+		
+		//console.log(nodeMap);
+		
 	};
 	
 	//exports
 	return {
 		initialize : function(options){
 			var control = JWic.$('ctrl_'+options.controlId),
-				build = buildHtml(control,options), searchFilter = applyFilter;
+				build = buildHtml(control,options);
+			
 			control.find("#showTree").on('click', build);
+			
+			//initialize the filter if exists
 			var filterField = JWic.$('search_' + options.controlId);
+			var clearFilterIcon = JWic.$("cse_" + options.controlId);
+			
 			if (filterField){
+
 				filterField.on("keyup", function(e) { 
 					var val = this.value; 
 
 					if (val.length == 0){
-						control.find('li a#title').parent().show();
-						control.find('#node-template').hide();
-					} else if (val.length > 2){
-						searchFilter(options.controlId);
+						clearFilter(options);
+					} else if (val.length >= minSizeToTriggerFiltering){
+						applyFilter(options);
 					}
 				});
 				filterField.on("click", function(e) {e.stopPropagation();});
@@ -392,16 +494,15 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 				
 				filterField.val(filterPlaceholder);
 				
-				var clearFilter = JWic.$("cse_" + options.controlId);
-				clearFilter.on("click", function(e) {
+				
+				clearFilterIcon.on("click", function(e) {
 					filterField.val(filterPlaceholder);
+					//stop bubbling in order to avoid closing the list
 					e.stopPropagation(); 
-					
-					 control.find('li a#title').parent().show();
-					 control.find('#node-template').hide();
-					 clearFilter.find(".j-listColSel-clearSearch").hide();
+					 //show all items
+					clearFilter(options);
 					});
-				clearFilter.find(".j-listColSel-clearSearch").hide();
+				
 			}
 		},
 		destroy : function(options){

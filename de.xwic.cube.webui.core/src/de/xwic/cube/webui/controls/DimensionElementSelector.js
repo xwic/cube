@@ -10,7 +10,7 @@
 		#if($control.visible)
 		var options = $control.buildJsonOptions();
 		options.controlId = '$control.controlID';
-		Cube.DimensionElementSelector.initialize(options);
+		Cube.DimensionElementSelector.destroy(options);
 		#end
 	}
 }
