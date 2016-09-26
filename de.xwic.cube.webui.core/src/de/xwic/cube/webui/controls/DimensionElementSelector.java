@@ -53,6 +53,17 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	private boolean showDimensionTitle = false;
 	
 	/**
+	 * The placeholder text to be used in the filter field when the filter is visible
+	 */
+	private String filterLabel="Filter";
+	
+	/**
+	 * The minimum number of characters to be entered in the filter field to trigger the filtering. 
+	 * This is to improve the performance. 
+	 */
+	private int minCharsToTriggerFiltering = 2;
+	
+	/**
 	 * If the selector should display a text field for filtering on key press when the content list is displayed
 	 */
 	private boolean showFilterField=false;
@@ -618,6 +629,40 @@ public class DimensionElementSelector extends HTMLElement implements IResourceCo
 	 */
 	public void setShowFilterField(boolean showFilterField) {
 		this.showFilterField = showFilterField;
+	}
+
+	
+	/**
+	 * @return the filterLabel
+	 */
+	@IncludeJsOption
+	public String getFilterLabel() {
+		return filterLabel;
+	}
+
+	
+	/**
+	 * @param filterLabel the filterLabel to set
+	 */
+	public void setFilterLabel(String filterLabel) {
+		this.filterLabel = filterLabel;
+	}
+
+	
+	/**
+	 * @return the minCharsToTriggerFiltering
+	 */
+	@IncludeJsOption
+	public int getMinCharsToTriggerFiltering() {
+		return minCharsToTriggerFiltering;
+	}
+
+	
+	/**
+	 * @param minCharsToTriggerFiltering the minCharsToTriggerFiltering to set
+	 */
+	public void setMinCharsToTriggerFiltering(int minCharsToTriggerFiltering) {
+		this.minCharsToTriggerFiltering = minCharsToTriggerFiltering;
 	}
 	
 	

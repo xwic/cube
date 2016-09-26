@@ -1,6 +1,7 @@
 Cube.DimensionElementSelector = (function($,util,Cube){
 	"use strict";
 	var buildHtml, buildTree, buildMultiSelectKey, bindNode, intialOpen, applyFilter, clearFilter, refreshTreeStates,
+		nodeMap = {},
 		tmpl = Cube.tmpl,
 		map = util.map,
 		reduce = util.reduce,
@@ -44,7 +45,6 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		//this will trigger a silent child prop change to this prop
 		this.on('propertyChanged',function(prop,val){
 			if(prop === 'state'){
-				//console.log('path:'+this.path()+'state:'+ this.state()+'visible:'+this.matchFilter());
 				if(this.state() === Node.SELECTED || this.state() === Node.UNSELECTED){
 					map(children,function(c){
 						//change state only if the child matches the filter(is visible)
@@ -71,6 +71,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 				}else{
 					that.state(Node.UNDEFINED);
 				}
+				
 			}else if(propName === 'expanded'){
 				if(value){
 					that.expanded(true);
@@ -114,9 +115,6 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	Node.SELECTED = "checked";
 	Node.UNDEFINED = "undefined";
 	Node.UNSELECTED = "unchecked";
-	var nodeMap = {};
-	var filterPlaceholder = 'Filter';
-	var minSizeToTriggerFiltering = 2;
 	
 	buildHtml = (function buildHtml(control,options){
 		var loaded = false,
@@ -135,9 +133,6 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		
 		//clear the node map
 		nodeMap = {};
-		//store the root into the node map for fast retrieval
-		nodeMap[nodeModel.path()] = nodeModel;
-		
 		bindNode(nodeModel,rootNode, options, {});
 		nodeModel.state(Node.UNSELECTED);
 		//multiselect ok button
@@ -173,6 +168,10 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 					if (filterField){
 						filterField.parent().show();
 					}
+					
+					//store the root into the node map for fast retrieval
+					nodeMap[nodeModel.path()] = nodeModel;
+
 					buildTree(rootNode.find('#children'), nodeModel, control, data.elements, options);
 					intialOpen(nodeModel,options.dimensionElementsPaths);
 					tree.append(rootNode);
@@ -200,7 +199,6 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			newNode.state(Node.UNSELECTED);
 			//add node to the map
 			nodeMap[newNode.path()]=newNode;
-			
 			nodeModel.addChild(newNode);
 			buildTree(node.find('#children') ,newNode, control, el.elements,options);
 			return acc.append(node);
@@ -324,7 +322,6 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	 * reevaluate one leaf node of each parent to trigger parent state refresh
 	 */
 	refreshTreeStates = function refreshTreeStates(node){
-		
 		if (node && node.matchFilter() && node.children().length > 0){
 			var children = node.children();
 			var refreshed = false;
@@ -384,7 +381,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			}
 			
 			//if the filter is cleared show all nodes
-			if (val.length == 0 || val === filterPlaceholder.toLowerCase()) {
+			if (val.length == 0 || val === options.filterLabel.toLowerCase()) {
 				//visibleRows.push($(row).parent()[0]);
 				visibleRows[$(row).parent().attr('nodePath')]=$(row).parent()[0];
 			} else {
@@ -450,8 +447,6 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		//start from root
 		refreshTreeStates(nodeMap[""]);
 		
-		//console.log(nodeMap);
-		
 	};
 	
 	//exports
@@ -473,7 +468,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 
 					if (val.length == 0){
 						clearFilter(options);
-					} else if (val.length >= minSizeToTriggerFiltering){
+					} else if (val.length >= options.minCharsToTriggerFiltering){
 						applyFilter(options);
 					}
 				});
@@ -481,22 +476,22 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 				
 				/** On IE 11 the placeholder does not work so we have to simulate with focus/blur handlers*/
 				filterField.on("focus", function(e) {
-					if (this.value == filterPlaceholder){
+					if (this.value == options.filterLabel){
 						this.value = '';	
 					}
 				});
 				
 				filterField.on("blur", function(e) {
 					if (this.value == ''){
-						this.value = filterPlaceholder;	
+						this.value = options.filterLabel;	
 					}
 				});
 				
-				filterField.val(filterPlaceholder);
+				filterField.val(options.filterLabel);
 				
 				
 				clearFilterIcon.on("click", function(e) {
-					filterField.val(filterPlaceholder);
+					filterField.val(options.filterLabel);
 					//stop bubbling in order to avoid closing the list
 					e.stopPropagation(); 
 					 //show all items
