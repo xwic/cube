@@ -3,7 +3,7 @@
     <parent>
         <groupId>de.xwic.cube</groupId>
         <artifactId>cube</artifactId>
-        <version>5.2.11</version>
+        <version>5.2.12-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>CUBE::WEB::SAMPLES</name>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>de.xwic.cube</groupId>
             <artifactId>cube-webui-core</artifactId>
-            <version>5.2.11</version>
+            <version>5.2.12-SNAPSHOT</version>
         </dependency>
 
 		<!-- jWic dependencies -->
