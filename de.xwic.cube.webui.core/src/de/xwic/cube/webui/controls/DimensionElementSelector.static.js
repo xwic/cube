@@ -137,7 +137,12 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		nodeModel.state(Node.UNSELECTED);
 		//multiselect ok button
 		buttonOk.unbind('click').on('click',function(){
-			fireAction(controlId,'selection',buildMultiSelectKey(nodeModel));
+			var filterField = JWic.$('search_' + controlId);
+			var filterVal = '';
+			if (filterField){
+				filterVal = jQuery.trim(filterField.val());
+			}
+			fireAction(controlId,'selection',buildMultiSelectKey(nodeModel, filterVal!= options.filterLabel && filterVal.length >=options.minCharsToTriggerFiltering));
 			return false;
 		});
 		return function(){
@@ -206,14 +211,15 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	};
 	
 
-	buildMultiSelectKey = function buildMultiSelectKey(node) {
+	buildMultiSelectKey = function buildMultiSelectKey(node, filtering) {
 		var key = node.path(), 
 			multiSelectKey = (function makeKey(key, node) {
 				var path = node.path();
-				if (node.state() === Node.UNSELECTED) {
+				
+				if (node.state() === Node.UNSELECTED || !node.matchFilter()) {
 					return key;
 				}
-				if (node.state() === Node.SELECTED) {
+				if (node.state() === Node.SELECTED && (!filtering || node.children().length == 0)) {
 					return key + path.substring(0, path.length - 1) + "##";
 				}
 				return reduce(node.children(), makeKey, key);
