@@ -155,8 +155,12 @@ public class FilterGroup  {
 			while (keys.hasNext()) {
 				String string = keys.next();
 				FilterState filterState =  filters.get(string);
-				IFilter filter = filterState.filter;
-				filter.load(object.getString(string));
+				
+				//the view filters are null if the view is not displayed until required global filters are entered 
+				if (null != filterState){
+					IFilter filter = filterState.filter;
+					filter.load(object.getString(string));
+				}
 			}
 			applyAllFilters();
 		} catch (JSONException e) {
