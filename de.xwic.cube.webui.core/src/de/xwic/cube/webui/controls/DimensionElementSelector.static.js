@@ -321,6 +321,9 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			//reevaluate one leaf node of each parent to trigger parent state refresh
 			//start from root
 			refreshTreeStates(nodeMap[""]);
+			
+			//enable the submit button
+			control.find('#tree-submit').prop('disabled',false);
 		}
 	};
 	
@@ -453,6 +456,8 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		//start from root
 		refreshTreeStates(nodeMap[""]);
 		
+		//disable the submit button until the filtering is done
+		base.find('#tree-submit').prop('disabled',true);
 	};
 	
 	//exports
