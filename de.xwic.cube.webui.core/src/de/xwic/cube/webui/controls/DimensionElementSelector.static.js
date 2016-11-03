@@ -362,10 +362,12 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 		var filterField = JWic.$('search_' + controlId);
 		var val = jQuery.trim(filterField.val()).toLowerCase();
 		var clearFilter = JWic.$("cse_" + controlId);
-		if (val.length != 0) {
-			clearFilter.find(".j-listColSel-clearSearch").show();
-		} else {
-			clearFilter.find(".j-listColSel-clearSearch").hide();
+		if(options.multiSelection){
+			if (val.length != 0) {
+				clearFilter.find(".j-listColSel-clearSearch").show();
+			} else {
+				clearFilter.find(".j-listColSel-clearSearch").hide();
+			}
 		}
 		
 		var base = JWic.$('ctrl_'+controlId);
@@ -500,14 +502,18 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 				
 				filterField.val(options.filterLabel);
 				
+				if(options.multiSelection){
+					clearFilterIcon.on("click", function(e) {
+						filterField.val(options.filterLabel);
+						//stop bubbling in order to avoid closing the list
+						e.stopPropagation(); 
+						 //show all items
+						clearFilter(options);
+						});
+				}
+					
+				clearFilterIcon.find(".j-listColSel-clearSearch").hide();
 				
-				clearFilterIcon.on("click", function(e) {
-					filterField.val(options.filterLabel);
-					//stop bubbling in order to avoid closing the list
-					e.stopPropagation(); 
-					 //show all items
-					clearFilter(options);
-					});
 				
 			}
 		},
