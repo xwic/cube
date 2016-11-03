@@ -183,7 +183,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 					//add some css
 					tree.find('li:last-child').addClass('last');
 					//remove the last expand elements
-					tree.find("ul:not(:has(>li))").parent().find('#expand').remove();
+					//tree.find("ul:not(:has(>li))").parent().find('#expand').remove();
 				},'');
 			}else{
 				nodeModel.state(Node.UNSELECTED);
@@ -196,7 +196,7 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 	
 	buildTree = function buildTree(tree,nodeModel,control,data,options){
 		return reduce(data, function(acc, el){
-			var node = tmpl(control, "#node-template"),
+			var node = tmpl(control, "#node-template"+(el.elements.length > 0 ? '':'-no-expand')),
 				newNode = new Node(el.title || el.key, el.key, nodeModel.path()+el.key+"/");
 			bindNode(newNode, node, options, el);
 			//setup intial states
