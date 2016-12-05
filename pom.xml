@@ -11,7 +11,7 @@
 
     <groupId>de.xwic.cube</groupId>
     <artifactId>cube</artifactId>
-    <version>5.2.16-SNAPSHOT</version>
+    <version>5.3.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>xWic - Cube Framework</name>
