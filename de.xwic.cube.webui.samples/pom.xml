@@ -29,7 +29,10 @@
             <groupId>de.xwic.jwic</groupId>
             <artifactId>jwic-controls</artifactId>
         </dependency>
-
+		<dependency>
+			<groupId>de.xwic.jwic</groupId>
+			<artifactId>jwic-web</artifactId>
+		</dependency>
 		<!-- General dependencies -->
         <dependency>
             <groupId>commons-digester</groupId>
