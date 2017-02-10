@@ -21,7 +21,14 @@
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
-  
+  	<servlet>
+		<servlet-name>jwicres</servlet-name>
+		<servlet-class>de.jwic.web.ClasspathResourceServlet</servlet-class>
+		<init-param>
+			<param-name>classresource</param-name>
+			<param-value>true</param-value>
+		</init-param>
+ 	</servlet>
   <!-- Define the ClassPathResourceServlet.
      - This servlet allows jWic application to reference 
      - images that are stored in the classpath (jar).
@@ -36,7 +43,10 @@
     <servlet-name>jwic</servlet-name>
     <url-pattern>*.xwic</url-pattern>
   </servlet-mapping>
-
+	<servlet-mapping>
+		<servlet-name>jwicres</servlet-name>
+		<url-pattern>/jwic/*</url-pattern>
+	</servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>cpres</servlet-name>
