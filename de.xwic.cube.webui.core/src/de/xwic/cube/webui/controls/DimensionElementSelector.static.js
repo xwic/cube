@@ -310,6 +310,8 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 			control.find('li a#title').parent().show();
 			//hide the template
 			control.find('#node-template').hide();
+			control.find('#node-template-no-expand').hide();
+			
 			//hide the icon
 			clearIcon.find(".j-listColSel-clearSearch").hide();
 			
