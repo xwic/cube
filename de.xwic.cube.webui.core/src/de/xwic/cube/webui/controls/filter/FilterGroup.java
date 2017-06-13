@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -62,12 +63,15 @@ public class FilterGroup  {
 	 * 
 	 */
 	public FilterGroup() {
-		filters = new HashMap<String, FilterState>();
+		filters = new LinkedHashMap<String, FilterState>();
 		listeners = new ArrayList<IFilterGroupListener>();
 		filterProfiles = new HashMap<String, String>();
 	}
 	
 	/**
+	 * Adds a new filter to the filter group.
+	 * The order in which the filters are added is the order in which applyFilter is executed.
+	 * 
 	 * @param filter
 	 */
 	public void addFilter(IFilter filter){
