@@ -11,7 +11,7 @@
 
     <groupId>de.xwic.cube</groupId>
     <artifactId>cube</artifactId>
-    <version>5.3.3-SNAPSHOT</version>
+    <version>5.3.3</version>
     <packaging>pom</packaging>
 
     <name>xWic - Cube Framework</name>
@@ -30,7 +30,7 @@
         <connection>scm:git:git@github.com:xwic/cube.git</connection>
         <developerConnection>scm:git:git@github.com:xwic/cube.git</developerConnection>
         <url>https://github.com/xwic/cube</url>
-        <tag>master</tag>
+        <tag>cube-5.3.3</tag>
     </scm>
     <developers>
         <developer>
