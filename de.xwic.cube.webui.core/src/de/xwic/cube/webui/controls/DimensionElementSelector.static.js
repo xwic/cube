@@ -166,6 +166,11 @@ Cube.DimensionElementSelector = (function($,util,Cube){
 				loading.show();
 				tree.html('');
 				load(controlId,function(resp){
+					if (loaded){
+						//another ajax request can reach to this point while the prev req is in progress
+						console.log("Discarded second ajax request on double click");
+						return;
+					}
 					var data = $.parseJSON(resp.responseText);
 					loaded = true;
 					loading.hide();
